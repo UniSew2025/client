@@ -22,16 +22,13 @@ function RenderHeaderButton({link, title}) {
     const navigate = useNavigate()
 
     return(
-        <Link
+        <Button
             className={"btn-link"}
-            component={"button"}
-            underline={"none"}
-            color={"textPrimary"}
-            sx={{fontWeight: "500", fontSize: '1.2rem', height: '100%', width: '9vw'}}
+            variant={"text"}
             onClick={() => navigate(link)}
         >
             {title}
-        </Link>
+        </Button>
     )
 }
 
