@@ -47,7 +47,6 @@ function RenderHeader() {
                 <RenderHeaderButton link={"/info/showroom"} title="Showroom"/>
             </div>
             <div className="header-buttons">
-                <Button variant={"outlined"} onClick={() => navigate("/sign-up")}>Sign up</Button>
                 <Button variant={"contained"} onClick={() => navigate("/sign-in")}>Sign in</Button>
             </div>
         </div>

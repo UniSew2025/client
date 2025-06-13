@@ -5,12 +5,12 @@ import {Grow} from "@mui/material";
 import WebAppUILayout from "./layouts/ui/WebAppUILayout.jsx";
 import Home from "./components/auth/Home.jsx";
 import SignIn from "./components/auth/SignIn.jsx";
-import Register from "./components/auth/SignUp.jsx";
 import {useEffect} from "react";
 import UniSewConsole from "./components/ui/UniSewConsole.jsx";
 import 'bootstrap/dist/css/bootstrap.min.css'
 import PlatformAdminLayout from "./layouts/platform_admin/PlatformAdminLayout.jsx";
 import PlatformAdminDashboard from "./components/platform_admin/PlatformAdminDashboard.jsx";
+import GoogleResponse from "./components/auth/GoogleResponse.jsx";
 
 const router = createBrowserRouter([
     {
@@ -30,11 +30,9 @@ const router = createBrowserRouter([
         )
     },
     {
-        path: "/sign-up",
+        path: "/google/result",
         element: (
-            <WebAppUILayout title={"Sign up"}>
-                <Register/>
-            </WebAppUILayout>
+            <GoogleResponse/>
         )
     },
     {
@@ -66,9 +64,10 @@ function App() {
     return (
         <SnackbarProvider
             maxSnack={4}
-            anchorOrigin={{vertical: 'top', horizontal: 'right'}}
+            anchorOrigin={{vertical: 'bottom', horizontal: 'right'}}
             autoHideDuration={1500}
-            TransitionComponent={Grow}>
+            TransitionComponent={Grow}
+        >
             <RouterProvider router={router}/>
         </SnackbarProvider>
     )
