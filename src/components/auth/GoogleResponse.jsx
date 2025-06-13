@@ -31,6 +31,7 @@ function HandleResponse(){
         Login(googleResponse.data.email).then(res => {
             if(res.status === 200){
                 enqueueSnackbar(res.data.message, {variant: "success"})
+                localStorage.setItem("user", JSON.stringify(res.data.data))
                 setTimeout(() => {
                     window.location.href = '/admin/dashboard'
                 }, 1500)

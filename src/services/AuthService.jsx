@@ -1,6 +1,5 @@
 import axiosClient from "../config/APIConfig.jsx";
 
-
 export const getGoogleUrl = async () => {
     const response = await axiosClient.get("/account/auth/google/url")
     return response ? response : null

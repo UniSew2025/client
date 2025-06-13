@@ -44,6 +44,10 @@ const signIn = async () => {
 
 function RenderPage() {
 
+    if(localStorage.length > 0) {
+        localStorage.clear()
+    }
+
     return (
         <div className="sign-in-container">
             <SignInPage
