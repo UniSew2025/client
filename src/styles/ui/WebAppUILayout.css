@@ -13,7 +13,8 @@
     align-items: center;
     position: fixed;
     top: 0;
-    z-index: 9999;
+    z-index: 3;
+    border-bottom: 1px solid #bdbcbc;
 }
 
 .header img {
@@ -47,6 +48,10 @@
 .btn-link {
     color: black !important;
     z-index: 1;
+    text-transform: capitalize !important;
+    font-size: 1.2rem !important;
+    font-weight: 500 !important;
+    border-radius: 10px !important;
 }
 
 /* body */

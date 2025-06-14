@@ -1,11 +1,13 @@
 import '../../styles/ui/WebAppUILayout.css'
-import {Button, Divider, Link, Typography} from "@mui/material";
+import {Button, Divider, Link, Typography, Menu, MenuItem} from "@mui/material";
+import {KeyboardArrowDown, KeyboardArrowUp} from '@mui/icons-material';
 import {useNavigate} from "react-router-dom";
+import {useState} from "react";
 
 function RenderFooterPolicyButton({link, title}) {
     const navigate = useNavigate()
 
-    return(
+    return (
         <Link
             component={"button"}
             variant={"body2"}
@@ -21,7 +23,7 @@ function RenderFooterPolicyButton({link, title}) {
 function RenderHeaderButton({link, title}) {
     const navigate = useNavigate()
 
-    return(
+    return (
         <Button
             className={"btn-link"}
             variant={"text"}
@@ -32,19 +34,73 @@ function RenderHeaderButton({link, title}) {
     )
 }
 
+function RenderHeaderMenuButton({title, children}) {
+    const navigate = useNavigate()
+    const [anchorEl, setAnchorEl] = useState(null)
+    const open = Boolean(anchorEl)
+
+    const handleClick = (e) => {
+        setAnchorEl(anchorEl === null ? e.currentTarget : null)
+    }
+
+    const handleCloseMenu = (link) => {
+        if(link !== null){
+            navigate(link)
+        }
+        setAnchorEl(null)
+    }
+
+    return (
+        <>
+            <Button
+                className={"btn-link"}
+                variant={"text"}
+                onClick={handleClick}
+                endIcon={open ? <KeyboardArrowUp fontSize={"medium"}/> : <KeyboardArrowDown fontSize={"large"}/>}
+            >
+                {title}
+            </Button>
+            <Menu
+                anchorEl={anchorEl}
+                open={open}
+                onClose={() => handleCloseMenu(null)}
+            >
+                {
+                    children.map((child, index) => (
+                        <MenuItem key={index} onClick={() => handleCloseMenu(child.link)}>{child.title}</MenuItem>
+                    ))
+                }
+            </Menu>
+        </>
+    )
+}
+
 function RenderHeader() {
     const navigate = useNavigate()
     return (
         <div className="header">
             <img src={"/logo_full.png"} alt="UniSew"/>
             <div className="header-content">
-                <RenderHeaderButton link={"/home"} title="Home"/>
-                <RenderHeaderButton link={"/info/about"} title="About"/>
-                <RenderHeaderButton link={"/info/contact"} title="Contact"/>
-                <RenderHeaderButton link={"/info/showroom"} title="Showroom"/>
+                <RenderHeaderButton
+                    link={"/home"}
+                    title="Home"
+                />
+                <RenderHeaderMenuButton
+                    title="Become Partner"
+                    children={[
+                        {
+                            link: '/partner/designer',
+                            title: 'Join Designer'
+                        },
+                        {
+                            link: '/partner/garment',
+                            title: 'Join Garment Factory'
+                        }
+                    ]}
+                />
             </div>
             <div className="header-buttons">
-                <Button variant={"contained"} onClick={() => navigate("/sign-in")}>Sign in</Button>
+                <Button variant={"outlined"} sx={{color: "black", borderColor: "black"}} onClick={() => navigate("/sign-in")}>Sign in</Button>
             </div>
         </div>
     )
@@ -72,9 +128,6 @@ function RenderFooter() {
                 <div className={"footer-item"}>
                     <Typography variant={"body1"} sx={{fontWeight: "bold", color: 'black'}}>Payment</Typography>
                     <img src={"/payos.png"} alt="PayOS"/>
-
-                    <Typography variant={"body1"} sx={{fontWeight: "bold", color: 'black', marginTop: "2vh"}}>Shipping</Typography>
-                    <img src={"/ghn.png"} alt="Giao hang nhanh"/>
                 </div>
             </div>
             <Divider/>
