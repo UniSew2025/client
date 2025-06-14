@@ -20,7 +20,7 @@ function CustomSignOutButton(){
     const navigate = useNavigate();
 
     return (
-        <IconButton color={"error"} size={"medium"} onClick={()=> navigate("/home")}>
+        <IconButton color={"error"} size={"medium"} onClick={()=> navigate("/sign-in")}>
             <Logout/>
         </IconButton>
     )

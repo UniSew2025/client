@@ -1,37 +1,7 @@
 import '../../styles/auth/SignIn.css'
-import {SignInPage} from "@toolpad/core";
-import {ReactRouterAppProvider} from "@toolpad/core/react-router";
-import {Typography} from "@mui/material";
+import {Button, Typography, Link} from "@mui/material";
+import {KeyboardBackspace} from '@mui/icons-material';
 import {getGoogleUrl} from "../../services/AuthService.jsx";
-
-/* init ui */
-const brand = {
-    logo: (
-        <img
-            src="/logo.png"
-            alt="UniSew"
-            width={50}
-            height={50}
-        />
-    ),
-    title: 'UniSew',
-}
-
-const providers = [
-    { id: 'google', name: 'Google' }
-]
-
-function CustomSubtitle(){
-    return (
-        <Typography variant={"body2"} sx={{marginBottom: '2vh'}}>UniSew</Typography>
-    )
-}
-
-function CustomTitle(){
-    return (
-        <Typography variant={"h4"} sx={{marginBottom: '0.5vh'}}>SIGN IN</Typography>
-    )
-}
 
 const signIn = async () => {
     const response = await getGoogleUrl()
@@ -40,7 +10,29 @@ const signIn = async () => {
     }
 }
 
-/* end init ui */
+function RenderLoginArea() {
+    return (
+        <div className={'sign-in-login-area-container'}>
+            <Typography variant={"h2"}>UniSew</Typography>
+            <Typography variant={"h6"}>Sign in to your account</Typography>
+            <Button
+                fullWidth
+                size={'medium'}
+                startIcon={<img src={'/google.png'} alt={'Google'} height={20} width={20}/>}
+                variant={"outlined"}
+                color={"inherit"}
+                onClick={signIn}
+            >
+                Continue with Google
+            </Button>
+            <div className={'d-flex align-items-end'}>
+                <KeyboardBackspace height={15} width={15} sx={{marginRight: '0.5vw'}}/>
+                <Link sx={{color: 'white', cursor: 'pointer'}} underline={"none"} href={'/home'}>Back to home</Link>
+            </div>
+
+        </div>
+    )
+}
 
 function RenderPage() {
 
@@ -49,24 +41,21 @@ function RenderPage() {
     }
 
     return (
-        <div className="sign-in-container">
-            <SignInPage
-                providers={providers}
-                slots={{
-                    subtitle: CustomSubtitle,
-                    title: CustomTitle,
-                }}
-                signIn={signIn}
-            />
+        <div className={'sign-in-main'}>
+            <div className={'sign-in-main-container'}>
+                <div className={'sign-in-login-area'}>
+                    <RenderLoginArea/>
+                </div>
+                <div className={'sign-in-img-area'}>
+                    <img src={"/unisew.jpg"} alt={'UniSew'}/>
+                </div>
+            </div>
         </div>
     )
 }
 
 export default function SignIn() {
-
     return (
-        <ReactRouterAppProvider branding={brand}>
-            <RenderPage/>
-        </ReactRouterAppProvider>
+        <RenderPage/>
     )
 }
