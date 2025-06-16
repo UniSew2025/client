@@ -1,8 +1,10 @@
 import '../../styles/ui/WebAppUILayout.css'
 import {Button, Divider, Link, Typography, Menu, MenuItem} from "@mui/material";
-import {KeyboardArrowDown, KeyboardArrowUp} from '@mui/icons-material';
+import {KeyboardArrowDown, KeyboardArrowUp, AccountCircle} from '@mui/icons-material';
 import {useNavigate} from "react-router-dom";
 import {useState} from "react";
+
+const existedUser = localStorage.getItem("user") && JSON.parse(localStorage.getItem("user")).role === "school";
 
 function RenderFooterPolicyButton({link, title}) {
     const navigate = useNavigate()
@@ -44,7 +46,7 @@ function RenderHeaderMenuButton({title, children}) {
     }
 
     const handleCloseMenu = (link) => {
-        if(link !== null){
+        if (link !== null) {
             navigate(link)
         }
         setAnchorEl(null)
@@ -75,6 +77,50 @@ function RenderHeaderMenuButton({title, children}) {
     )
 }
 
+function RenderHeaderProfileButton({title, children}) {
+    const navigate = useNavigate()
+    const [anchorEl, setAnchorEl] = useState(null)
+    const open = Boolean(anchorEl)
+
+    const handleClick = (e) => {
+        setAnchorEl(anchorEl === null ? e.currentTarget : null)
+    }
+
+    const handleCloseMenu = (link) => {
+        if (link !== null) {
+            navigate(link)
+        }
+        setAnchorEl(null)
+    }
+
+    return (
+        <>
+            <Button
+                className={"btn-link"}
+                variant={"text"}
+                onClick={handleClick}
+                endIcon={<AccountCircle/>}
+                sx={{color: "black"}}
+            >
+                {title}
+            </Button>
+            <Menu
+                anchorOrigin={{vertical: 'bottom', horizontal: 'right'}}
+                transformOrigin={{vertical: 'top', horizontal: 'right'}}
+                anchorEl={anchorEl}
+                open={open}
+                onClose={() => handleCloseMenu(null)}
+            >
+                {
+                    children.map((child, index) => (
+                        <MenuItem key={index} onClick={() => handleCloseMenu(child.link)}>{child.title}</MenuItem>
+                    ))
+                }
+            </Menu>
+        </>
+    )
+}
+
 function RenderHeader() {
     const navigate = useNavigate()
     return (
@@ -85,22 +131,52 @@ function RenderHeader() {
                     link={"/home"}
                     title="Home"
                 />
-                <RenderHeaderMenuButton
-                    title="Become Partner"
-                    children={[
-                        {
-                            link: '/partner/designer',
-                            title: 'Join Designer'
-                        },
-                        {
-                            link: '/partner/garment',
-                            title: 'Join Garment Factory'
-                        }
-                    ]}
-                />
+                {existedUser && (
+                    <RenderHeaderButton
+                        link={"/school"}
+                        title="Create Design Request"
+                    />
+                )}
+                {!existedUser && (
+                    <RenderHeaderMenuButton
+                        title="Become Partner"
+                        children={[
+                            {
+                                link: '/partner/designer',
+                                title: 'Join Designer'
+                            },
+                            {
+                                link: '/partner/garment',
+                                title: 'Join Garment Factory'
+                            }
+                        ]}
+                    />
+                )}
             </div>
             <div className="header-buttons">
-                <Button variant={"outlined"} sx={{color: "black", borderColor: "black"}} onClick={() => navigate("/sign-in")}>Sign in</Button>
+                {!existedUser ? (
+                    <Button variant={"outlined"} sx={{color: "black", borderColor: "black"}}
+                            onClick={() => navigate("/sign-in")}>Sign in</Button>
+                ) : (
+                    <RenderHeaderProfileButton
+                        title={
+                            JSON.parse(localStorage.getItem("user")).email
+                        }
+                        children={
+                            [
+                                {
+                                    link: '/school-profile',
+                                    title: 'Profile'
+                                },
+                                {
+                                    link: '/sign-in',
+                                    title: 'Sign out'
+                                }
+                            ]
+                        }
+                    />
+                )}
+
             </div>
         </div>
     )

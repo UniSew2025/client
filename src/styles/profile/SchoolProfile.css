@@ -1,0 +1,27 @@
+.school-profile-page {
+    min-height: 100vh;
+    background: #f6fafd;
+}
+.school-banner {
+    width: 100%;
+    min-height: 200px;
+    position: relative;
+    background-color: #eaeaea;
+    border-bottom: 1px solid #e3e3e3;
+}
+.school-avatar-box img {
+    box-shadow: 0 2px 16px rgba(30,191,115,.11);
+}
+@media (max-width: 767px) {
+    .school-banner {
+        min-height: 120px;
+    }
+    .school-avatar-box {
+        left: 12px !important;
+        bottom: -36px !important;
+    }
+    .school-avatar-box img {
+        width: 66px !important;
+        height: 66px !important;
+    }
+}

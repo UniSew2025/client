@@ -32,9 +32,23 @@ function HandleResponse(){
             if(res.status === 200){
                 enqueueSnackbar(res.data.message, {variant: "success"})
                 localStorage.setItem("user", JSON.stringify(res.data.data))
-                setTimeout(() => {
-                    window.location.href = '/admin/dashboard'
-                }, 1500)
+                switch (res.data.data.role){
+                    case "admin":
+                        setTimeout(() => {
+                            window.location.href = '/admin/dashboard'
+                        }, 1500)
+                        break;
+                    case "school":
+                        setTimeout(() => {
+                            window.location.href = '/home'
+                        }, 1500)
+                        break;
+                    default:
+                        setTimeout(() => {
+                            window.location.href = '/sign-in'
+                        }, 1500)
+                        break;
+                }
             }
         }).catch(err => {
             enqueueSnackbar(err.response.data.message, {variant: "error"})
