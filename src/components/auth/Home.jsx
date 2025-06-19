@@ -1,17 +1,17 @@
 import '../../styles/auth/Home.css';
 import { Container, Row, Col, Button, Carousel, Card } from 'react-bootstrap';
-import heroBg from '../../assets/homepage_background.jpg'
+import heroBg from '../../assets/sewing.jpg'
 
 function HeroSection() {
     return (
-        <section className="fiverr-hero d-flex align-items-center" style={{ backgroundImage: `url(${heroBg})` }}>
+        <section className="uni-hero d-flex align-items-center" style={{ backgroundImage: `url(${heroBg})` }}>
             <Container>
                 <Row>
                     <Col md={7} className="hero-content">
                         <h1 className="display-4 fw-bold text-white mb-4">Find the right service, right away</h1>
                         <form className="d-flex mb-3">
                             <input className="form-control rounded-start-pill" placeholder="Search for any service" />
-                            <Button variant="success" className="rounded-end-pill px-4 fw-bold">Search</Button>
+                            <Button variant="primary" className="rounded-end-pill px-4 fw-bold">Search</Button>
                         </form>
                         <div className="text-white small">
                             Popular:&nbsp;
@@ -41,11 +41,11 @@ function TrustedBySection() {
 
 function PopularServicesSection() {
     const services = [
-        { img: '/designer.jpg', label: 'Adam', desc: 'Customize your uniform' },
-        { img: '/designer.jpg', label: 'Eva', desc: 'Customize your uniform' },
-        { img: '/designer.jpg', label: 'Saber', desc: 'Customize your uniform' },
-        { img: '/designer.jpg', label: 'Cartethyia', desc: 'Customize your uniform' },
-        { img: '/designer.jpg', label: 'Chisa', desc: 'Customize your uniform' },
+        { img: '/designer.jpg', label: 'Adam', desc: 'Uni Pro' },
+        { img: '/designer.jpg', label: 'Eva', desc: 'Uni Pro' },
+        { img: '/designer.jpg', label: 'Saber', desc: 'Uni Pro' },
+        { img: '/designer.jpg', label: 'Cartethyia', desc: 'Uni Pro' },
+        { img: '/designer.jpg', label: 'Chisa', desc: 'Uni Pro' },
     ];
     return (
         <section className="popular-services py-5">
@@ -105,14 +105,14 @@ function HowItWorksSection() {
 
 function FeaturedCategoriesSection() {
     const categories = [
-        { img: '/designer.jpg', title: 'Garment Factory A' },
-        { img: '/designer.jpg', title: 'Garment Factory B' },
-        { img: '/designer.jpg', title: 'Garment Factory C' },
-        { img: '/designer.jpg', title: 'Garment Factory D' },
-        { img: '/designer.jpg', title: 'Garment Factory E' },
-        { img: '/designer.jpg', title: 'Garment Factory F' },
-        { img: '/designer.jpg', title: 'Garment Factory G' },
-        { img: '/designer.jpg', title: 'Garment Factory H' },
+        { img: '/JG.png', title: 'Jiayung' },
+        { img: '/stussy.png', title: 'Stussy' },
+        { img: '/broklyn.jpg', title: 'Broklyn' },
+        { img: '/blossom.png', title: 'Blossom' },
+        { img: '/cosy.jpg', title: 'Cosy' },
+        { img: '/hollister.png', title: 'Hollister' },
+        { img: '/lismiknits.jpg', title: 'Lismiknits' },
+        { img: '/Valentino.png', title: 'Valentino' },
     ];
     return (
         <section className="featured-categories py-5">
@@ -205,20 +205,20 @@ function CTABottomSection() {
             <Container>
                 <h2 className="mb-3 fw-bold">Ready to get started?</h2>
                 <p className="mb-4">Join thousands of businesses using UniSew to get work done.</p>
-                <Button variant="success" size="lg" className="fw-bold px-5">Join UniSew</Button>
+                <Button variant="primary" size="lg" className="fw-bold px-5">Join UniSew</Button>
             </Container>
         </section>
     );
 }
 
-function FiverrProSection() {
+function UnisewProSection() {
     return (
-        <section className="fiverr-pro-section py-5 bg-white border-top border-bottom">
+        <section className="uni-pro-section py-5 bg-white border-top border-bottom">
             <div className="container">
                 <div className="row align-items-center flex-column-reverse flex-lg-row">
                     {/* Left content */}
                     <div className="col-lg-6 col-12 mt-4 mt-lg-0">
-                        <h2 className="fw-bold mb-3" style={{ color: '#1dbf73' }}>UniSew Pro</h2>
+                        <h2 className="fw-bold mb-3" style={{ color: '#034efc' }}>UniSew Pro</h2>
                         <h5 className="mb-4">The premium solution for businesses</h5>
                         <ul className="list-unstyled mb-4">
                             <li className="mb-3 d-flex">
@@ -252,7 +252,7 @@ function FiverrProSection() {
                         </ul>
                         <a
                             href="#"
-                            className="btn btn-success btn-lg px-5"
+                            className="btn btn-primary btn-lg px-5"
                             style={{ borderRadius: 40, fontWeight: 600 }}
                         >
                             Try now &rarr;
@@ -262,7 +262,7 @@ function FiverrProSection() {
                     <div className="col-lg-6 col-12 text-center">
                         <img
                             src="/pro.jpg"
-                            alt="Fiverr Pro"
+                            alt="Unisew Pro"
                             className="img-fluid rounded"
                             style={{ maxHeight: 330, objectFit: 'cover' }}
                         />
@@ -365,7 +365,7 @@ function RenderPage() {
             <PopularServicesSection />
             <FeaturedCategoriesSection />
             <HowItWorksSection />
-            <FiverrProSection />
+            <UnisewProSection />
             <TestimonialsSection />
             <BusinessSolutionsSection />
             <CTABottomSection />

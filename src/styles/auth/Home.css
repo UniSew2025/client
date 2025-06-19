@@ -1,18 +1,18 @@
-.fiverr-hero {
+.uni-hero {
     min-height: 440px;
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
 }
-.fiverr-hero .hero-content {
+.uni-hero .hero-content {
     padding-top: 80px;
 }
-.fiverr-hero .hero-popular-link {
+.uni-hero .hero-popular-link {
     color: #e4e3e3;
     text-decoration: underline;
     cursor: pointer;
 }
-.fiverr-hero .hero-popular-link:hover {
+.uni-hero .hero-popular-link:hover {
     color: #fff;
 }
 
@@ -54,17 +54,17 @@
 .cta-bottom {
     background: #232323;
 }
-.fiverr-pro-section {
+.uni-pro-section {
     background: #fff;
 }
-.fiverr-pro-section h2 {
+.uni-pro-section h2 {
     color: #1dbf73;
 }
-.fiverr-pro-section ul li span {
+.uni-pro-section ul li span {
     color: #1dbf73;
 }
 @media (max-width: 992px) {
-    .fiverr-pro-section .col-lg-6 {
+    .uni-pro-section .col-lg-6 {
         margin-bottom: 2rem;
     }
 }

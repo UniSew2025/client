@@ -5,6 +5,11 @@ import {useNavigate} from "react-router-dom";
 import {useState} from "react";
 
 const existedUser = localStorage.getItem("user") && JSON.parse(localStorage.getItem("user")).role === "school";
+const userRole = existedUser ? JSON.parse(localStorage.getItem("user")).role : null;
+const profileLink = userRole === 'school' ? '/school-profile'
+    : userRole === 'designer' ? '/designer-profile'
+        : userRole === 'garment' ? '/garment-profile'
+            : '/';
 
 function RenderFooterPolicyButton({link, title}) {
     const navigate = useNavigate()
@@ -165,7 +170,7 @@ function RenderHeader() {
                         children={
                             [
                                 {
-                                    link: '/school-profile',
+                                    link: profileLink,
                                     title: 'Profile'
                                 },
                                 {
