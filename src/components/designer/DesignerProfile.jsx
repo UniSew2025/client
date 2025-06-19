@@ -1,231 +1,317 @@
-import { useState } from "react";
-import '../../styles/profile/DesignerProfile.css'
-
-const demoUser = {
-    name: "Linh Nguyen",
-    avatar: "https://thietkewebchuyen.com/wp-content/uploads/logo-avatar-free-fire-cute-2.jpg",
-    banner: "https://png.pngtree.com/thumb_back/fh260/background/20221011/pngtree-blue-gold-background-banner-idea-modern-simple-free-download-image_1467602.jpg",
-    role: "Graphic Designer",
-    location: "Hanoi, Vietnam",
-    online: true,
-    joined: "Joined Jan 2022",
-    description:
-        "Hi! I'm Linh, a passionate graphic designer with over 5 years of experience in logo, branding and UI/UX. Let's work together to make your vision come true!",
-    stats: {
-        completed: "98%",
-        response: "1 Hour",
-        delivered: "On Time",
-        repeat: "21%"
-    },
-    gigs: [
-        {
-            id: 1,
-            title: "I will design a professional modern logo",
-            img: "/assets/demo-gig1.jpg",
-            price: 50,
-            rating: 5,
-            sold: 120
-        },
-        {
-            id: 2,
-            title: "I will create outstanding brand guidelines",
-            img: "/assets/demo-gig2.jpg",
-            price: 70,
-            rating: 4.9,
-            sold: 80
-        }
-    ],
-    reviews: [
-        {
-            id: 1,
-            user: "Alice B.",
-            avatar: "/assets/demo-ava1.jpg",
-            rating: 5,
-            text: "Amazing work! Fast, creative, and professional.",
-            date: "Apr 2024"
-        },
-        {
-            id: 2,
-            user: "Tom K.",
-            avatar: "/assets/demo-ava2.jpg",
-            rating: 5,
-            text: "Perfect branding guideline, will order again.",
-            date: "Mar 2024"
-        }
-    ]
-};
+import React, {useState} from "react";
+import {useLocation, useNavigate} from "react-router-dom";
+import '../../styles/profile/DesignerProfile.css';
+import {
+    Button,
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogActions,
+    Typography,
+    Box,
+    ListItemText,
+    CircularProgress,
+    ListItem,
+    List,
+    IconButton,
+    ListItemSecondaryAction,
+    Table,
+    TableHead,
+    TableRow,
+    TableCell,
+    TableBody
+} from "@mui/material";
+import {chooseDesignPackage, getClothByRequestId, viewListHistory} from "../../services/DesignService.jsx";
+import VisibilityIcon from "@mui/icons-material/Visibility";
 
 export default function DesignerProfile() {
-    const [user] = useState(demoUser);
+
+    const [selectedPackage, setSelectedPackage] = useState(null);
+    const [openDialog, setOpenDialog] = useState(false);
+    const [openRequestDialog, setOpenRequestDialog] = useState(false);
+    const [requestList, setRequestList] = useState([]);
+    const [loadingRequests, setLoadingRequests] = useState(false);
+    const [openDetailDialog, setOpenDetailDialog] = useState(false);
+    const [clothList, setClothList] = useState([]);
+    const [selectedRequestId, setSelectedRequestId] = useState(null);
+    const navigate = useNavigate();
+
+    const location = useLocation();
+    const designer = location.state?.designer;
+
+
+    if (!designer) {
+        return <div style={{padding: 40}}>No designer data found.</div>;
+    }
+    const handleSelectPackage = (pkg) => {
+        setSelectedPackage(pkg);
+        setOpenDialog(true);
+    };
+
+    const handleConfirmPay = async () => {
+        setLoadingRequests(true);
+        setOpenRequestDialog(true);
+        try {
+            const res = await viewListHistory();
+            const createdRequests = res.data.filter(item => item.status === "CREATED" && item.package == null);
+            setRequestList(createdRequests);
+        } catch (error) {
+            console.error("Failed to fetch requests:", error);
+        } finally {
+            setLoadingRequests(false);
+        }
+    };
+
+    const handleViewRequestDetail = async (requestId) => {
+        try {
+            setSelectedRequestId(requestId);
+            const res = await getClothByRequestId(requestId);
+            setClothList(res);
+            setOpenDetailDialog(true);
+        } catch (err) {
+            console.error("Failed to fetch cloths", err);
+        }
+    };
+
+    const handleChooseRequest = async () => {
+        try {
+            const res = await chooseDesignPackage({
+                designRequestId: selectedRequestId,
+                packageId: selectedPackage.id
+            });
+
+            console.log("Package selected successfully:", res);
+            setOpenDetailDialog(false);
+            setOpenDialog(false);
+            alert("You have successfully selected a package!");
+        } catch (error) {
+            console.error("Error choosing package:", error);
+            alert("Failed to choose package");
+        }
+    };
+
+    const handleCreateRequest = () => {
+
+        navigate("/school");
+    }
+
 
     return (
         <div className="profile-page bg-light pb-5">
-            {/* Banner + avatar */}
             <div
                 className="profile-banner"
                 style={{
-                    backgroundImage: `url(${user.banner})`,
+                    backgroundImage: `url(https://png.pngtree.com/thumb_back/fh260/background/20221011/pngtree-blue-gold-background-banner-idea-modern-simple-free-download-image_1467602.jpg)`,
                     backgroundSize: "cover",
                     backgroundPosition: "center",
                     height: 240,
                     position: "relative"
                 }}
             >
-                <div
-                    className="profile-avatar-box"
-                    style={{
-                        position: "absolute",
-                        left: 40,
-                        bottom: -50,
-                        display: "flex",
-                        alignItems: "center"
-                    }}
-                >
+                <div className="profile-avatar-box"
+                     style={{position: "absolute", left: 40, bottom: -50, display: "flex", alignItems: "center"}}>
                     <img
-                        src={user.avatar}
+                        src={designer.profile.avatar}
                         alt="Avatar"
                         className="rounded-circle border border-4 border-white shadow"
-                        style={{ width: 100, height: 100, objectFit: "cover" }}
+                        style={{width: 100, height: 100, objectFit: "cover"}}
                     />
                     <div className="ms-4 d-none d-md-block">
-                        <h2 className="fw-bold mb-1">{user.name}</h2>
-                        <div className="text-muted mb-1">{user.role}</div>
+                        <h2 className="fw-bold mb-1">{designer.profile.name}</h2>
+                        <div className="text-muted mb-1">Graphic Designer</div>
                         <div className="d-flex align-items-center gap-3">
-              <span className="me-2" style={{ color: "#1dbf73", fontWeight: 600 }}>
-                {user.online ? "● Online" : "● Offline"}
-              </span>
-                            <span>
-                <i className="bi bi-geo-alt-fill me-1"></i>
-                                {user.location}
-              </span>
-                            <span className="text-muted">{user.joined}</span>
+                            <span><i className="bi bi-geo-alt-fill me-1"></i>Vietnam</span>
+                            <span className="text-muted">Joined 2022</span>
                         </div>
                     </div>
                 </div>
             </div>
-            <div className="container" style={{ marginTop: 70 }}>
+
+            <div className="container" style={{marginTop: 70}}>
                 <div className="row">
-                    {/* Main content */}
                     <div className="col-lg-8">
-                        {/* Thông tin ngắn cho mobile */}
-                        <div className="d-block d-md-none text-center mb-4 mt-2">
-                            <h2 className="fw-bold mb-1">{user.name}</h2>
-                            <div className="text-muted mb-1">{user.role}</div>
-                            <div className="d-flex justify-content-center align-items-center gap-3 mb-2">
-                <span className="me-2" style={{ color: "#1dbf73", fontWeight: 600 }}>
-                  {user.online ? "● Online" : "● Offline"}
-                </span>
-                                <span>
-                  <i className="bi bi-geo-alt-fill me-1"></i>
-                                    {user.location}
-                </span>
-                                <span className="text-muted">{user.joined}</span>
-                            </div>
-                        </div>
-                        {/* Action */}
                         <div className="mb-4 d-flex gap-3">
-                            <button className="btn btn-outline-secondary rounded-pill fw-semibold px-4">
-                                Edit Profile
-                            </button>
                             <button className="btn btn-success rounded-pill fw-semibold px-4">
                                 Contact
                             </button>
                         </div>
-                        {/* About */}
+
                         <div className="mb-4">
                             <h5 className="fw-bold mb-2">About</h5>
-                            <p className="text-dark">{user.description}</p>
+                            <p className="text-dark">{designer.bio}</p>
                         </div>
-                        {/* Gigs/Portfolio */}
                         <div className="mb-4">
-                            <h5 className="fw-bold mb-3">Gigs</h5>
+                            <h5 className="fw-bold mb-2">My Portfolio</h5>
+                        </div>
+
+                        <div className="mb-4">
+                            <h5 className="fw-bold mb-3">Packages</h5>
                             <div className="row g-3">
-                                {user.gigs.map((gig) => (
-                                    <div className="col-md-6" key={gig.id}>
+                                {designer.package?.map(pkg => (
+                                    <div className="col-md-6" key={pkg.id}>
                                         <div className="card h-100 shadow-sm">
-                                            <img
-                                                src={gig.img}
-                                                alt={gig.title}
-                                                className="card-img-top"
-                                                style={{ height: 140, objectFit: "cover" }}
-                                            />
                                             <div className="card-body">
-                                                <h6 className="card-title fw-semibold">{gig.title}</h6>
-                                                <div className="d-flex align-items-center mb-2">
-                          <span className="badge bg-success me-2">
-                            ★ {gig.rating}
-                          </span>
-                                                    <span className="text-muted">{gig.sold} sold</span>
-                                                </div>
-                                                <div>
-                          <span className="fw-bold text-success">
-                            ${gig.price}
-                          </span>
-                                                </div>
+                                                <h6 className="card-title fw-semibold">{pkg.name}</h6>
+                                                <div className="text-muted small mb-2">{pkg.header_content}</div>
+                                                <div><strong>Fee:</strong> ${pkg.fee}</div>
+                                                <div><strong>Delivery:</strong> {pkg.delivery_duration} days</div>
+                                                <div><strong>Revisions:</strong> {pkg.revision_time}</div>
+                                            </div>
+                                            <div className="card-footer d-flex justify-content-center">
+                                                <Button variant="outlined" onClick={() => handleSelectPackage(pkg)}>
+                                                    Select
+                                                </Button>
                                             </div>
                                         </div>
                                     </div>
                                 ))}
                             </div>
                         </div>
-                        {/* Reviews */}
-                        <div>
-                            <h5 className="fw-bold mb-3">Reviews</h5>
-                            <div>
-                                {user.reviews.map((review) => (
-                                    <div
-                                        className="d-flex mb-4 border-bottom pb-3"
-                                        key={review.id}
-                                    >
-                                        <img
-                                            src={review.avatar}
-                                            alt={review.user}
-                                            className="rounded-circle me-3"
-                                            width={48}
-                                            height={48}
-                                            style={{ objectFit: "cover" }}
-                                        />
-                                        <div>
-                                            <div className="fw-semibold">{review.user}</div>
-                                            <div className="mb-1 text-warning">
-                                                {"★".repeat(Math.round(review.rating))}
-                                                {"☆".repeat(5 - Math.round(review.rating))}
-                                            </div>
-                                            <div className="text-muted mb-1" style={{ fontSize: 14 }}>
-                                                {review.date}
-                                            </div>
-                                            <div>{review.text}</div>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
+
+                        <div className="text-muted">/* Reviews section /</div>
                     </div>
-                    {/* Sidebar Stats */}
+
                     <div className="col-lg-4 mt-4 mt-lg-0">
                         <div className="card p-4 shadow-sm mb-4">
                             <h6 className="fw-bold mb-3">Profile Stats</h6>
                             <div className="d-flex justify-content-between mb-2">
                                 <span>Orders Completed</span>
-                                <span className="fw-semibold text-success">{user.stats.completed}</span>
+                                <span className="fw-semibold text-success">98%</span>
                             </div>
                             <div className="d-flex justify-content-between mb-2">
                                 <span>Response Time</span>
-                                <span>{user.stats.response}</span>
+                                <span>1 Hour</span>
                             </div>
                             <div className="d-flex justify-content-between mb-2">
                                 <span>Delivered on Time</span>
-                                <span>{user.stats.delivered}</span>
+                                <span>On Time</span>
                             </div>
                             <div className="d-flex justify-content-between">
                                 <span>Repeat Clients</span>
-                                <span>{user.stats.repeat}</span>
+                                <span>21%</span>
                             </div>
                         </div>
-                        {/* Thêm các phần sidebar khác nếu cần */}
                     </div>
                 </div>
             </div>
+
+            <Dialog open={openDialog} onClose={() => setOpenDialog(false)} maxWidth="sm" fullWidth>
+                <DialogTitle>Confirm Your Package</DialogTitle>
+                <DialogContent dividers>
+                    {selectedPackage && (
+                        <Box>
+                            <Typography variant="h6">{selectedPackage.name}</Typography>
+                            <Typography variant="body2" gutterBottom color="text.secondary">
+                                {selectedPackage.header_content}
+                            </Typography>
+                            <Typography><strong>Fee:</strong> ${selectedPackage.fee}</Typography>
+                            <Typography><strong>Delivery:</strong> {selectedPackage.delivery_duration} days</Typography>
+                            <Typography><strong>Revisions:</strong> {selectedPackage.revision_time}</Typography>
+                        </Box>
+                    )}
+                </DialogContent>
+                <DialogActions sx={{justifyContent: "space-between", px: 3}}>
+                    <Typography variant="h6" fontWeight="bold">
+                        Total: ${selectedPackage?.fee || 0}
+                    </Typography>
+                    <Button variant="contained" onClick={handleConfirmPay}>
+                        Confirm
+                    </Button>
+                </DialogActions>
+            </Dialog>
+
+            <Dialog open={openRequestDialog} onClose={() => setOpenRequestDialog(false)} maxWidth="sm" fullWidth>
+                <DialogTitle>Select a Design Request</DialogTitle>
+                <DialogContent dividers>
+                    {loadingRequests ? (
+                        <Box display="flex" justifyContent="center" alignItems="center" p={2}>
+                            <CircularProgress/>
+                        </Box>
+                    ) : requestList.length === 0 ? (
+                        <div>
+                            <Typography>No request with status found.</Typography>
+                            <Button onClick={handleCreateRequest}>Crete new Request</Button>
+                        </div>
+                    ) : (
+                        <List>
+                            {requestList.map((req) => (
+                                <ListItem button key={req.id}>
+                                    <ListItemText
+                                        primary={`Request ID: ${req.id}`}
+                                        secondary={`Private: ${req.private ? "Yes" : "No"} | School: ${req.school}`}
+                                    />
+                                    <ListItemSecondaryAction>
+                                        <IconButton
+                                            edge="end"
+                                            onClick={() => handleViewRequestDetail(req.id)}
+                                        >
+                                            <VisibilityIcon />
+                                        </IconButton>
+                                    </ListItemSecondaryAction>
+                                </ListItem>
+                            ))}
+                        </List>
+                    )}
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setOpenRequestDialog(false)}>Cancel</Button>
+                </DialogActions>
+            </Dialog>
+
+            <Dialog open={openDetailDialog} onClose={() => setOpenDetailDialog(false)} maxWidth="md" fullWidth>
+                <DialogTitle>Cloth Details</DialogTitle>
+                <DialogContent dividers>
+                    <Table size="small">
+                        <TableHead>
+                            <TableRow>
+                                <TableCell>Category</TableCell>
+                                <TableCell>Type</TableCell>
+                                <TableCell>Color</TableCell>
+                                <TableCell>Logo Pos</TableCell>
+                                <TableCell>Logo Img</TableCell>
+                                <TableCell>Logo Width</TableCell>
+                                <TableCell>Logo Height</TableCell>
+                                <TableCell>Note</TableCell>
+                            </TableRow>
+                        </TableHead>
+                        <TableBody>
+                            {clothList.map((cloth, idx) => (
+                                <TableRow key={idx}>
+                                    <TableCell>{cloth.cloth_category}</TableCell>
+                                    <TableCell>{cloth.cloth_type}</TableCell>
+                                    <TableCell>{cloth.color}</TableCell>
+                                    <TableCell>{cloth.logo_position}</TableCell>
+                                    <TableCell>
+                                        {cloth.logo_image ? (
+                                            <img
+                                                src={cloth.logo_image}
+                                                alt="Logo"
+                                                style={{ width: '50px', height: 'auto' }}
+                                            />
+                                        ) : (
+                                            <span style={{ display: 'none' }}></span>
+                                        )}
+                                    </TableCell>
+                                    <TableCell>{cloth.logo_width}</TableCell>
+                                    <TableCell>{cloth.logo_height}</TableCell>
+                                    <TableCell>{cloth.note}</TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setOpenDetailDialog(false)}>Close</Button>
+
+                    <Button
+                        variant="contained"
+                        color="primary"
+                        onClick={handleChooseRequest}
+                    >
+                        Choose
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </div>
     );
 }

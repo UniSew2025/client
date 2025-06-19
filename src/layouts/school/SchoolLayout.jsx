@@ -3,6 +3,16 @@ import DashBoardWebUILayout from "../ui/DashBoardWebUILayout.jsx";
 const navigation = [
     {
         type: "caption",
+        label: "My Design",
+    },
+    {
+        type: "sub",
+        label: "Design History",
+        segment: "/design-request/history",
+    },
+
+    {
+        type: "caption",
         label: "My Orders",
     },
     {

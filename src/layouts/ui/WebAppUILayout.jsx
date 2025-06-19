@@ -1,6 +1,6 @@
 import '../../styles/ui/WebAppUILayout.css'
-import {Button, Divider, Link, Typography, Menu, MenuItem} from "@mui/material";
-import {KeyboardArrowDown, KeyboardArrowUp, AccountCircle} from '@mui/icons-material';
+import {Button, Divider, Link, Menu, MenuItem, Typography,} from "@mui/material";
+import {AccountCircle, KeyboardArrowDown, KeyboardArrowUp} from '@mui/icons-material';
 import {useNavigate} from "react-router-dom";
 import {useState} from "react";
 
@@ -136,12 +136,6 @@ function RenderHeader() {
                     link={"/home"}
                     title="Home"
                 />
-                {existedUser && (
-                    <RenderHeaderButton
-                        link={"/school"}
-                        title="Create Design Request"
-                    />
-                )}
                 {!existedUser && (
                     <RenderHeaderMenuButton
                         title="Become Partner"
