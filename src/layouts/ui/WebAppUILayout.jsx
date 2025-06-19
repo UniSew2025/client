@@ -129,7 +129,7 @@ function RenderHeaderProfileButton({title, children}) {
 function RenderHeader() {
     const navigate = useNavigate()
     return (
-        <div className="header">
+        <div className="home-header">
             <img src={"/logo_full.png"} alt="UniSew"/>
             <div className="header-content">
                 <RenderHeaderButton
@@ -165,7 +165,8 @@ function RenderHeader() {
                 ) : (
                     <RenderHeaderProfileButton
                         title={
-                            JSON.parse(localStorage.getItem("user")).email
+                            // JSON.parse(localStorage.getItem("user")).email
+                            ""
                         }
                         children={
                             [
@@ -191,7 +192,7 @@ function RenderFooter() {
     const today = new Date();
 
     return (
-        <div className={"footer"}>
+        <div className={"home-footer"}>
             <div className={"footer-content"}>
                 <img src={"/logo_full.png"} alt="UniSew"/>
                 <div className={"footer-item"}>
@@ -222,9 +223,9 @@ function RenderFooter() {
 function RenderPage({children, title}) {
     document.title = title;
     return (
-        <div className={"main"}>
+        <div className={"home-main"}>
             <RenderHeader/>
-            <div className={"body"}>
+            <div className={"home-body"}>
                 {children}
             </div>
             <RenderFooter/>

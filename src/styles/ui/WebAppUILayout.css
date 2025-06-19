@@ -1,10 +1,10 @@
 /* main */
-.main {
+.home-main {
     overflow: hidden;
 }
 
 /* header */
-.header {
+.home-header {
     background-color: white;
     height: 10vh;
     width: 100vw;
@@ -17,7 +17,7 @@
     border-bottom: 1px solid #bdbcbc;
 }
 
-.header img {
+.home-header img {
     height: 20vh;
     flex: 0.5;
     margin-left: 2vw;
@@ -64,16 +64,17 @@
 }
 
 /* body */
-.body {
+.home-body {
     width: 100vw;
     margin-top: 10vh;
     margin-bottom: 1vh;
-    max-height: 500vh;
+    max-height: 10000vh;
 }
 
 /* footer */
-.footer {
+.home-footer {
     background-color: white;
+    border-top: 1px solid rgba(225, 221, 221, 0.6);
     width: 100vw;
     height: 60vh;
 }

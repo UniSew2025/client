@@ -1,6 +1,7 @@
 import '../../styles/auth/Home.css';
 import { Container, Row, Col, Button, Carousel, Card } from 'react-bootstrap';
 import heroBg from '../../assets/sewing.jpg'
+import {enqueueSnackbar} from "notistack";
 
 function HeroSection() {
     return (
@@ -356,6 +357,12 @@ function ExpertTrustSection() {
 
 
 function RenderPage() {
+    if(localStorage.getItem("message") && localStorage.getItem("variant")){
+        enqueueSnackbar(localStorage.getItem("message"), {variant: localStorage.getItem("variant")})
+        localStorage.removeItem("message")
+        localStorage.removeItem("variant")
+    }
+
     return (
         <>
             <HeroSection />
