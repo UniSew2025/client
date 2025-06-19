@@ -13,6 +13,8 @@ import GoogleResponse from "./components/auth/GoogleResponse.jsx";
 import SignIn from "./components/auth/SignIn.jsx";
 import DesignerProfile from "./components/designer/DesignerProfile.jsx";
 import SchoolProfile from "./components/school/SchoolProfile.jsx";
+import RequestHistory from "./components/designer/RequestHistory.jsx";
+import DesignerList from "./components/designer/DesignerList.jsx";
 import SchoolOrder from "./components/school/SchoolOrder.jsx";
 import SchoolLayout from "./layouts/school/SchoolLayout.jsx";
 
@@ -43,7 +45,10 @@ const router = createBrowserRouter([
         children: [
             {
                 index: true,
-                element: <Navigate to={"/school/order"}/>
+                element: <Navigate to={"/school/design"}/>
+            },{
+                path: 'design',
+                element: <RequestHistory/>
             },
             {
                 path: 'order',
@@ -69,6 +74,12 @@ const router = createBrowserRouter([
         path: "/google/result",
         element: (
             <GoogleResponse/>
+        )
+    },
+    {
+        path: "/designer/list",
+        element: (
+            <DesignerList/>
         )
     },
     {

@@ -287,7 +287,7 @@ function DesignHeroSection() {
                             Logos, websites, packaging design and more. Our trusted designer community has helped thousands of businesses launch, grow, expand and rebrand with custom, professional design.
                         </p>
                         <a
-                            href="#"
+                            href="/designer/list"
                             className="btn btn-primary btn-lg px-4"
                             style={{
                                 backgroundColor: '#002f6c',
