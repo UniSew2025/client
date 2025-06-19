@@ -101,6 +101,7 @@ export default function DashboardUILayout({navigation, header, title}) {
             authentication={authentication}
         >
             <DashboardLayout
+                disableCollapsibleSidebar
                 slots={{
                     toolbarAccount: () => null,
                     sidebarFooter: SidebarFooterAccount,

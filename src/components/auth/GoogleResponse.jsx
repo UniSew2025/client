@@ -30,23 +30,18 @@ function HandleResponse(){
     if(googleResponse){
         Login(googleResponse.data.email).then(res => {
             if(res.status === 200){
-                enqueueSnackbar(res.data.message, {variant: "success"})
                 localStorage.setItem("user", JSON.stringify(res.data.data))
+                localStorage.setItem("message", res.data.message)
+                localStorage.setItem("variant", "success")
                 switch (res.data.data.role){
                     case "admin":
-                        setTimeout(() => {
-                            window.location.href = '/admin/dashboard'
-                        }, 1500)
+                        window.location.href = '/admin/dashboard'
                         break;
                     case "school":
-                        setTimeout(() => {
-                            window.location.href = '/home'
-                        }, 1500)
+                        window.location.href = '/home'
                         break;
                     default:
-                        setTimeout(() => {
-                            window.location.href = '/sign-in'
-                        }, 1500)
+                        window.location.href = '/sign-in'
                         break;
                 }
             }

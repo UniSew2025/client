@@ -13,6 +13,8 @@ import GoogleResponse from "./components/auth/GoogleResponse.jsx";
 import SignIn from "./components/auth/SignIn.jsx";
 import DesignerProfile from "./components/designer/DesignerProfile.jsx";
 import SchoolProfile from "./components/school/SchoolProfile.jsx";
+import SchoolOrder from "./components/school/SchoolOrder.jsx";
+import SchoolLayout from "./layouts/school/SchoolLayout.jsx";
 
 const router = createBrowserRouter([
     {
@@ -30,6 +32,24 @@ const router = createBrowserRouter([
                 <SchoolProfile/>
             </WebAppUILayout>
         )
+    },
+    {
+        path: "/school",
+        element: (
+            <WebAppUILayout title={"School"}>
+                <SchoolLayout/>
+            </WebAppUILayout>
+        ),
+        children: [
+            {
+                index: true,
+                element: <Navigate to={"/school/order"}/>
+            },
+            {
+                path: 'order',
+                element: <SchoolOrder/>
+            }
+        ]
     },
     {
         path: "/designer-profile",
@@ -83,6 +103,7 @@ function App() {
             anchorOrigin={{vertical: 'top', horizontal: 'right'}}
             autoHideDuration={1500}
             TransitionComponent={Grow}
+            style={{marginTop: "7vh"}}
         >
             <RouterProvider router={router}/>
         </SnackbarProvider>
