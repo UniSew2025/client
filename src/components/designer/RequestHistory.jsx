@@ -26,6 +26,7 @@ import {
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import {createDesignRequest, viewListHistory} from "../../services/DesignService.jsx";
 import {Add} from '@mui/icons-material';
+import {useNavigate} from "react-router-dom";
 
 
 const ClothItem = ({label, clothData, index, gender, showClothTypeSelect = false, onChange}) => {
@@ -194,12 +195,18 @@ const PhysicalForm = ({onClothChange}) => (
 );
 
 const RequestHistory = () => {
-    const [open, setOpen] = useState(false);
+    const [open, setOpen] = useState(localStorage.getItem("createDesignPopup"));
     const [step, setStep] = useState(0);
     const [designTypes, setDesignTypes] = useState({regular: false, physical: false});
     const [designRequest, setDesignRequest] = useState({schoolId: 0, clothes: []});
 
     const [historyList, setHistoryList] = useState([]);
+
+    const navigate = useNavigate()
+
+    if(localStorage.getItem("createDesignPopup")){
+        localStorage.removeItem("createDesignPopup")
+    }
 
     useEffect(() => {
         getListRequest();
@@ -274,6 +281,14 @@ const RequestHistory = () => {
         }
     };
 
+    function HandleReturn() {
+        const pageInfo = JSON.parse(localStorage.getItem("pageInfo"))
+        if(pageInfo) localStorage.removeItem("pageInfo")
+        const designer = pageInfo.designer
+        navigate(pageInfo.url, {
+            state: {designer}
+        })
+    }
 
     const getListRequest = async () => {
         const user = JSON.parse(localStorage.getItem("user"));
@@ -344,6 +359,7 @@ const RequestHistory = () => {
                             <PhysicalForm onClothChange={handleClothChange} currentClothes={designRequest.clothes}/>}
                     </DialogContent>
                     <DialogActions>
+                        {step <= 0 && localStorage.getItem("pageInfo") && <Button onClick={HandleReturn}>Return to previous page</Button>}
                         {step > 0 && <Button onClick={handleBack}>Back</Button>}
                         <Button onClick={handleNext} variant="contained">
                             {step === 0 ? 'Next' : (step === 1 && designTypes.physical ? 'Next' : 'Submit')}
