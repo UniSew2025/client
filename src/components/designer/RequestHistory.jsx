@@ -194,12 +194,16 @@ const PhysicalForm = ({onClothChange}) => (
 );
 
 const RequestHistory = () => {
-    const [open, setOpen] = useState(false);
+    const [open, setOpen] = useState(localStorage.getItem("createDesignPopup"));
     const [step, setStep] = useState(0);
     const [designTypes, setDesignTypes] = useState({regular: false, physical: false});
     const [designRequest, setDesignRequest] = useState({schoolId: 0, clothes: []});
 
     const [historyList, setHistoryList] = useState([]);
+
+    if(localStorage.getItem("createDesignPopup")){
+        localStorage.removeItem("createDesignPopup");
+    }
 
     useEffect(() => {
         getListRequest();
