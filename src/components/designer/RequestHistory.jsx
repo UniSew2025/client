@@ -25,6 +25,7 @@ import {
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import {createDesignRequest, viewListHistory} from "../../services/DesignService.jsx";
+import {Add} from '@mui/icons-material';
 
 
 const ClothItem = ({label, clothData, index, gender, showClothTypeSelect = false, onChange}) => {
@@ -294,7 +295,7 @@ const RequestHistory = () => {
             <Box p={4}>
                 <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
                     <Typography variant="h5">History</Typography>
-                    <Button variant="contained" onClick={handleOpen}>Create Design Request</Button>
+                    <Button variant="contained" onClick={handleOpen} startIcon={<Add/>}>Create new</Button>
                 </Box>
 
                 <TableContainer component={Paper} sx={{ mt: 3 }}>

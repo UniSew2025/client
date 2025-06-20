@@ -6,7 +6,7 @@ function RenderNav({navigation}) {
 
     function RenderNavCaption({label, key}) {
         return (
-            <Typography key={key} variant={"h6"}>{label}</Typography>
+            <Typography key={key} variant={"h6"} sx={{marginTop: '2vh'}}>{label}</Typography>
         )
     }
 
