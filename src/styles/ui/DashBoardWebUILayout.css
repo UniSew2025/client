@@ -8,11 +8,13 @@
 }
 
 .dbwui-nav{
-    border: 2px solid purple;
+    /*border: 2px solid purple;*/
+    border-right: 1px solid rgba(225, 221, 221, 0.6);
     flex: 1;
+    padding-top: 3vh;
 }
 
 .dbwui-outlet{
-    border: 2px solid darkslategrey;
-    flex: 5;
+    /*border: 2px solid darkslategrey;*/
+    flex: 7;
 }

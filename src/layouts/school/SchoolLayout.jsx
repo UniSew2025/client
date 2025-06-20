@@ -5,12 +5,16 @@ const navigation = [
         type: "caption",
         label: "My Design",
     },
+    // {
+    //     type: "sub",
+    //     label: "Design History",
+    //     segment: "/design-request/history",
+    // },
     {
         type: "sub",
         label: "Design History",
-        segment: "/design-request/history",
+        segment: "/school/design",
     },
-
     {
         type: "caption",
         label: "My Orders",

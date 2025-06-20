@@ -151,6 +151,15 @@ function RenderHeader() {
                         ]}
                     />
                 )}
+                {existedUser && (
+                    <Button
+                        variant={"outlined"}
+                        color={"primary"}
+                        onClick={() => navigate('/school/design')}
+                    >
+                        Create my design
+                    </Button>
+                )}
             </div>
             <div className="header-buttons">
                 {!existedUser ? (
