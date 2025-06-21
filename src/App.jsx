@@ -11,7 +11,7 @@ import PlatformAdminLayout from "./layouts/platform_admin/PlatformAdminLayout.js
 import PlatformAdminDashboard from "./components/platform_admin/PlatformAdminDashboard.jsx";
 import GoogleResponse from "./components/auth/GoogleResponse.jsx";
 import SignIn from "./components/auth/SignIn.jsx";
-import DesignerProfile from "./components/designer/DesignerProfile.jsx";
+import DesignerDetail from "./components/school/DesignerDetail.jsx";
 import SchoolProfile from "./components/school/SchoolProfile.jsx";
 import RequestHistory from "./components/school/RequestHistory.jsx";
 import DesignerList from "./components/school/DesignerList.jsx";
@@ -65,7 +65,7 @@ const router = createBrowserRouter([
         path: "/designer-profile",
         element: (
             <WebAppUILayout title={"Profile"}>
-                <DesignerProfile/>
+                <DesignerDetail/>
             </WebAppUILayout>
         )
     },
