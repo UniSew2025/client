@@ -258,7 +258,7 @@ const ClothItem = ({
                                 <Box
                                     position="relative"
                                     sx={{ cursor: 'pointer' }}
-                                    onClick={() => setZoomDialogOpen(true)}
+                                    onClick={() => setPreviewImage(templateList.find(t => t.sampleId === sampleId)?.imageUrl)}
                                 >
                                     <img
                                         src={templateList.find(t => t.sampleId === sampleId)?.imageUrl}
@@ -270,7 +270,7 @@ const ClothItem = ({
                                         size="small"
                                         onClick={(e) => {
                                             e.stopPropagation();
-                                            setTemplateId(0);
+                                            setSampleId(0);
                                         }}
                                         sx={{
                                             position: 'absolute',
@@ -300,6 +300,7 @@ const ClothItem = ({
                                                 setSampleId(template.sampleId);
                                                 setTemplateId(template.templateId);
                                                 setTemplateDialogOpen(false);
+                                                setZoomDialogOpen()
                                             }}
                                             sx={{
                                                 border: templateId === template.id ? '2px solid blue' : '1px solid gray',
@@ -620,13 +621,13 @@ const RequestHistory = () => {
                                 <TableCell>{item.private ? "Yes" : "No"}</TableCell>
                                 <TableCell>{item.feedback}</TableCell>
                                 <TableCell>{item.status}</TableCell>
-                                <Button
+                                <TableCell><Button
                                     size="small"
                                     variant="outlined"
                                     onClick={() => handleViewDetail(item)}
                                 >
                                     View Detail
-                                </Button>
+                                </Button></TableCell>
                             </TableRow>
                         ))}
                     </TableBody>
