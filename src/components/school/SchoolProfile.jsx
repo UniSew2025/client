@@ -1,5 +1,7 @@
-
-import '..//..//styles/profile/SchoolProfile.css';
+import { Box, Avatar, Card, CardContent, Typography, Grid, Chip, Stack, Link } from "@mui/material";
+import LocationOnIcon from "@mui/icons-material/LocationOn";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import PendingIcon from "@mui/icons-material/Pending";
 
 const schoolData = {
     name: "Greenfield International School",
@@ -37,138 +39,196 @@ const schoolData = {
     ]
 };
 
+// Function hiển thị phần info bên banner
+function SchoolInfo({ school }) {
+    return (
+        <Box
+            sx={{
+                position: "absolute",
+                left: { xs: 12, md: 40 },
+                bottom: { xs: -36, md: -45 },
+                display: "flex",
+                alignItems: "center",
+                pl: { xs: 2, md: 12 }
+            }}
+        >
+            <Avatar
+                src={school.avatar}
+                alt="School Avatar"
+                sx={{
+                    width: { xs: 66, md: 90 },
+                    height: { xs: 66, md: 90 },
+                    boxShadow: "0 2px 16px rgba(30,191,115,.11)",
+                    border: "4px solid #fff"
+                }}
+            />
+            <Box sx={{ ml: 4, display: { xs: "none", md: "block" } }}>
+                <Typography variant="h5" fontWeight="bold">{school.name}</Typography>
+                <Typography variant="body2" color="text.secondary">{school.type}</Typography>
+                <Stack direction="row" spacing={2} alignItems="center" mt={1}>
+                    <Chip
+                        label={school.status}
+                        color={school.status === "Active" ? "success" : "warning"}
+                        icon={school.status === "Active" ? <CheckCircleIcon /> : <PendingIcon />}
+                        size="small"
+                    />
+                    <Typography variant="body2" color="text.secondary" sx={{ display: "flex", alignItems: "center" }}>
+                        <LocationOnIcon fontSize="small" sx={{ mr: 0.5 }} />
+                        {school.address}
+                    </Typography>
+                    <Typography variant="body2" color="text.disabled">{school.joined}</Typography>
+                </Stack>
+            </Box>
+        </Box>
+    );
+}
+
+// Function hiển thị phần Contact
+function SchoolContact({ school }) {
+    return (
+        <Card sx={{ mb: 3, width: "1200px" }}>
+            <CardContent>
+                <Typography variant="subtitle1" fontWeight="bold" mb={1}>Contact</Typography>
+                <Typography variant="body2" mb={0.5}>
+                    <b>Representative:</b> {school.representative}
+                </Typography>
+                <Typography variant="body2" mb={0.5}>
+                    <b>Email:</b> <Link href={`mailto:${school.email}`}>{school.email}</Link>
+                </Typography>
+                <Typography variant="body2" mb={0.5}>
+                    <b>Phone:</b> <Link href={`tel:${school.phone}`}>{school.phone}</Link>
+                </Typography>
+                <Typography variant="body2">
+                    <b>Website:</b> <Link href={school.website} target="_blank" rel="noopener">{school.website}</Link>
+                </Typography>
+            </CardContent>
+        </Card>
+    );
+}
+
+// Function hiển thị phần About
+function SchoolAbout({ school }) {
+    return (
+        <Card sx={{ mb: 3, width: "1200px" }}>
+            <CardContent>
+                <Typography variant="subtitle1" fontWeight="bold" mb={1}>About School</Typography>
+                <Typography variant="body2" color="text.primary">{school.description}</Typography>
+            </CardContent>
+        </Card>
+    );
+}
+
+// Function hiển thị phần Projects
+function SchoolProjects({ projects }) {
+    return (
+        <>
+            <Typography variant="subtitle1" fontWeight="bold" mb={2}>School Projects</Typography>
+            <Grid container spacing={2}>
+                {projects.map((proj) => (
+                    <Grid item xs={12} md={6} key={proj.id}>
+                        <Card sx={{ height: "100%" }}>
+                            <Box
+                                component="img"
+                                src={proj.img}
+                                alt={proj.name}
+                                sx={{ width: "100%", height: 120, objectFit: "cover" }}
+                            />
+                            <CardContent>
+                                <Stack direction="row" alignItems="center" justifyContent="space-between" mb={1}>
+                                    <Typography fontWeight="medium">{proj.name}</Typography>
+                                    <Chip
+                                        label={proj.status}
+                                        color={proj.status === "Completed" ? "success" : "warning"}
+                                        size="small"
+                                    />
+                                </Stack>
+                                <Typography variant="body2" color="text.secondary">{proj.date}</Typography>
+                            </CardContent>
+                        </Card>
+                    </Grid>
+                ))}
+                {projects.length === 0 && (
+                    <Grid item xs={12}>
+                        <Typography color="text.disabled">No projects yet.</Typography>
+                    </Grid>
+                )}
+            </Grid>
+        </>
+    );
+}
+
+// Function hiển thị phần Stats
+function SchoolStats({ stats }) {
+    return (
+        <Card sx={{ p: 3, width: "210px" }}>
+            <Typography variant="subtitle1" fontWeight="bold" mb={2}>School Stats</Typography>
+            <Stack direction="row" justifyContent="space-between" mb={1}>
+                <span>Projects</span>
+                <Typography color="success.main" fontWeight="medium">{stats.projects}</Typography>
+            </Stack>
+            <Stack direction="row" justifyContent="space-between" mb={1}>
+                <span>Members</span>
+                <span>{stats.members}</span>
+            </Stack>
+            <Stack direction="row" justifyContent="space-between">
+                <span>Orders</span>
+                <span>{stats.orders}</span>
+            </Stack>
+        </Card>
+    );
+}
+
 export default function SchoolProfile() {
     const school = schoolData;
     return (
-        <div className="school-profile-page bg-light pb-5">
-            {/* Banner + avatar */}
-            <div
-                className="school-banner"
-                style={{
+        <Box sx={{ minHeight: "100vh", bgcolor: "#f6fafd", pb: 5 }}>
+            {/* Banner */}
+            <Box
+                sx={{
+                    width: "100%",
+                    minHeight: { xs: 120, md: 200 },
+                    position: "relative",
                     backgroundImage: `url(${school.banner})`,
                     backgroundSize: "cover",
                     backgroundPosition: "center",
-                    height: 200,
-                    position: "relative"
+                    borderBottom: "1px solid #e3e3e3"
                 }}
             >
-                <div
-                    className="school-avatar-box"
-                    style={{
-                        position: "absolute",
-                        left: 40,
-                        bottom: -45,
-                        display: "flex",
-                        alignItems: "center"
-                    }}
-                >
-                    <img
-                        src={school.avatar}
-                        alt="School Avatar"
-                        className="rounded-circle border border-4 border-white shadow"
-                        style={{ width: 90, height: 90, objectFit: "cover" }}
-                    />
-                    <div className="ms-4 d-none d-md-block">
-                        <h2 className="fw-bold mb-1">{school.name}</h2>
-                        <div className="text-muted mb-1">{school.type}</div>
-                        <div className="d-flex align-items-center gap-3">
-                            <span className="badge bg-success me-2">{school.status}</span>
-                            <span>
-                <i className="bi bi-geo-alt-fill me-1"></i>
-                                {school.address}
-              </span>
-                            <span className="text-muted">{school.joined}</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div className="container" style={{ marginTop: 60 }}>
-                <div className="row">
-                    {/* Main content */}
-                    <div className="col-lg-8">
-                        {/* Thông tin ngắn cho mobile */}
-                        <div className="d-block d-md-none text-center mb-4 mt-2">
-                            <h2 className="fw-bold mb-1">{school.name}</h2>
-                            <div className="text-muted mb-1">{school.type}</div>
-                            <div className="d-flex justify-content-center align-items-center gap-3 mb-2">
-                                <span className="badge bg-success me-2">{school.status}</span>
-                                <span>
-                  <i className="bi bi-geo-alt-fill me-1"></i>
+                <SchoolInfo school={school} />
+            </Box>
+
+            <Box sx={{ maxWidth: 1600, mx: "auto", mt: { xs: 7, md: 9 }, px: 2 }}>
+                <Grid container spacing={4} >
+                    {/* Bên trái */}
+                    <Grid item xs={12} md={7}>
+                        {/* Info cho mobile nếu muốn có thể bổ sung SchoolInfoMobile ở đây */}
+                        <Box sx={{ display: { xs: "block", md: "none" }, textAlign: "center", mb: 4, mt: 2 }}>
+                            <Typography variant="h5" fontWeight="bold">{school.name}</Typography>
+                            <Typography variant="body2" color="text.secondary">{school.type}</Typography>
+                            <Stack direction="row" spacing={2} justifyContent="center" alig nItems="center" mb={2}>
+                                <Chip
+                                    label={school.status}
+                                    color={school.status === "Active" ? "success" : "warning"}
+                                    icon={school.status === "Active" ? <CheckCircleIcon /> : <PendingIcon />}
+                                    size="small"
+                                />
+                                <Typography variant="body2" color="text.secondary" sx={{ display: "flex", alignItems: "center" }}>
+                                    <LocationOnIcon fontSize="small" sx={{ mr: 0.5 }} />
                                     {school.address}
-                </span>
-                                <span className="text-muted">{school.joined}</span>
-                            </div>
-                        </div>
-                        {/* Contact info */}
-                        <div className="mb-4">
-                            <h6 className="fw-bold mb-2">Contact</h6>
-                            <div className="mb-1">
-                                <strong>Representative:</strong> {school.representative}
-                            </div>
-                            <div className="mb-1">
-                                <strong>Email:</strong> <a href={`mailto:${school.email}`}>{school.email}</a>
-                            </div>
-                            <div className="mb-1">
-                                <strong>Phone:</strong> <a href={`tel:${school.phone}`}>{school.phone}</a>
-                            </div>
-                            <div className="mb-1">
-                                <strong>Website:</strong> <a href={school.website} target="_blank" rel="noopener noreferrer">{school.website}</a>
-                            </div>
-                        </div>
-                        {/* About */}
-                        <div className="mb-4">
-                            <h6 className="fw-bold mb-2">About School</h6>
-                            <p className="text-dark">{school.description}</p>
-                        </div>
-                        {/* Projects */}
-                        <div>
-                            <h6 className="fw-bold mb-3">School Projects</h6>
-                            <div className="row g-3">
-                                {school.projects.map((proj) => (
-                                    <div className="col-md-6" key={proj.id}>
-                                        <div className="card h-100 shadow-sm">
-                                            <img
-                                                src={proj.img}
-                                                alt={proj.name}
-                                                className="card-img-top"
-                                                style={{ height: 120, objectFit: "cover" }}
-                                            />
-                                            <div className="card-body">
-                                                <div className="d-flex justify-content-between align-items-center mb-1">
-                                                    <span className="fw-semibold">{proj.name}</span>
-                                                    <span className={`badge ${proj.status === "Completed" ? "bg-success" : "bg-warning text-dark"}`}>
-                            {proj.status}
-                          </span>
-                                                </div>
-                                                <div className="text-muted" style={{ fontSize: 14 }}>{proj.date}</div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                ))}
-                                {school.projects.length === 0 && <div className="col-12 text-muted">No projects yet.</div>}
-                            </div>
-                        </div>
-                    </div>
-                    {/* Sidebar */}
-                    <div className="col-lg-4 mt-4 mt-lg-0">
-                        <div className="card p-4 shadow-sm mb-4">
-                            <h6 className="fw-bold mb-3">School Stats</h6>
-                            <div className="d-flex justify-content-between mb-2">
-                                <span>Total Projects</span>
-                                <span className="fw-semibold text-success">{school.stats.projects}</span>
-                            </div>
-                            <div className="d-flex justify-content-between mb-2">
-                                <span>Members</span>
-                                <span>{school.stats.members}</span>
-                            </div>
-                            <div className="d-flex justify-content-between">
-                                <span>Orders</span>
-                                <span>{school.stats.orders}</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+                                </Typography>
+                                <Typography variant="body2" color="text.disabled">{school.joined}</Typography>
+                            </Stack>
+                        </Box>
+                        <SchoolContact school={school} />
+                        <SchoolAbout school={school} />
+                        <SchoolProjects projects={school.projects} />
+                    </Grid>
+                    {/* Bên phải */}
+                    <Grid item xs={12} md={5}>
+                        <SchoolStats stats={school.stats} />
+                    </Grid>
+                </Grid>
+            </Box>
+        </Box>
     );
 }

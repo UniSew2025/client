@@ -4,12 +4,9 @@ import {AccountCircle, KeyboardArrowDown, KeyboardArrowUp} from '@mui/icons-mate
 import {useNavigate} from "react-router-dom";
 import {useState} from "react";
 
-const existedUser = localStorage.getItem("user") && JSON.parse(localStorage.getItem("user")).role === "school";
+const existedUser = localStorage.getItem("user");
 const userRole = existedUser ? JSON.parse(localStorage.getItem("user")).role : null;
-const profileLink = userRole === 'school' ? '/school-profile'
-    : userRole === 'designer' ? '/designer-profile'
-        : userRole === 'garment' ? '/garment-profile'
-            : '/';
+const profileLink = userRole === 'school' ?  '/' + userRole + '-profile' : '/';
 
 function RenderFooterPolicyButton({link, title}) {
     const navigate = useNavigate()
@@ -174,7 +171,7 @@ function RenderHeader() {
                         children={
                             [
                                 {
-                                    link: profileLink,
+                                    link: '/designer-profile',
                                     title: 'Profile'
                                 },
                                 {
