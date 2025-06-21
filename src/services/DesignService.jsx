@@ -22,3 +22,8 @@ export const chooseDesignPackage = async ({ designRequestId, packageId }) => {
     });
     return res?.data?.data || [];
 }
+
+export const getSampleImages = async () => {
+    const response = await axiosClient.get("/design/sampleImage-list");
+    return response?.data || null;
+}

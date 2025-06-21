@@ -91,7 +91,7 @@ export default function DesignerProfile() {
     };
 
     const handleCreateRequest = () => {
-
+        localStorage.setItem("createDesignPopup", "open");
         navigate("/school");
     }
 

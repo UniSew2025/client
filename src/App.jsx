@@ -13,10 +13,11 @@ import GoogleResponse from "./components/auth/GoogleResponse.jsx";
 import SignIn from "./components/auth/SignIn.jsx";
 import DesignerProfile from "./components/designer/DesignerProfile.jsx";
 import SchoolProfile from "./components/school/SchoolProfile.jsx";
-import RequestHistory from "./components/designer/RequestHistory.jsx";
-import DesignerList from "./components/designer/DesignerList.jsx";
+import RequestHistory from "./components/school/RequestHistory.jsx";
+import DesignerList from "./components/school/DesignerList.jsx";
 import SchoolOrder from "./components/school/SchoolOrder.jsx";
 import SchoolLayout from "./layouts/school/SchoolLayout.jsx";
+import RequestDetail from "./components/school/RequestDetail.jsx";
 
 const router = createBrowserRouter([
     {
@@ -49,6 +50,10 @@ const router = createBrowserRouter([
             },{
                 path: 'design',
                 element: <RequestHistory/>
+            },
+            {
+                path: 'detail',
+                element: <RequestDetail/>
             },
             {
                 path: 'order',
