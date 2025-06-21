@@ -4,22 +4,22 @@ import {useEffect, useState} from "react";
 import {login} from "../../services/AuthService.jsx";
 import {enqueueSnackbar} from "notistack";
 
-async function Login(email){
+async function Login(email) {
     const response = await login(email)
-    if(response){
+    if (response) {
         return response
     }
 }
 
-function HandleResponse(){
+function HandleResponse() {
     const [googleResponse, setGoogleResponse] = useState(null)
     const location = useLocation()
     const accessToken = new URLSearchParams(location.hash.substring(1)).get('access_token')
 
     useEffect(() => {
-        async function FetchInfo(){
+        async function FetchInfo() {
             const r = await axios.get("https://www.googleapis.com/oauth2/v3/userinfo?access_token=" + accessToken)
-            if(r.status === 200){
+            if (r.status === 200) {
                 return r
             }
         }
@@ -27,17 +27,18 @@ function HandleResponse(){
         FetchInfo().then(r => setGoogleResponse(r))
     }, [accessToken]);
 
-    if(googleResponse){
+    if (googleResponse) {
         Login(googleResponse.data.email).then(res => {
-            if(res.status === 200){
+            if (res.status === 200) {
                 localStorage.setItem("user", JSON.stringify(res.data.data))
                 localStorage.setItem("message", res.data.message)
                 localStorage.setItem("variant", "success")
-                switch (res.data.data.role){
+                switch (res.data.data.role) {
                     case "admin":
                         window.location.href = '/admin/dashboard'
                         break;
                     case "school":
+                    case "designer":
                         window.location.href = '/home'
                         break;
                     default:
@@ -57,6 +58,6 @@ function HandleResponse(){
     )
 }
 
-export default function GoogleResponse(){
+export default function GoogleResponse() {
     return <HandleResponse/>
 }

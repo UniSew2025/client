@@ -28,6 +28,7 @@ function RenderPage(){
 }
 
 export default function SchoolLayout(){
+    window.scrollTo(0, 0);
     return (
         <RenderPage/>
     )

@@ -24,7 +24,7 @@ import {
 import {chooseDesignPackage, getClothByRequestId, viewListHistory} from "../../services/DesignService.jsx";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 
-export default function DesignerProfile() {
+export default function DesignerDetail() {
 
     const [selectedPackage, setSelectedPackage] = useState(null);
     const [openDialog, setOpenDialog] = useState(false);
