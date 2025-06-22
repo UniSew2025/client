@@ -607,21 +607,21 @@ const RequestHistory = () => {
                 <Table>
                     <TableHead>
                         <TableRow>
-                            <TableCell><strong>Request Id</strong></TableCell>
-                            <TableCell><strong>Private</strong></TableCell>
-                            <TableCell><strong>Feedback</strong></TableCell>
-                            <TableCell><strong>Status</strong></TableCell>
-                            <TableCell><strong>Action</strong></TableCell>
+                            <TableCell align={"center"}><strong>Request Id</strong></TableCell>
+                            <TableCell align={"center"}><strong>Private</strong></TableCell>
+                            <TableCell align={"center"}><strong>Feedback</strong></TableCell>
+                            <TableCell align={"center"}><strong>Status</strong></TableCell>
+                            <TableCell align={"center"}><strong>Action</strong></TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
                         {paginatedData.map((item, index) => (
                             <TableRow key={`${item.id}-${index}`}>
-                                <TableCell>{item.id}</TableCell>
-                                <TableCell>{item.private ? "Yes" : "No"}</TableCell>
-                                <TableCell>{item.feedback}</TableCell>
-                                <TableCell>{item.status}</TableCell>
-                                <TableCell><Button
+                                <TableCell align={"center"}>{item.id}</TableCell>
+                                <TableCell align={"center"}>{item.private ? "Yes" : "No"}</TableCell>
+                                <TableCell align={"center"}>{item.feedback ? item.feedback : "N/A"}</TableCell>
+                                <TableCell align={"center"}>{item.status}</TableCell>
+                                <TableCell align={"center"}><Button
                                     size="small"
                                     variant="outlined"
                                     onClick={() => handleViewDetail(item)}

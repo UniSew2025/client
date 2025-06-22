@@ -4,8 +4,8 @@ import {useEffect, useState} from "react";
 import {login} from "../../services/AuthService.jsx";
 import {enqueueSnackbar} from "notistack";
 
-async function Login(email) {
-    const response = await login(email)
+async function Login(email, avatar, name) {
+    const response = await login(email, avatar, name)
     if (response) {
         return response
     }
@@ -28,7 +28,7 @@ function HandleResponse() {
     }, [accessToken]);
 
     if (googleResponse) {
-        Login(googleResponse.data.email).then(res => {
+        Login(googleResponse.data.email, googleResponse.data.picture, googleResponse.data.name).then(res => {
             if (res.status === 200) {
                 localStorage.setItem("user", JSON.stringify(res.data.data))
                 localStorage.setItem("message", res.data.message)
