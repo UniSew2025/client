@@ -38,16 +38,11 @@
     /*background-color: darkgreen;*/
     height: 100%;
     flex: 1;
-    margin-right: 2vw;
     display: flex;
     flex-direction: row;
     align-items: center;
+    margin-right: 2vw;
     justify-content: space-evenly;
-}
-
-
-.header-buttons button {
-    text-transform: lowercase !important;
 }
 
 .header-buttons button svg {
@@ -61,6 +56,13 @@
     font-size: 1.2rem !important;
     font-weight: 500 !important;
     border-radius: 10px !important;
+}
+
+.profile-btn-image{
+    width: 50px !important;
+    height: 50px !important;
+    border-radius: 50px !important;
+    margin-left: 1vw !important;
 }
 
 /* body */

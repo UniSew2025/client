@@ -55,6 +55,7 @@ function RenderPage() {
 }
 
 export default function SignIn() {
+    document.title = "Sign in"
     return (
         <RenderPage/>
     )

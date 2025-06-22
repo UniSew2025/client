@@ -1,12 +1,12 @@
 import '../../styles/ui/WebAppUILayout.css'
-import {Button, Divider, Link, Menu, MenuItem, Typography,} from "@mui/material";
-import {AccountCircle, KeyboardArrowDown, KeyboardArrowUp} from '@mui/icons-material';
+import {Avatar, Button, Divider, Link, ListItemIcon, Menu, MenuItem, Typography,} from "@mui/material";
+import {AccountBox, AccountCircle, KeyboardArrowDown, KeyboardArrowUp, Logout} from '@mui/icons-material';
 import {useNavigate} from "react-router-dom";
 import {useState} from "react";
 
 const existedUser = localStorage.getItem("user");
 const userRole = existedUser ? JSON.parse(localStorage.getItem("user")).role : null;
-const profileLink = userRole === 'school' ?  '/' + userRole + '-profile' : '/';
+const profileLink = userRole === 'school' ? '/' + userRole + '-profile' : '/';
 
 function RenderFooterPolicyButton({link, title}) {
     const navigate = useNavigate()
@@ -79,7 +79,7 @@ function RenderHeaderMenuButton({title, children}) {
     )
 }
 
-function RenderHeaderProfileButton({title, children}) {
+function RenderHeaderProfileButton({children}) {
     const navigate = useNavigate()
     const [anchorEl, setAnchorEl] = useState(null)
     const open = Boolean(anchorEl)
@@ -101,10 +101,13 @@ function RenderHeaderProfileButton({title, children}) {
                 className={"btn-link"}
                 variant={"text"}
                 onClick={handleClick}
-                endIcon={<AccountCircle/>}
+                fullWidth
+                endIcon={
+                    <img className={'profile-btn-image'} src={JSON.parse(localStorage.getItem('user')).profile.avatar} alt={""}/>
+                }
                 sx={{color: "black"}}
             >
-                {title}
+                {JSON.parse(localStorage.getItem('user')).profile.name}
             </Button>
             <Menu
                 anchorOrigin={{vertical: 'bottom', horizontal: 'right'}}
@@ -115,7 +118,12 @@ function RenderHeaderProfileButton({title, children}) {
             >
                 {
                     children.map((child, index) => (
-                        <MenuItem key={index} onClick={() => handleCloseMenu(child.link)}>{child.title}</MenuItem>
+                        <MenuItem key={index} sx={{width: '15vw'}} onClick={() => handleCloseMenu(child.link)}>
+                            <ListItemIcon>
+                                {child.icon}
+                            </ListItemIcon>
+                            {child.title}
+                        </MenuItem>
                     ))
                 }
             </Menu>
@@ -164,19 +172,17 @@ function RenderHeader() {
                             onClick={() => navigate("/sign-in")}>Sign in</Button>
                 ) : (
                     <RenderHeaderProfileButton
-                        title={
-                            // JSON.parse(localStorage.getItem("user")).email
-                            ""
-                        }
                         children={
                             [
                                 {
                                     link: '/designer-profile',
-                                    title: 'Profile'
+                                    title: 'Profile',
+                                    icon: <AccountBox fontSize={"small"} color={"info"}/>
                                 },
                                 {
                                     link: '/sign-in',
-                                    title: 'Sign out'
+                                    title: 'Sign out',
+                                    icon: <Logout fontSize={"small"} color={"error"}/>
                                 }
                             ]
                         }

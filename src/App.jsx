@@ -119,7 +119,7 @@ function App() {
             anchorOrigin={{vertical: 'top', horizontal: 'right'}}
             autoHideDuration={1500}
             TransitionComponent={Grow}
-            style={{marginTop: "7vh"}}
+            // style={{marginTop: "7vh"}}
         >
             <RouterProvider router={router}/>
         </SnackbarProvider>
