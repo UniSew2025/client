@@ -39,6 +39,7 @@ function HandleResponse() {
                         break;
                     case "school":
                     case "designer":
+                    case "garment":
                         window.location.href = '/home'
                         break;
                     default:
