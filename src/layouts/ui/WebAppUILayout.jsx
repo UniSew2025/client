@@ -100,7 +100,12 @@ function RenderHeaderProfileButton({children}) {
                 onClick={handleClick}
                 fullWidth
                 endIcon={
-                    <img className={'profile-btn-image'} src={JSON.parse(localStorage.getItem('user')).profile.avatar} alt={""}/>
+                    <img
+                        className={'profile-btn-image'}
+                        referrerPolicy={"no-referrer"}
+                        src={JSON.parse(localStorage.getItem('user')).profile.avatar}
+                        alt={""}
+                    />
                 }
                 sx={{color: "black"}}
             >
