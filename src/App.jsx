@@ -20,6 +20,7 @@ import DesignerList from "./components/school/DesignerList.jsx";
 import SchoolOrder from "./components/school/SchoolOrder.jsx";
 import SchoolLayout from "./layouts/school/SchoolLayout.jsx";
 import RequestDetail from "./components/school/RequestDetail.jsx";
+import RequestList from "./components/school/RequestList.jsx";
 
 const router = createBrowserRouter([
     {
@@ -51,6 +52,14 @@ const router = createBrowserRouter([
         element: (
             <WebAppUILayout title={"Profile"}>
                 <GarmentProfile/>
+            </WebAppUILayout>
+        )
+    },
+    {
+        path: "/request-list",
+        element: (
+            <WebAppUILayout title={"Request List"}>
+                <RequestList/>
             </WebAppUILayout>
         )
     },
