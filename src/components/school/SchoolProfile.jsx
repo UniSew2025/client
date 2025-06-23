@@ -18,7 +18,6 @@ import {
 import PublicIcon from "@mui/icons-material/Public";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import WorkOutlineIcon from "@mui/icons-material/WorkOutline";
-import LanguageIcon from "@mui/icons-material/Language";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import RemoveRedEyeIcon from "@mui/icons-material/RemoveRedEye";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
@@ -26,20 +25,9 @@ import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import StarRateIcon from "@mui/icons-material/StarRate";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
-import {Link as RouterLink, useNavigate} from "react-router-dom";
-import {forwardRef} from "react";
 import '../../styles/school/SchoolProfile.css'
 import {dateFormatter} from "../../utils/DateFormatter.jsx";
 
-const profile = {
-    name: "Your Fiverr Name",
-    username: "@trieumn",
-    location: "Vietnam",
-    joined: "June 2025",
-    industry: "",
-    languages: "",
-    workingHours: "",
-};
 
 const user = JSON.parse(localStorage.getItem('user'))
 
@@ -201,7 +189,7 @@ function RenderRightArea(){
                                     ))}
                                 </Stack>
                                 <Typography variant="body2" color="text.secondary">
-                                    trieumn doesn't have any reviews yet.
+                                    You don't have any reviews yet.
                                 </Typography>
                             </Box>
                         </CardContent>
