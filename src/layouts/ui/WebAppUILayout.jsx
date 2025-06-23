@@ -1,12 +1,9 @@
 import '../../styles/ui/WebAppUILayout.css'
-import {Avatar, Button, Divider, Link, ListItemIcon, Menu, MenuItem, Typography,} from "@mui/material";
-import {AccountBox, AccountCircle, KeyboardArrowDown, KeyboardArrowUp, Logout} from '@mui/icons-material';
+import {Button, Divider, Link, ListItemIcon, Menu, MenuItem, Typography,} from "@mui/material";
+import {AccountBox, KeyboardArrowDown, KeyboardArrowUp, Logout} from '@mui/icons-material';
 import {useNavigate} from "react-router-dom";
 import {useState} from "react";
 
-const existedUser = localStorage.getItem("user");
-const userRole = existedUser ? JSON.parse(localStorage.getItem("user")).role : null;
-const profileLink = userRole === 'school' ? '/' + userRole + '-profile' : '/';
 
 function RenderFooterPolicyButton({link, title}) {
     const navigate = useNavigate()
@@ -133,6 +130,8 @@ function RenderHeaderProfileButton({children}) {
 
 function RenderHeader() {
     const navigate = useNavigate()
+    const existedUser = JSON.parse(localStorage.getItem("user"));
+    const profileLink = existedUser ? '/' + existedUser.role + "-profile" : null
     return (
         <div className="home-header">
             <img src={"/logo_full.png"} alt="UniSew"/>
