@@ -175,7 +175,7 @@ function RenderHeader() {
                         children={
                             [
                                 {
-                                    link: '/designer-profile',
+                                    link: profileLink,
                                     title: 'Profile',
                                     icon: <AccountBox fontSize={"small"} color={"info"}/>
                                 },
