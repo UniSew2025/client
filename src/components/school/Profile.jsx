@@ -1,231 +1,235 @@
-import { Box, Avatar, Card, CardContent, Typography, Grid, Chip, Stack, Link } from "@mui/material";
-import LocationOnIcon from "@mui/icons-material/LocationOn";
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
-import PendingIcon from "@mui/icons-material/Pending";
+import {
+    Box,
+    Card,
+    CardContent,
+    Avatar,
+    Typography,
+    Button,
+    Grid,
+    Stack,
+    Divider,
+    LinearProgress,
+    List,
+    ListItem,
+    ListItemIcon,
+    ListItemText,
+    Link as MuiLink,
+    IconButton,
+    Chip
+} from "@mui/material";
+import PublicIcon from "@mui/icons-material/Public";
+import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
+import WorkOutlineIcon from "@mui/icons-material/WorkOutline";
+import LanguageIcon from "@mui/icons-material/Language";
+import AccessTimeIcon from "@mui/icons-material/AccessTime";
+import RemoveRedEyeIcon from "@mui/icons-material/RemoveRedEye";
+import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
+import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
+import StarRateIcon from "@mui/icons-material/StarRate";
+import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
+import ChevronRightIcon from "@mui/icons-material/ChevronRight";
+import {Link as RouterLink} from "react-router-dom";
+import React from "react";
 
-const schoolData = {
-    name: "Greenfield International School",
-    avatar: "https://thietkewebchuyen.com/wp-content/uploads/logo-avatar-free-fire-cute-2.jpg",
-    banner: "https://png.pngtree.com/thumb_back/fh260/background/20221011/pngtree-blue-gold-background-banner-idea-modern-simple-free-download-image_1467602.jpg",
-    type: "Public School",
-    status: "Active",
-    address: "123 Nguyen Van Cu, District 5, HCMC",
-    representative: "Mrs. Nguyen Thi Mai",
-    email: "contact@greenfield.edu.vn",
-    phone: "+84 28 8888 8888",
-    website: "https://greenfield.edu.vn",
-    joined: "Joined Sep 2021",
-    description: "Greenfield International School is committed to providing world-class education and nurturing talent for the future. Our campus is home to 2000+ students from primary to high school levels.",
-    stats: {
-        projects: 8,
-        members: 35,
-        orders: 17
-    },
-    projects: [
-        {
-            id: 1,
-            name: "Uniform Design 2023",
-            img: "/assets/school-project1.jpg",
-            status: "Completed",
-            date: "Oct 2023"
-        },
-        {
-            id: 2,
-            name: "Sports Outfit Project",
-            img: "/assets/school-project2.jpg",
-            status: "In Progress",
-            date: "Apr 2024"
-        }
-    ]
+const profile = {
+    name: "Your Fiverr Name",
+    username: "@trieumn",
+    location: "Vietnam",
+    joined: "June 2025",
+    industry: "",
+    languages: "",
+    workingHours: "",
 };
 
-// Function hiển thị phần info bên banner
-function SchoolInfo({ school }) {
-    return (
-        <Box
-            sx={{
-                position: "absolute",
-                left: { xs: 12, md: 40 },
-                bottom: { xs: -36, md: -45 },
-                display: "flex",
-                alignItems: "center",
-                pl: { xs: 2, md: 12 }
-            }}
-        >
-            <Avatar
-                src={school.avatar}
-                alt="School Avatar"
-                sx={{
-                    width: { xs: 66, md: 90 },
-                    height: { xs: 66, md: 90 },
-                    boxShadow: "0 2px 16px rgba(30,191,115,.11)",
-                    border: "4px solid #fff"
-                }}
-            />
-            <Box sx={{ ml: 4, display: { xs: "none", md: "block" } }}>
-                <Typography variant="h5" fontWeight="bold">{school.name}</Typography>
-                <Typography variant="body2" color="text.secondary">{school.type}</Typography>
-                <Stack direction="row" spacing={2} alignItems="center" mt={1}>
-                    <Chip
-                        label={school.status}
-                        color={school.status === "Active" ? "success" : "warning"}
-                        icon={school.status === "Active" ? <CheckCircleIcon /> : <PendingIcon />}
-                        size="small"
-                    />
-                    <Typography variant="body2" color="text.secondary" sx={{ display: "flex", alignItems: "center" }}>
-                        <LocationOnIcon fontSize="small" sx={{ mr: 0.5 }} />
-                        {school.address}
-                    </Typography>
-                    <Typography variant="body2" color="text.disabled">{school.joined}</Typography>
-                </Stack>
-            </Box>
-        </Box>
-    );
-}
+const checklist = [
+    {
+        icon: <InfoOutlinedIcon color="primary" />,
+        title: "Share how you plan to use Fiverr",
+        desc: "Tell us if you’re here to find services or offer them.",
+        percent: 75,
+        done: false
+    },
+    {
+        icon: <AddCircleOutlineIcon color="action" />,
+        title: "Add details for your profile",
+        desc: "Upload a photo and info for a more tailored experience.",
+        action: "Add"
+    },
+    {
+        icon: <WorkOutlineIcon color="action" />,
+        title: "Tell us about your business",
+        desc: "Get tailored recommendations and tips to help it grow.",
+        action: "Add"
+    },
+    {
+        icon: <AccessTimeIcon color="action" />,
+        title: "Set your communication preferences",
+        desc: "Let freelancers know your collaboration preferences.",
+        action: "Add"
+    }
+];
 
-// Function hiển thị phần Contact
-function SchoolContact({ school }) {
-    return (
-        <Card sx={{ mb: 3, width: "1200px" }}>
-            <CardContent>
-                <Typography variant="subtitle1" fontWeight="bold" mb={1}>Contact</Typography>
-                <Typography variant="body2" mb={0.5}>
-                    <b>Representative:</b> {school.representative}
-                </Typography>
-                <Typography variant="body2" mb={0.5}>
-                    <b>Email:</b> <Link href={`mailto:${school.email}`}>{school.email}</Link>
-                </Typography>
-                <Typography variant="body2" mb={0.5}>
-                    <b>Phone:</b> <Link href={`tel:${school.phone}`}>{school.phone}</Link>
-                </Typography>
-                <Typography variant="body2">
-                    <b>Website:</b> <Link href={school.website} target="_blank" rel="noopener">{school.website}</Link>
-                </Typography>
-            </CardContent>
-        </Card>
-    );
-}
+const LinkBehavior = React.forwardRef((props, ref) =>
+    <RouterLink ref={ref} {...props} />
+);
 
-// Function hiển thị phần About
-function SchoolAbout({ school }) {
+export default function FiverrBuyerProfile() {
     return (
-        <Card sx={{ mb: 3, width: "1200px" }}>
-            <CardContent>
-                <Typography variant="subtitle1" fontWeight="bold" mb={1}>About School</Typography>
-                <Typography variant="body2" color="text.primary">{school.description}</Typography>
-            </CardContent>
-        </Card>
-    );
-}
+        <Box sx={{ bgcolor: "#f6fafd", minHeight: "100vh", py: 5 }}>
 
-// Function hiển thị phần Projects
-function SchoolProjects({ projects }) {
-    return (
-        <>
-            <Typography variant="subtitle1" fontWeight="bold" mb={2}>School Projects</Typography>
-            <Grid container spacing={2}>
-                {projects.map((proj) => (
-                    <Grid item xs={12} md={6} key={proj.id}>
-                        <Card sx={{ height: "100%" }}>
-                            <Box
-                                component="img"
-                                src={proj.img}
-                                alt={proj.name}
-                                sx={{ width: "100%", height: 120, objectFit: "cover" }}
-                            />
+            <Box sx={{ maxWidth: 1200, mx: "auto" }}>
+                <Grid container spacing={3} >
+                    {/* Left: Card info */}
+                    <Grid item xs={12} md={4} maxWidth={400}>
+                        <Card sx={{ borderRadius: 3, textAlign: "center", px: 2 }}>
                             <CardContent>
-                                <Stack direction="row" alignItems="center" justifyContent="space-between" mb={1}>
-                                    <Typography fontWeight="medium">{proj.name}</Typography>
-                                    <Chip
-                                        label={proj.status}
-                                        color={proj.status === "Completed" ? "success" : "warning"}
-                                        size="small"
-                                    />
+                                <Avatar sx={{ width: 70, height: 70, mx: "auto", mb: 2, fontSize: 34, bgcolor: "#e0e0e0", color: "#757575" }}>
+                                    T
+                                </Avatar>
+                                <Typography variant="h6" fontWeight="bold">{profile.name}</Typography>
+                                <Typography variant="body2" color="text.secondary" mb={2}>{profile.username}</Typography>
+                                <Divider sx={{ my: 1.5 }} />
+                                <Stack spacing={1} sx={{ textAlign: "left", pl: 2, mb: 2 }}>
+                                    <Stack direction="row" spacing={1} alignItems="center">
+                                        <PublicIcon fontSize="small" color="action" />
+                                        <Typography variant="body2">Located in {profile.location}</Typography>
+                                    </Stack>
+                                    <Stack direction="row" spacing={1} alignItems="center">
+                                        <CalendarMonthIcon fontSize="small" color="action" />
+                                        <Typography variant="body2">Joined in {profile.joined}</Typography>
+                                    </Stack>
+                                    <Stack direction="row" spacing={1} alignItems="center">
+                                        <WorkOutlineIcon fontSize="small" color="action" />
+                                        <Typography variant="body2">{profile.industry || "Your industry"}</Typography>
+                                    </Stack>
+                                    <Stack direction="row" spacing={1} alignItems="center">
+                                        <LanguageIcon fontSize="small" color="action" />
+                                        <Typography variant="body2">{profile.languages || "Preferred languages"}</Typography>
+                                    </Stack>
+                                    <Stack direction="row" spacing={1} alignItems="center">
+                                        <AccessTimeIcon fontSize="small" color="action" />
+                                        <Typography variant="body2">{profile.workingHours || "Preferred working hours"}</Typography>
+                                    </Stack>
                                 </Stack>
-                                <Typography variant="body2" color="text.secondary">{proj.date}</Typography>
+                                <Button
+                                    variant="outlined"
+                                    fullWidth
+                                    startIcon={<RemoveRedEyeIcon />}
+                                    sx={{ mb: 1, borderRadius: 2, textTransform: "none", fontWeight: "bold" }}
+                                    component={LinkBehavior}
+                                    to="/designer/list"
+                                >
+                                    Preview public profile
+                                </Button>
+                                <Button
+                                    variant="outlined"
+                                    fullWidth
+                                    endIcon={<ArrowForwardIcon />}
+                                    sx={{ borderRadius: 2, textTransform: "none", fontWeight: "bold" }}
+                                    component={LinkBehavior}
+                                    to="/designer/list"
+                                >
+                                    Explore Fiverr
+                                </Button>
+                                <Typography
+                                    variant="caption"
+                                    color="text.secondary"
+                                    display="block"
+                                    mt={2}
+                                >
+                                    You're currently on your buyer profile. To access your freelancer profile, switch to seller mode
+                                </Typography>
                             </CardContent>
                         </Card>
                     </Grid>
-                ))}
-                {projects.length === 0 && (
-                    <Grid item xs={12}>
-                        <Typography color="text.disabled">No projects yet.</Typography>
-                    </Grid>
-                )}
-            </Grid>
-        </>
-    );
-}
 
-// Function hiển thị phần Stats
-function SchoolStats({ stats }) {
-    return (
-        <Card sx={{ p: 3, width: "210px" }}>
-            <Typography variant="subtitle1" fontWeight="bold" mb={2}>School Stats</Typography>
-            <Stack direction="row" justifyContent="space-between" mb={1}>
-                <span>Projects</span>
-                <Typography color="success.main" fontWeight="medium">{stats.projects}</Typography>
-            </Stack>
-            <Stack direction="row" justifyContent="space-between" mb={1}>
-                <span>Members</span>
-                <span>{stats.members}</span>
-            </Stack>
-            <Stack direction="row" justifyContent="space-between">
-                <span>Orders</span>
-                <span>{stats.orders}</span>
-            </Stack>
-        </Card>
-    );
-}
-
-export default function Profile() {
-    const school = schoolData;
-    return (
-        <Box sx={{ minHeight: "100vh", bgcolor: "#f6fafd", pb: 5 }}>
-            {/* Banner */}
-            <Box
-                sx={{
-                    width: "100%",
-                    minHeight: { xs: 120, md: 200 },
-                    position: "relative",
-                    backgroundImage: `url(${school.banner})`,
-                    backgroundSize: "cover",
-                    backgroundPosition: "center",
-                    borderBottom: "1px solid #e3e3e3"
-                }}
-            >
-                <SchoolInfo school={school} />
-            </Box>
-
-            <Box sx={{ maxWidth: 1600, mx: "auto", mt: { xs: 7, md: 9 }, px: 2 }}>
-                <Grid container spacing={4} >
-                    {/* Bên trái */}
-                    <Grid item xs={12} md={7}>
-                        {/* Info cho mobile nếu muốn có thể bổ sung SchoolInfoMobile ở đây */}
-                        <Box sx={{ display: { xs: "block", md: "none" }, textAlign: "center", mb: 4, mt: 2 }}>
-                            <Typography variant="h5" fontWeight="bold">{school.name}</Typography>
-                            <Typography variant="body2" color="text.secondary">{school.type}</Typography>
-                            <Stack direction="row" spacing={2} justifyContent="center" alig nItems="center" mb={2}>
-                                <Chip
-                                    label={school.status}
-                                    color={school.status === "Active" ? "success" : "warning"}
-                                    icon={school.status === "Active" ? <CheckCircleIcon /> : <PendingIcon />}
-                                    size="small"
-                                />
-                                <Typography variant="body2" color="text.secondary" sx={{ display: "flex", alignItems: "center" }}>
-                                    <LocationOnIcon fontSize="small" sx={{ mr: 0.5 }} />
-                                    {school.address}
-                                </Typography>
-                                <Typography variant="body2" color="text.disabled">{school.joined}</Typography>
-                            </Stack>
+                    {/* Right: Checklist & Review */}
+                    <Grid item xs={12} md={8}>
+                        {/* Breadcrumb */}
+                        <Box sx={{ maxWidth: 980, mx: "auto", mb: 1 }}>
+                            <Typography variant="body2" color="text.secondary">
+                                Home / My Profile
+                            </Typography>
                         </Box>
-                        <SchoolContact school={school} />
-                        <SchoolAbout school={school} />
-                        <SchoolProjects projects={school.projects} />
-                    </Grid>
-                    {/* Bên phải */}
-                    <Grid item xs={12} md={5}>
-                        <SchoolStats stats={school.stats} />
+                        {/* Headline */}
+                        <Box sx={{ mb: 2 }}>
+                            <Typography variant="h5" fontWeight="bold" mb={1}>
+                                Hi <span role="img" aria-label="wave">👋</span> Let’s help freelancers get to know you
+                            </Typography>
+                            <Typography variant="body2" color="text.secondary">
+                                Get the most out of Fiverr by sharing a bit more about yourself and how you prefer to work with freelancers.
+                            </Typography>
+                        </Box>
+                        {/* Profile checklist */}
+                        <Card sx={{ mb: 3, borderRadius: 3 }}>
+                            <CardContent>
+                                <Typography variant="subtitle1" fontWeight="bold" mb={1.5}>
+                                    Profile checklist
+                                </Typography>
+                                <LinearProgress
+                                    variant="determinate"
+                                    value={25}
+                                    sx={{ height: 7, borderRadius: 5, mb: 2, bgcolor: "#e0e8ef" }}
+                                />
+                                <List disablePadding>
+                                    {checklist.map((item, i) => (
+                                        <ListItem key={i} disablePadding sx={{ alignItems: "flex-start", mb: 1.5 }}>
+                                            <ListItemIcon sx={{ mt: 0.5 }}>{item.icon}</ListItemIcon>
+                                            <ListItemText
+                                                primary={
+                                                    <Stack direction="row" spacing={1} alignItems="center">
+                                                        <Typography variant="body1" fontWeight="bold">
+                                                            {item.title}
+                                                        </Typography>
+                                                        {item.percent && (
+                                                            <Chip
+                                                                label={`${item.percent}%`}
+                                                                color={item.percent === 100 ? "success" : "primary"}
+                                                                size="small"
+                                                                sx={{ fontWeight: 600 }}
+                                                            />
+                                                        )}
+                                                    </Stack>
+                                                }
+                                                secondary={item.desc}
+                                                secondaryTypographyProps={{ color: "text.secondary" }}
+                                            />
+                                            <Box>
+                                                {item.percent === 75 ? (
+                                                    <Typography variant="body2" color="primary" fontWeight="bold">75%</Typography>
+                                                ) : (
+                                                    <Button
+                                                        size="small"
+                                                        sx={{ textTransform: "none", fontWeight: 600, color: "#3488e2" }}
+                                                        endIcon={<ChevronRightIcon fontSize="small" />}
+                                                    >
+                                                        {item.action}
+                                                    </Button>
+                                                )}
+                                            </Box>
+                                        </ListItem>
+                                    ))}
+                                </List>
+                            </CardContent>
+                        </Card>
+                        {/* Review card */}
+                        <Card sx={{ borderRadius: 3, textAlign: "center" }}>
+                            <CardContent>
+                                <Typography variant="subtitle1" fontWeight="bold" mb={2}>
+                                    Reviews from freelancers
+                                </Typography>
+                                <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+                                    <Stack direction="row" spacing={0.3} mb={1.5}>
+                                        {[...Array(5)].map((_, i) => (
+                                            <StarRateIcon key={i} color="warning" />
+                                        ))}
+                                    </Stack>
+                                    <Typography variant="body2" color="text.secondary">
+                                        trieumn doesn't have any reviews yet.
+                                    </Typography>
+                                </Box>
+                            </CardContent>
+                        </Card>
                     </Grid>
                 </Grid>
             </Box>

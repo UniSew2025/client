@@ -32,7 +32,6 @@ import CircularProgress from '@mui/material/CircularProgress';
 import {useNavigate} from "react-router-dom";
 
 
-
 const ClothItem = ({
                        label,
                        clothData,
@@ -633,7 +632,6 @@ const RequestHistory = () => {
                     </TableBody>
                 </Table>
 
-                {/* Pagination Component */}
                 <TablePagination
                     component="div"
                     count={historyList.length}

@@ -104,10 +104,12 @@ function RenderHeaderProfileButton({children}) {
                 fullWidth
                 endIcon={
                     <img className={'profile-btn-image'} src={JSON.parse(localStorage.getItem('user')).profile.avatar} alt={""}/>
+                    // <img className={'profile-btn-image'} src={"https://res.cloudinary.com/di1aqthok/image/upload/v1750428654/nkf4dn0imvtm5crjgben.jpg"}/>
                 }
                 sx={{color: "black"}}
             >
                 {JSON.parse(localStorage.getItem('user')).profile.name}
+                {/*{"test"}*/}
             </Button>
             <Menu
                 anchorOrigin={{vertical: 'bottom', horizontal: 'right'}}
