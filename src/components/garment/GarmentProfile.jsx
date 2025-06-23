@@ -71,7 +71,7 @@ const LinkBehavior = React.forwardRef((props, ref) =>
     <RouterLink ref={ref} {...props} />
 );
 
-export default function FiverrBuyerProfile() {
+export default function GarmentProfile() {
     return (
         <Box sx={{ bgcolor: "#f6fafd", minHeight: "100vh", py: 5 }}>
 

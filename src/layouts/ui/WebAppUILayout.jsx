@@ -103,13 +103,11 @@ function RenderHeaderProfileButton({children}) {
                 onClick={handleClick}
                 fullWidth
                 endIcon={
-                    // <img className={'profile-btn-image'} src={JSON.parse(localStorage.getItem('user')).profile.avatar} alt={""}/>
-                    <img className={'profile-btn-image'} src={"https://i.pinimg.com/564x/c6/dc/8c/c6dc8c2764bf1a42b11e97eb095a9593.jpg"} alt={""}/>
+                    <img className={'profile-btn-image'} src={JSON.parse(localStorage.getItem('user')).profile.avatar} alt={""}/>
                 }
                 sx={{color: "black"}}
             >
-                {/*{JSON.parse(localStorage.getItem('user')).profile.name}*/}
-                ABC
+                {JSON.parse(localStorage.getItem('user')).profile.name}
             </Button>
             <Menu
                 anchorOrigin={{vertical: 'bottom', horizontal: 'right'}}
@@ -177,7 +175,7 @@ function RenderHeader() {
                         children={
                             [
                                 {
-                                    link: '/designer-profile',
+                                    link: profileLink,
                                     title: 'Profile',
                                     icon: <AccountBox fontSize={"small"} color={"info"}/>
                                 },
