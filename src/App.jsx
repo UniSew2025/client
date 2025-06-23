@@ -12,7 +12,9 @@ import PlatformAdminDashboard from "./components/platform_admin/PlatformAdminDas
 import GoogleResponse from "./components/auth/GoogleResponse.jsx";
 import SignIn from "./components/auth/SignIn.jsx";
 import DesignerDetail from "./components/school/DesignerDetail.jsx";
-import SchoolProfile from "./components/school/SchoolProfile.jsx";
+import SchoolProfile from "./components/school/Profile.jsx";
+import DesignerProfile from "./components/designer/Profile.jsx";
+import GarmentProfile from "./components/garment/Profile.jsx";
 import RequestHistory from "./components/school/RequestHistory.jsx";
 import DesignerList from "./components/school/DesignerList.jsx";
 import SchoolOrder from "./components/school/SchoolOrder.jsx";
@@ -33,6 +35,22 @@ const router = createBrowserRouter([
         element: (
             <WebAppUILayout title={"Profile"}>
                 <SchoolProfile/>
+            </WebAppUILayout>
+        )
+    },
+    {
+        path: "/designer-profile",
+        element: (
+            <WebAppUILayout title={"Profile"}>
+                <DesignerProfile/>
+            </WebAppUILayout>
+        )
+    },
+    {
+        path: "/garment-profile",
+        element: (
+            <WebAppUILayout title={"Profile"}>
+                <GarmentProfile/>
             </WebAppUILayout>
         )
     },
