@@ -178,7 +178,7 @@ function SchoolStats({ stats }) {
     );
 }
 
-export default function SchoolProfile() {
+export default function Profile() {
     const school = schoolData;
     return (
         <Box sx={{ minHeight: "100vh", bgcolor: "#f6fafd", pb: 5 }}>
