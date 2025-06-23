@@ -25,7 +25,6 @@ import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import StarRateIcon from "@mui/icons-material/StarRate";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
-import {useNavigate} from "react-router-dom";
 import '../../styles/school/SchoolProfile.css'
 import {dateFormatter} from "../../utils/DateFormatter.jsx";
 
