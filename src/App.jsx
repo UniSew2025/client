@@ -12,7 +12,7 @@ import PlatformAdminDashboard from "./components/platform_admin/PlatformAdminDas
 import GoogleResponse from "./components/auth/GoogleResponse.jsx";
 import SignIn from "./components/auth/SignIn.jsx";
 import DesignerDetail from "./components/school/DesignerDetail.jsx";
-import SchoolProfile from "./components/school/Profile.jsx";
+import SchoolProfile from "./components/school/SchoolProfile.jsx";
 import DesignerProfile from "./components/designer/Profile.jsx";
 import GarmentProfile from "./components/garment/Profile.jsx";
 import RequestHistory from "./components/school/RequestHistory.jsx";
