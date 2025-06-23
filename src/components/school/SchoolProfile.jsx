@@ -1,26 +1,23 @@
 import {
     Box,
+    Button,
     Card,
     CardContent,
-    Avatar,
-    Typography,
-    Button,
-    Grid,
-    Stack,
+    Chip,
     Divider,
+    Grid,
     LinearProgress,
     List,
     ListItem,
     ListItemIcon,
     ListItemText,
-    Link as MuiLink,
-    IconButton,
-    Chip
+    Paper,
+    Stack,
+    Typography
 } from "@mui/material";
 import PublicIcon from "@mui/icons-material/Public";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import WorkOutlineIcon from "@mui/icons-material/WorkOutline";
-import LanguageIcon from "@mui/icons-material/Language";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import RemoveRedEyeIcon from "@mui/icons-material/RemoveRedEye";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
@@ -28,18 +25,11 @@ import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import StarRateIcon from "@mui/icons-material/StarRate";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
-import {Link as RouterLink} from "react-router-dom";
-import React from "react";
+import '../../styles/school/SchoolProfile.css'
+import {dateFormatter} from "../../utils/DateFormatter.jsx";
 
-const profile = {
-    name: "Your Fiverr Name",
-    username: "@trieumn",
-    location: "Vietnam",
-    joined: "June 2025",
-    industry: "",
-    languages: "",
-    workingHours: "",
-};
+
+const user = JSON.parse(localStorage.getItem('user'))
 
 const checklist = [
     {
@@ -69,168 +59,155 @@ const checklist = [
     }
 ];
 
-const LinkBehavior = React.forwardRef((props, ref) =>
-    <RouterLink ref={ref} {...props} />
-);
+function RenderLeftArea(){
+    const navigate = useNavigate()
+    return (
+        <>
+            <Paper elevation={6}>
+                <Card className={'profile-left-card'}>
+                    <CardContent>
+                        <img src={user.profile.avatar} referrerPolicy={"no-referrer"} alt={user.profile.name}/>
+                        <Typography variant="h6" fontWeight="bold">{user.profile.name}</Typography>
+                        <Typography variant="body2" color="text.secondary" mb={2}>@{user.profile.name.normalize("NFD").replace(/[\u0300-\u036f]/g, "").split(" ").join("")}</Typography>
+                        <Divider sx={{ my: 1.5 }} />
+                        <Stack spacing={1} sx={{ textAlign: "left", pl: 2, mb: 2 }}>
+                            <Stack direction="row" spacing={1} alignItems="center">
+                                <PublicIcon fontSize="small" color="action" />
+                                <Typography variant="body2">Located in {user.profile.partner.province}</Typography>
+                            </Stack>
+                            <Stack direction="row" spacing={1} alignItems="center">
+                                <CalendarMonthIcon fontSize="small" color="action" />
+                                <Typography variant="body2">Joined in {dateFormatter(user.registerDate)}</Typography>
+                            </Stack>
+                            <Stack direction="row" spacing={1} alignItems="center">
+                                <AccessTimeIcon fontSize="small" color="action" />
+                                <Typography variant="body2">Work from {"6am to 5pm"}</Typography>
+                            </Stack>
+                        </Stack>
+                        <Button
+                            variant="outlined"
+                            fullWidth
+                            startIcon={<RemoveRedEyeIcon />}
+                            sx={{ mb: 1, borderRadius: 2, textTransform: "none", fontWeight: "bold" }}
+                            onClick={() => navigate("/school/order")}
+                        >
+                            View my orders
+                        </Button>
+                        <Button
+                            variant="outlined"
+                            fullWidth
+                            endIcon={<ArrowForwardIcon />}
+                            sx={{ borderRadius: 2, textTransform: "none", fontWeight: "bold" }}
+                            onClick={() => navigate("/home")}
+                        >
+                            Explore UniSew
+                        </Button>
+                    </CardContent>
+                </Card>
+            </Paper>
+        </>
+    )
+}
+
+function RenderRightArea(){
+    return(
+        <>
+            <Grid item xs={12} md={8}>
+                <Box sx={{ mb: 2 }}>
+                    <Typography variant="h5" fontWeight="bold" mb={1}>
+                        Hi {user.profile.name} <span role="img" aria-label="wave">👋</span> Let’s help UniSew get to know you
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                        Get the most out of UniSew by sharing a bit more about yourself and how you prefer to work with us.
+                    </Typography>
+                </Box>
+
+                <Paper elevation={6}>
+                    <Card sx={{ mb: 3}}>
+                        <CardContent>
+                            <Typography variant="subtitle1" fontWeight="bold" mb={1.5}>
+                                Profile checklist
+                            </Typography>
+                            <LinearProgress
+                                variant="determinate"
+                                value={25}
+                                sx={{ height: 7, borderRadius: 5, mb: 2, bgcolor: "#e0e8ef" }}
+                            />
+                            <List disablePadding>
+                                {checklist.map((item, i) => (
+                                    <ListItem key={i} disablePadding sx={{ alignItems: "flex-start", mb: 1.5 }}>
+                                        <ListItemIcon sx={{ mt: 0.5 }}>{item.icon}</ListItemIcon>
+                                        <ListItemText
+                                            primary={
+                                                <Stack direction="row" spacing={1} alignItems="center">
+                                                    <Typography variant="body1" fontWeight="bold">
+                                                        {item.title}
+                                                    </Typography>
+                                                    {item.percent && (
+                                                        <Chip
+                                                            label={`${item.percent}%`}
+                                                            color={item.percent === 100 ? "success" : "primary"}
+                                                            size="small"
+                                                            sx={{ fontWeight: 600 }}
+                                                        />
+                                                    )}
+                                                </Stack>
+                                            }
+                                            secondary={item.desc}
+                                            secondaryTypographyProps={{ color: "text.secondary" }}
+                                        />
+                                        <Box>
+                                            {item.percent === 75 ? (
+                                                <Typography variant="body2" color="primary" fontWeight="bold">75%</Typography>
+                                            ) : (
+                                                <Button
+                                                    size="small"
+                                                    sx={{ textTransform: "none", fontWeight: 600, color: "#3488e2" }}
+                                                    endIcon={<ChevronRightIcon fontSize="small" />}
+                                                >
+                                                    {item.action}
+                                                </Button>
+                                            )}
+                                        </Box>
+                                    </ListItem>
+                                ))}
+                            </List>
+                        </CardContent>
+                    </Card>
+                </Paper>
+
+                <Paper elevation={6}>
+                    <Card sx={{textAlign: "center" }}>
+                        <CardContent>
+                            <Typography variant="subtitle1" fontWeight="bold" mb={2}>
+                                Reviews from freelancers
+                            </Typography>
+                            <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+                                <Stack direction="row" spacing={0.3} mb={1.5}>
+                                    {[...Array(5)].map((_, i) => (
+                                        <StarRateIcon key={i} color="warning" />
+                                    ))}
+                                </Stack>
+                                <Typography variant="body2" color="text.secondary">
+                                    You don't have any reviews yet.
+                                </Typography>
+                            </Box>
+                        </CardContent>
+                    </Card>
+                </Paper>
+            </Grid>
+        </>
+    )
+}
 
 export default function FiverrBuyerProfile() {
     return (
-        <Box sx={{ bgcolor: "#f6fafd", minHeight: "100vh", py: 5 }}>
+        <Box sx={{minHeight: "100vh", py: 5 }}>
 
             <Box sx={{ maxWidth: 1200, mx: "auto" }}>
                 <Grid container spacing={3} >
-                    {/* Left: Card info */}
-                    <Grid item xs={12} md={4} maxWidth={400}>
-                        <Card sx={{ borderRadius: 3, textAlign: "center", px: 2 }}>
-                            <CardContent>
-                                <Avatar sx={{ width: 70, height: 70, mx: "auto", mb: 2, fontSize: 34, bgcolor: "#e0e0e0", color: "#757575" }}>
-                                    T
-                                </Avatar>
-                                <Typography variant="h6" fontWeight="bold">{profile.name}</Typography>
-                                <Typography variant="body2" color="text.secondary" mb={2}>{profile.username}</Typography>
-                                <Divider sx={{ my: 1.5 }} />
-                                <Stack spacing={1} sx={{ textAlign: "left", pl: 2, mb: 2 }}>
-                                    <Stack direction="row" spacing={1} alignItems="center">
-                                        <PublicIcon fontSize="small" color="action" />
-                                        <Typography variant="body2">Located in {profile.location}</Typography>
-                                    </Stack>
-                                    <Stack direction="row" spacing={1} alignItems="center">
-                                        <CalendarMonthIcon fontSize="small" color="action" />
-                                        <Typography variant="body2">Joined in {profile.joined}</Typography>
-                                    </Stack>
-                                    <Stack direction="row" spacing={1} alignItems="center">
-                                        <WorkOutlineIcon fontSize="small" color="action" />
-                                        <Typography variant="body2">{profile.industry || "Your industry"}</Typography>
-                                    </Stack>
-                                    <Stack direction="row" spacing={1} alignItems="center">
-                                        <LanguageIcon fontSize="small" color="action" />
-                                        <Typography variant="body2">{profile.languages || "Preferred languages"}</Typography>
-                                    </Stack>
-                                    <Stack direction="row" spacing={1} alignItems="center">
-                                        <AccessTimeIcon fontSize="small" color="action" />
-                                        <Typography variant="body2">{profile.workingHours || "Preferred working hours"}</Typography>
-                                    </Stack>
-                                </Stack>
-                                <Button
-                                    variant="outlined"
-                                    fullWidth
-                                    startIcon={<RemoveRedEyeIcon />}
-                                    sx={{ mb: 1, borderRadius: 2, textTransform: "none", fontWeight: "bold" }}
-                                    component={LinkBehavior}
-                                    to="/designer/list"
-                                >
-                                    Preview public profile
-                                </Button>
-                                <Button
-                                    variant="outlined"
-                                    fullWidth
-                                    endIcon={<ArrowForwardIcon />}
-                                    sx={{ borderRadius: 2, textTransform: "none", fontWeight: "bold" }}
-                                    component={LinkBehavior}
-                                    to="/designer/list"
-                                >
-                                    Explore Fiverr
-                                </Button>
-                                <Typography
-                                    variant="caption"
-                                    color="text.secondary"
-                                    display="block"
-                                    mt={2}
-                                >
-                                    You're currently on your buyer profile. To access your freelancer profile, switch to seller mode
-                                </Typography>
-                            </CardContent>
-                        </Card>
-                    </Grid>
-
-                    {/* Right: Checklist & Review */}
-                    <Grid item xs={12} md={8}>
-                        {/* Breadcrumb */}
-                        <Box sx={{ maxWidth: 980, mx: "auto", mb: 1 }}>
-                            <Typography variant="body2" color="text.secondary">
-                                Home / My Profile
-                            </Typography>
-                        </Box>
-                        {/* Headline */}
-                        <Box sx={{ mb: 2 }}>
-                            <Typography variant="h5" fontWeight="bold" mb={1}>
-                                Hi <span role="img" aria-label="wave">👋</span> Let’s help freelancers get to know you
-                            </Typography>
-                            <Typography variant="body2" color="text.secondary">
-                                Get the most out of Fiverr by sharing a bit more about yourself and how you prefer to work with freelancers.
-                            </Typography>
-                        </Box>
-                        {/* Profile checklist */}
-                        <Card sx={{ mb: 3, borderRadius: 3 }}>
-                            <CardContent>
-                                <Typography variant="subtitle1" fontWeight="bold" mb={1.5}>
-                                    Profile checklist
-                                </Typography>
-                                <LinearProgress
-                                    variant="determinate"
-                                    value={25}
-                                    sx={{ height: 7, borderRadius: 5, mb: 2, bgcolor: "#e0e8ef" }}
-                                />
-                                <List disablePadding>
-                                    {checklist.map((item, i) => (
-                                        <ListItem key={i} disablePadding sx={{ alignItems: "flex-start", mb: 1.5 }}>
-                                            <ListItemIcon sx={{ mt: 0.5 }}>{item.icon}</ListItemIcon>
-                                            <ListItemText
-                                                primary={
-                                                    <Stack direction="row" spacing={1} alignItems="center">
-                                                        <Typography variant="body1" fontWeight="bold">
-                                                            {item.title}
-                                                        </Typography>
-                                                        {item.percent && (
-                                                            <Chip
-                                                                label={`${item.percent}%`}
-                                                                color={item.percent === 100 ? "success" : "primary"}
-                                                                size="small"
-                                                                sx={{ fontWeight: 600 }}
-                                                            />
-                                                        )}
-                                                    </Stack>
-                                                }
-                                                secondary={item.desc}
-                                                secondaryTypographyProps={{ color: "text.secondary" }}
-                                            />
-                                            <Box>
-                                                {item.percent === 75 ? (
-                                                    <Typography variant="body2" color="primary" fontWeight="bold">75%</Typography>
-                                                ) : (
-                                                    <Button
-                                                        size="small"
-                                                        sx={{ textTransform: "none", fontWeight: 600, color: "#3488e2" }}
-                                                        endIcon={<ChevronRightIcon fontSize="small" />}
-                                                    >
-                                                        {item.action}
-                                                    </Button>
-                                                )}
-                                            </Box>
-                                        </ListItem>
-                                    ))}
-                                </List>
-                            </CardContent>
-                        </Card>
-                        {/* Review card */}
-                        <Card sx={{ borderRadius: 3, textAlign: "center" }}>
-                            <CardContent>
-                                <Typography variant="subtitle1" fontWeight="bold" mb={2}>
-                                    Reviews from freelancers
-                                </Typography>
-                                <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-                                    <Stack direction="row" spacing={0.3} mb={1.5}>
-                                        {[...Array(5)].map((_, i) => (
-                                            <StarRateIcon key={i} color="warning" />
-                                        ))}
-                                    </Stack>
-                                    <Typography variant="body2" color="text.secondary">
-                                        trieumn doesn't have any reviews yet.
-                                    </Typography>
-                                </Box>
-                            </CardContent>
-                        </Card>
-                    </Grid>
+                    <RenderLeftArea/>
+                    <RenderRightArea/>
                 </Grid>
             </Box>
         </Box>
