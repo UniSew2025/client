@@ -30,7 +30,7 @@ import {Link as RouterLink} from "react-router-dom";
 import React from "react";
 
 const profile = {
-    name: "Your Fiverr Name",
+    name: "Your UniSew Name",
     username: "@trieumn",
     location: "Vietnam",
     joined: "June 2025",
@@ -42,7 +42,7 @@ const profile = {
 const checklist = [
     {
         icon: <InfoOutlinedIcon color="primary" />,
-        title: "Share how you plan to use Fiverr",
+        title: "Share how you plan to use UniSew",
         desc: "Tell us if you’re here to find services or offer them.",
         percent: 75,
         done: false
@@ -127,7 +127,7 @@ export default function SchoolProfile() {
                                     component={LinkBehavior}
                                     to="/designer/list"
                                 >
-                                    Explore Fiverr
+                                    Explore UniSew
                                 </Button>
                                 <Typography
                                     variant="caption"
@@ -155,7 +155,7 @@ export default function SchoolProfile() {
                                 Hi <span role="img" aria-label="wave">👋</span> Let’s help freelancers get to know you
                             </Typography>
                             <Typography variant="body2" color="text.secondary">
-                                Get the most out of Fiverr by sharing a bit more about yourself and how you prefer to work with freelancers.
+                                Get the most out of UniSew by sharing a bit more about yourself and how you prefer to work with freelancers.
                             </Typography>
                         </Box>
                         {/* Profile checklist */}
