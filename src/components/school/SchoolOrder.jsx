@@ -2,7 +2,7 @@ import '../../styles/school/SchoolOrder.css'
 
 function RenderPage(){
     return (
-        <h1>School order</h1>
+        <h1 className={'d-flex w-100 justify-content-center'}>Coming soon</h1>
     )
 }
 

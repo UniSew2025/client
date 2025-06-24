@@ -27,6 +27,8 @@ import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import '../../styles/school/SchoolProfile.css'
 import {dateFormatter} from "../../utils/DateFormatter.jsx";
+import {useNavigate} from "react-router-dom";
+
 
 
 const user = JSON.parse(localStorage.getItem('user'))
@@ -34,7 +36,7 @@ const user = JSON.parse(localStorage.getItem('user'))
 const checklist = [
     {
         icon: <InfoOutlinedIcon color="primary" />,
-        title: "Share how you plan to use Fiverr",
+        title: "Share how you plan to use UniSew",
         desc: "Tell us if you’re here to find services or offer them.",
         percent: 75,
         done: false
@@ -180,16 +182,11 @@ function RenderRightArea(){
                     <Card sx={{textAlign: "center" }}>
                         <CardContent>
                             <Typography variant="subtitle1" fontWeight="bold" mb={2}>
-                                Reviews from freelancers
+                                My feedback history
                             </Typography>
                             <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-                                <Stack direction="row" spacing={0.3} mb={1.5}>
-                                    {[...Array(5)].map((_, i) => (
-                                        <StarRateIcon key={i} color="warning" />
-                                    ))}
-                                </Stack>
                                 <Typography variant="body2" color="text.secondary">
-                                    You don't have any reviews yet.
+                                    You haven't left any feedback yet.
                                 </Typography>
                             </Box>
                         </CardContent>

@@ -21,6 +21,7 @@ import DesignerList from "./components/school/DesignerList.jsx";
 import SchoolOrder from "./components/school/SchoolOrder.jsx";
 import SchoolLayout from "./layouts/school/SchoolLayout.jsx";
 import RequestDetail from "./components/school/RequestDetail.jsx";
+import UploadZip from "./components/school/UploadZip.jsx";
 
 const router = createBrowserRouter([
     {
@@ -81,7 +82,7 @@ const router = createBrowserRouter([
         ]
     },
     {
-        path: "/designer-profile",
+        path: "/designer/detail",
         element: (
             <WebAppUILayout title={"Profile"}>
                 <DesignerDetail/>
@@ -92,6 +93,12 @@ const router = createBrowserRouter([
         path: "/sign-in",
         element: (
             <SignIn/>
+        )
+    },
+    {
+        path: "/upload",
+        element: (
+            <UploadZip/>
         )
     },
     {
