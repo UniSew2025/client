@@ -27,3 +27,8 @@ export const getSampleImages = async () => {
     const response = await axiosClient.get("/design/sampleImage-list");
     return response?.data || null;
 }
+
+export const getAllComments = async (requestId) => {
+    const response = await axiosClient.get(`/design/design-request/${requestId}/comments`);
+    return response?.data || null;
+}

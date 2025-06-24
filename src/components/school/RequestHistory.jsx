@@ -1,4 +1,4 @@
-import {useEffect, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import {
     Accordion,
     AccordionDetails,
@@ -62,6 +62,9 @@ const ClothItem = ({
     const [templateList, setTemplateList] = useState([]);
     const [templateDialogOpen, setTemplateDialogOpen] = useState(false);
     const [zoomDialogOpen, setZoomDialogOpen] = useState(false);
+    const imageInputRef = useRef();
+    const logoInputRef = useRef();
+
 
 
     const [logoPart1, setLogoPart1] = useState('front');
@@ -164,7 +167,9 @@ const ClothItem = ({
                 }));
             }
         }
+        if (logoInputRef.current) logoInputRef.current.value = '';
     };
+
 
     return (
         <Accordion>
@@ -209,7 +214,14 @@ const ClothItem = ({
                         <Typography variant="subtitle2">Upload your uniform images</Typography>
                         <Button variant="outlined" component="label" fullWidth disabled={uploading}>
                             {uploading ? "Uploading..." : "Upload Images"}
-                            <input hidden type="file" multiple accept="image/*" onChange={handleImageUpload}/>
+                            <input
+                                ref={imageInputRef}
+                                hidden
+                                type="file"
+                                multiple
+                                accept="image/*"
+                                onChange={handleImageUpload}
+                            />
                         </Button>
                         {uploading && (
                             <Box display="flex" alignItems="center" mt={1}>
@@ -231,6 +243,7 @@ const ClothItem = ({
                                         size="small"
                                         onClick={() => {
                                             setImages(prev => prev.filter((_, idx) => idx !== i));
+                                            if (imageInputRef.current) imageInputRef.current.value = '';
                                         }}
                                         sx={{
                                             position: 'absolute',
@@ -344,13 +357,42 @@ const ClothItem = ({
                             </Typography>
                             <Button variant="outlined" component="label" fullWidth>
                                 Upload Logo
-                                <input hidden type="file" accept="image/*" onChange={handleLogoUpload}/>
+                                <input
+                                    ref={logoInputRef}
+                                    hidden
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={handleLogoUpload}
+                                />
                             </Button>
+
                             {sharedLogo?.logoImage && (
-                                <Box mt={1}>
-                                    <img src={sharedLogo.logoImage} alt="logo" width={80}/>
+                                <Box mt={1} position="relative" display="inline-block" width={80} height={80}>
+                                    <img src={sharedLogo.logoImage} alt="logo" width={80} height={80} style={{ borderRadius: 4, border: '1px solid #ccc', objectFit: 'cover' }} />
+                                    <IconButton
+                                        size="small"
+                                        onClick={() => {
+                                            if (onSharedLogoChange) {
+                                                onSharedLogoChange(prev => ({
+                                                    ...prev,
+                                                    logoImage: '',
+                                                }));
+                                                if (logoInputRef.current) logoInputRef.current.value = '';
+                                            }
+                                        }}
+                                        sx={{
+                                            position: 'absolute',
+                                            top: 0,
+                                            right: 0,
+                                            background: 'rgba(255,255,255,0.8)',
+                                            '&:hover': { background: 'rgba(255,0,0,0.7)' }
+                                        }}
+                                    >
+                                        <CloseIcon fontSize="small" />
+                                    </IconButton>
                                 </Box>
                             )}
+
                         </Box>
 
                         <Box mt={2}>
@@ -623,7 +665,7 @@ const RequestHistory = () => {
     };
 
     const handleViewDetail = (item) => {
-        navigate('/school/detail', {state: {requestId: item.id}});
+        navigate('/school/detail', { state: { requestId: item.id , packageId: item.package } });
     }
 
     function RenderRadioSelection() {
