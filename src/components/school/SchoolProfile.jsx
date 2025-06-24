@@ -27,6 +27,8 @@ import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import '../../styles/school/SchoolProfile.css'
 import {dateFormatter} from "../../utils/DateFormatter.jsx";
+import {useNavigate} from "react-router-dom";
+
 
 
 const user = JSON.parse(localStorage.getItem('user'))
