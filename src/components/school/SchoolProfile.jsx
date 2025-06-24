@@ -185,16 +185,11 @@ function RenderRightArea(){
                     <Card sx={{textAlign: "center" }}>
                         <CardContent>
                             <Typography variant="subtitle1" fontWeight="bold" mb={2}>
-                                Reviews from freelancers
+                                My feedback history
                             </Typography>
                             <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-                                <Stack direction="row" spacing={0.3} mb={1.5}>
-                                    {[...Array(5)].map((_, i) => (
-                                        <StarRateIcon key={i} color="warning" />
-                                    ))}
-                                </Stack>
                                 <Typography variant="body2" color="text.secondary">
-                                    You don't have any reviews yet.
+                                    You haven't left any feedback yet.
                                 </Typography>
                             </Box>
                         </CardContent>

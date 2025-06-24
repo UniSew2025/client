@@ -7,8 +7,8 @@ import Home from "./components/auth/Home.jsx";
 import {useEffect} from "react";
 import UniSewConsole from "./components/ui/UniSewConsole.jsx";
 import 'bootstrap/dist/css/bootstrap.min.css'
-import PlatformAdminLayout from "./layouts/platform_admin/PlatformAdminLayout.jsx";
-import PlatformAdminDashboard from "./components/platform_admin/PlatformAdminDashboard.jsx";
+import PlatformAdminLayout from "./layouts/admin/PlatformAdminLayout.jsx";
+import AdminDashboard from "./components/admin/AdminDashboard.jsx";
 import GoogleResponse from "./components/auth/GoogleResponse.jsx";
 import SignIn from "./components/auth/SignIn.jsx";
 import DesignerDetail from "./components/school/DesignerDetail.jsx";
@@ -21,6 +21,8 @@ import SchoolOrder from "./components/school/SchoolOrder.jsx";
 import SchoolLayout from "./layouts/school/SchoolLayout.jsx";
 import RequestDetail from "./components/school/RequestDetail.jsx";
 import RequestList from "./components/school/RequestList.jsx";
+import AdminAccount from "./components/admin/AdminAccount.jsx";
+import UploadZip from "./components/school/UploadZip.jsx";
 
 const router = createBrowserRouter([
     {
@@ -89,7 +91,7 @@ const router = createBrowserRouter([
         ]
     },
     {
-        path: "/designer-profile",
+        path: "/designer/detail",
         element: (
             <WebAppUILayout title={"Profile"}>
                 <DesignerDetail/>
@@ -100,6 +102,12 @@ const router = createBrowserRouter([
         path: "/sign-in",
         element: (
             <SignIn/>
+        )
+    },
+    {
+        path: "/upload",
+        element: (
+            <UploadZip/>
         )
     },
     {
@@ -124,7 +132,11 @@ const router = createBrowserRouter([
             },
             {
                 path: 'dashboard',
-                element: <PlatformAdminDashboard/>
+                element: <AdminDashboard/>
+            },
+            {
+                path: 'account',
+                element: <AdminAccount/>
             }
         ]
     },

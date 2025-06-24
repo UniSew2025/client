@@ -1,6 +1,14 @@
 import '../../styles/ui/WebAppUILayout.css'
-import {Button, Divider, Link, ListItemIcon, Menu, MenuItem, Typography,} from "@mui/material";
-import {AccountBox, KeyboardArrowDown, KeyboardArrowUp, Logout} from '@mui/icons-material';
+import {Badge, Button, Divider, IconButton, Link, ListItemIcon, Menu, MenuItem, Typography,} from "@mui/material";
+import {
+    AccountBox,
+    DesignServices,
+    Inventory,
+    KeyboardArrowDown,
+    KeyboardArrowUp,
+    Logout,
+    Notifications
+} from '@mui/icons-material';
 import {useNavigate} from "react-router-dom";
 import {useState} from "react";
 
@@ -137,6 +145,7 @@ function RenderHeader() {
     const navigate = useNavigate()
     const existedUser = JSON.parse(localStorage.getItem("user"));
     const profileLink = existedUser ? '/' + existedUser.role + "-profile" : null
+    const notification = 0
     return (
         <div className="home-header">
             <img src={"/logo_full.png"} alt="UniSew"/>
@@ -175,22 +184,53 @@ function RenderHeader() {
                     <Button variant={"outlined"} sx={{color: "black", borderColor: "black"}}
                             onClick={() => navigate("/sign-in")}>Sign in</Button>
                 ) : (
-                    <RenderHeaderProfileButton
-                        children={
-                            [
-                                {
-                                    link: profileLink,
-                                    title: 'Profile',
-                                    icon: <AccountBox fontSize={"small"} color={"info"}/>
-                                },
-                                {
-                                    link: '/sign-in',
-                                    title: 'Sign out',
-                                    icon: <Logout fontSize={"small"} color={"error"}/>
-                                }
-                            ]
-                        }
-                    />
+                    <>
+                        <IconButton>
+                            <Badge badgeContent={notification} max={10} color={"error"} invisible={notification === 0}>
+                                <Notifications sx={{height: '30px', width: '30px'}} color={"warning"}/>
+                            </Badge>
+                        </IconButton>
+                        <RenderHeaderProfileButton
+                            children={
+                                existedUser.role === 'school' ?
+                                    [
+                                        {
+                                            link: profileLink,
+                                            title: 'Profile',
+                                            icon: <AccountBox fontSize={"small"} color={"info"}/>
+                                        },
+                                        {
+                                            link: '/school/design',
+                                            title: 'My Designs',
+                                            icon: <DesignServices fontSize={"small"} color={"primary"}/>
+                                        },
+                                        {
+                                            link: '/school/order',
+                                            title: 'My Orders',
+                                            icon: <Inventory fontSize={"small"} color={"secondary"}/>
+                                        },
+                                        {
+                                            link: '/sign-in',
+                                            title: 'Sign out',
+                                            icon: <Logout fontSize={"small"} color={"error"}/>
+                                        }
+                                    ]
+                                    :
+                                    [
+                                        {
+                                            link: profileLink,
+                                            title: 'Profile',
+                                            icon: <AccountBox fontSize={"small"} color={"info"}/>
+                                        },
+                                        {
+                                            link: '/sign-in',
+                                            title: 'Sign out',
+                                            icon: <Logout fontSize={"small"} color={"error"}/>
+                                        }
+                                    ]
+                            }
+                        />
+                    </>
                 )}
 
             </div>
@@ -244,6 +284,9 @@ function RenderPage({children, title}) {
 }
 
 export default function WebAppUILayout({children, title}) {
+    if(localStorage.getItem('user') && JSON.parse(localStorage.getItem('user')).role !== 'school'){
+        window.location.href = "/sign-in"
+    }
     return (
         <RenderPage children={children} title={title}/>
     )
