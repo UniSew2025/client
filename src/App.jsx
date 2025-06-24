@@ -9,6 +9,7 @@ import UniSewConsole from "./components/ui/UniSewConsole.jsx";
 import 'bootstrap/dist/css/bootstrap.min.css'
 import PlatformAdminLayout from "./layouts/platform_admin/PlatformAdminLayout.jsx";
 import PlatformAdminDashboard from "./components/platform_admin/PlatformAdminDashboard.jsx";
+import Accounts from "./components/platform_admin/Accounts.jsx";
 import GoogleResponse from "./components/auth/GoogleResponse.jsx";
 import SignIn from "./components/auth/SignIn.jsx";
 import DesignerDetail from "./components/school/DesignerDetail.jsx";
@@ -116,6 +117,10 @@ const router = createBrowserRouter([
             {
                 path: 'dashboard',
                 element: <PlatformAdminDashboard/>
+            },
+            {
+                path: 'accounts',
+                element: <Accounts/>
             }
         ]
     },
