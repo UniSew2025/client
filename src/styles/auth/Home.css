@@ -49,6 +49,7 @@
 .testimonial-card {
     border: none;
     background: #fff;
+    min-height: 25vh;
 }
 
 .cta-bottom {
