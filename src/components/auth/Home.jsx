@@ -157,28 +157,28 @@ function BusinessSolutionsSection() {
 function TestimonialsSection() {
     const testimonials = [
         {
-            avatar: '/ava1.jpg',
-            name: 'Anna K.',
+            avatar: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSu93al_iOZAIP-60vS24JSfHTXitp9sHTZSA&s',
+            name: 'Tiểu Học Võ Văn Hát',
             text: 'UniSew helped me find exactly the design I wanted in record time!',
-            job: 'Pro Designer'
+            job: 'School'
         },
         {
-            avatar: '/ava2.jpg',
-            name: 'Mark T.',
+            avatar: 'https://ueed.edu.vn/wp-content/uploads/2022/11/tieu-hoc-linh-dong.png',
+            name: 'Tiểu học Linh Đông',
             text: 'The designer I hired was professional and quick. 10/10 experience.',
-            job: 'Pro Designer'
+            job: 'School'
         },
         {
-            avatar: '/ava3.jpg',
-            name: 'Linh P.',
+            avatar: 'https://steamsolutions.com.vn/wp-content/uploads/2024/03/TRUONG-LE-VAN-VIET-768x768.jpg',
+            name: 'Tiểu Học Lê Văn Việt',
             text: 'I use UniSew for all my needs. Always satisfied.',
-            job: 'Pro Designer'
+            job: 'School'
         }
     ];
     return (
         <section className="testimonials py-5 bg-light">
             <Container>
-                <h2 className="section-title mb-4 text-center">What customers say</h2>
+                <h2 className="section-title mb-4 text-center">What schools said</h2>
                 <Row className="justify-content-center">
                     {testimonials.map((t, idx) => (
                         <Col md={4} sm={6} xs={12} className="mb-4" key={idx}>
