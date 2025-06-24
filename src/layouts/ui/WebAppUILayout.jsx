@@ -284,6 +284,9 @@ function RenderPage({children, title}) {
 }
 
 export default function WebAppUILayout({children, title}) {
+    if(localStorage.getItem('user') && JSON.parse(localStorage.getItem('user')).role !== 'school'){
+        window.location.href = "/sign-in"
+    }
     return (
         <RenderPage children={children} title={title}/>
     )
