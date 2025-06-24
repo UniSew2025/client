@@ -18,18 +18,9 @@ function RenderLayout() {
             title: 'Account Management',
         },
         {
-            segment: 'admin/accounts',
+            segment: 'admin/account',
             title: 'Accounts',
             icon: <ManageAccounts/>
-        },
-        {
-            kind: 'header',
-            title: 'Order Management',
-        },
-        {
-            segment: 'admin/orders',
-            title: 'Orders',
-            icon: <ShoppingCart/>
         },
     ]
 
