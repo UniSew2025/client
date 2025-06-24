@@ -1,4 +1,4 @@
-import {Dashboard, ManageAccounts, ShoppingCart} from '@mui/icons-material';
+import {Dashboard, ManageAccounts} from '@mui/icons-material';
 import DashboardUILayout from "../ui/DashboardUILayout.jsx";
 
 function RenderLayout() {
