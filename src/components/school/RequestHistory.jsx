@@ -7,16 +7,18 @@ import {
     Button,
     Card,
     CardActionArea,
-    CardContent, CardMedia,
-    Checkbox,
+    CardContent,
+    CardMedia,
     Dialog,
     DialogActions,
     DialogContent,
     DialogTitle,
-    FormControlLabel,
-    FormGroup,
+    Divider,
     MenuItem,
     Paper,
+    Step,
+    StepLabel,
+    Stepper,
     Table,
     TableBody,
     TableCell,
@@ -406,55 +408,75 @@ const ClothItem = ({
 };
 
 
-const RegularForm = ({onClothChange, sharedLogo, onSharedLogoChange}) => (
-    <Box>
-        <Typography variant="h6">Regular Request</Typography>
-        <Box mt={2}>
-            <Typography fontWeight="bold">Boy</Typography>
-            <ClothItem label="Shirt" clothData={{type: 'SHIRT', category: 'REGULAR'}} gender="BOY" index={0}
-                       onChange={onClothChange}
-                       sharedLogo={sharedLogo}
-                       onSharedLogoChange={onSharedLogoChange}/>
-            <ClothItem label="Pant" clothData={{type: 'PANTS', category: 'REGULAR'}} gender="BOY" index={1}
-                       onChange={onClothChange}/>
+const RegularForm = ({onClothChange, sharedLogo, onSharedLogoChange, steps}) => {
+    return (
+        <Box>
+            <Box sx={{width: '100%'}}>
+                <Stepper activeStep={1} alternativeLabel>
+                    {steps.map((label) => (
+                        <Step key={label}>
+                            <StepLabel>{label}</StepLabel>
+                        </Step>
+                    ))}
+                </Stepper>
+            </Box>
+            <Box mt={2}>
+                <Typography fontWeight="bold">Boy</Typography>
+                <ClothItem label="Shirt" clothData={{type: 'SHIRT', category: 'REGULAR'}} gender="BOY" index={0}
+                           onChange={onClothChange}
+                           sharedLogo={sharedLogo}
+                           onSharedLogoChange={onSharedLogoChange}/>
+                <ClothItem label="Pant" clothData={{type: 'PANTS', category: 'REGULAR'}} gender="BOY" index={1}
+                           onChange={onClothChange}/>
+            </Box>
+            <Box mt={2}>
+                <Typography fontWeight="bold">Girl</Typography>
+                <ClothItem label="Shirt" clothData={{type: 'SHIRT', category: 'REGULAR'}} gender="GIRL" index={2}
+                           onChange={onClothChange}
+                           sharedLogo={sharedLogo}
+                           onSharedLogoChange={onSharedLogoChange}/>
+                <ClothItem label="Pant / Skirt" clothData={{type: 'PANTS', category: 'REGULAR'}} gender="GIRL" index={3}
+                           onChange={onClothChange}
+                           showClothTypeSelect/>
+            </Box>
         </Box>
-        <Box mt={2}>
-            <Typography fontWeight="bold">Girl</Typography>
-            <ClothItem label="Shirt" clothData={{type: 'SHIRT', category: 'REGULAR'}} gender="GIRL" index={2}
-                       onChange={onClothChange}
-                       sharedLogo={sharedLogo}
-                       onSharedLogoChange={onSharedLogoChange}/>
-            <ClothItem label="Pant / Skirt" clothData={{type: 'PANTS', category: 'REGULAR'}} gender="GIRL" index={3}
-                       onChange={onClothChange}
-                       showClothTypeSelect/>
-        </Box>
-    </Box>
-);
+    )
+};
 
 
-const PhysicalForm = ({onClothChange, sharedLogo, onSharedLogoChange}) => (
-    <Box>
-        <Typography variant="h6">Physical Education</Typography>
-        <Box mt={2}>
-            <Typography fontWeight="bold">Boy</Typography>
-            <ClothItem label="Shirt" clothData={{type: 'SHIRT', category: 'PHYSICAL'}} gender="BOY" index={4}
-                       onChange={onClothChange}
-                       sharedLogo={sharedLogo}
-                       onSharedLogoChange={onSharedLogoChange}/>
-            <ClothItem label="Pant" clothData={{type: 'PANTS', category: 'PHYSICAL'}} gender="BOY" index={5}
-                       onChange={onClothChange}/>
+const PhysicalForm = ({onClothChange, sharedLogo, onSharedLogoChange, steps}) => {
+    return (
+        <Box>
+            <Box sx={{width: '100%'}}>
+                <Stepper activeStep={steps.length === 3 ? 1 : 2} alternativeLabel>
+                    {steps.map((label) => (
+                        <Step key={label}>
+                            <StepLabel>{label}</StepLabel>
+                        </Step>
+                    ))}
+                </Stepper>
+            </Box>
+            <Box mt={2}>
+                <Typography fontWeight="bold">Boy</Typography>
+                <ClothItem label="Shirt" clothData={{type: 'SHIRT', category: 'PHYSICAL'}} gender="BOY" index={4}
+                           onChange={onClothChange}
+                           sharedLogo={sharedLogo}
+                           onSharedLogoChange={onSharedLogoChange}/>
+                <ClothItem label="Pant" clothData={{type: 'PANTS', category: 'PHYSICAL'}} gender="BOY" index={5}
+                           onChange={onClothChange}/>
+            </Box>
+            <Box mt={2}>
+                <Typography fontWeight="bold">Girl</Typography>
+                <ClothItem label="Shirt" clothData={{type: 'SHIRT', category: 'PHYSICAL'}} gender="GIRL" index={6}
+                           onChange={onClothChange}
+                           sharedLogo={sharedLogo}
+                           onSharedLogoChange={onSharedLogoChange}/>
+                <ClothItem label="Pant" clothData={{type: 'PANTS', category: 'PHYSICAL'}} gender="GIRL" index={7}
+                           onChange={onClothChange}/>
+            </Box>
         </Box>
-        <Box mt={2}>
-            <Typography fontWeight="bold">Girl</Typography>
-            <ClothItem label="Shirt" clothData={{type: 'SHIRT', category: 'PHYSICAL'}} gender="GIRL" index={6}
-                       onChange={onClothChange}
-                       sharedLogo={sharedLogo}
-                       onSharedLogoChange={onSharedLogoChange}/>
-            <ClothItem label="Pant" clothData={{type: 'PANTS', category: 'PHYSICAL'}} gender="GIRL" index={7}
-                       onChange={onClothChange}/>
-        </Box>
-    </Box>
-);
+    )
+};
 
 
 const RequestHistory = () => {
@@ -470,6 +492,11 @@ const RequestHistory = () => {
         logoImage: '',
         logoPosition: ''
     });
+
+    const steps =
+        designTypes.regular && designTypes.physical ? ["Select type", "Create regular uniform", "Create physical education uniform", "Complete"] :
+            designTypes.regular && !designTypes.physical ? ["Select type", "Create regular uniform", "Complete"] :
+                ["Select type", "Create physical education uniform", "Complete"]
 
     if (localStorage.getItem("createDesignPopup")) {
         localStorage.removeItem("createDesignPopup");
@@ -600,7 +627,6 @@ const RequestHistory = () => {
     }
 
     function RenderRadioSelection() {
-        console.log("designTypes: ", designTypes)
         return (
             <div className={'d-flex justify-content-center align-content-center mb-lg-5 gap-3'}>
                 <Card>
@@ -609,7 +635,7 @@ const RequestHistory = () => {
                         data-active={designTypes.regular ? '' : undefined}
                         sx={{
                             height: '100%',
-                            minWidth: '35vw',
+                            width: '25vw',
                             '&[data-active]': {
                                 backgroundColor: 'action.selected',
                                 '&:hover': {
@@ -621,12 +647,13 @@ const RequestHistory = () => {
                         <CardContent sx={{height: '100%'}}>
                             <CardMedia
                                 component="img"
-                                height="500"
+                                height="400"
                                 image="/regular.png"
                                 alt="Regular"
                             />
                             <Typography variant="h5" component="div" align={"center"} sx={{marginTop: '3vh'}}>
-                                Regular Uniform {designTypes.regular ? <Typography fontWeight={"bold"} color={"success"}>Selected</Typography> : ''}
+                                Regular Uniform {designTypes.regular ?
+                                <Typography fontWeight={"bold"} color={"success"}>Selected</Typography> : ''}
                             </Typography>
                         </CardContent>
                     </CardActionArea>
@@ -638,7 +665,7 @@ const RequestHistory = () => {
                         data-active={designTypes.physical ? '' : undefined}
                         sx={{
                             height: '100%',
-                            minWidth: '35vw',
+                            width: '25vw',
                             '&[data-active]': {
                                 backgroundColor: 'action.selected',
                                 '&:hover': {
@@ -650,12 +677,13 @@ const RequestHistory = () => {
                         <CardContent sx={{height: '100%'}}>
                             <CardMedia
                                 component="img"
-                                height="500"
+                                height="400"
                                 image="/PE.jpg"
                                 alt="Physical Education"
                             />
                             <Typography variant="h5" component="div" align={"center"} sx={{marginTop: '3vh'}}>
-                                Physical Education Uniform {designTypes.physical ? <Typography fontWeight={"bold"} color={"success"}>Selected</Typography> : ''}
+                                Physical Education Uniform {designTypes.physical ?
+                                <Typography fontWeight={"bold"} color={"success"}>Selected</Typography> : ''}
                             </Typography>
                         </CardContent>
                     </CardActionArea>
@@ -726,7 +754,8 @@ const RequestHistory = () => {
             </TableContainer>
 
             <Dialog open={open} onClose={handleClose} fullWidth maxWidth="lg" scroll={'paper'}>
-                <DialogTitle>Create Design Request</DialogTitle>
+                <DialogTitle variant={"h4"}>Create Design Request</DialogTitle>
+                <Divider variant={"middle"} sx={{borderTop: '1px solid black'}}/>
 
                 <DialogContent>
                     {step === 0 && (
@@ -739,6 +768,11 @@ const RequestHistory = () => {
                             {/*        control={<Checkbox checked={designTypes.physical} onChange={handleCheckboxChange}*/}
                             {/*                           name="physical"/>} label="Physical Education"/>*/}
                             {/*</FormGroup>*/}
+                            <Typography variant={"h5"} sx={{marginBottom: '1vh'}}>Choose uniform type you want to design
+                                <Typography color={"error"}>
+                                    Select at least 1 type *
+                                </Typography>
+                            </Typography>
                             <RenderRadioSelection/>
                         </>
                     )}
@@ -747,6 +781,7 @@ const RequestHistory = () => {
                             onClothChange={handleClothChange}
                             sharedLogo={sharedLogo}
                             onSharedLogoChange={setSharedLogo}
+                            steps={steps}
                         />
                     )}
                     {step === 2 && designTypes.physical && (
@@ -754,12 +789,14 @@ const RequestHistory = () => {
                             onClothChange={handleClothChange}
                             sharedLogo={sharedLogo}
                             onSharedLogoChange={setSharedLogo}
+                            steps={steps}
                         />
                     )}
 
                 </DialogContent>
                 <DialogActions>
                     {step > 0 && <Button onClick={handleBack}>Back</Button>}
+                    {step === 0 && <Button onClick={handleClose}>Close</Button>}
                     <Button onClick={handleNext} variant="contained">
                         {step === 0 ? 'Next' : (step === 1 && designTypes.physical ? 'Next' : 'Submit')}
                     </Button>
