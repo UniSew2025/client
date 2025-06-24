@@ -27,6 +27,8 @@ import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import '../../styles/school/SchoolProfile.css'
 import {dateFormatter} from "../../utils/DateFormatter.jsx";
+import {useNavigate} from "react-router-dom";
+import EditIcon from "@mui/icons-material/Edit";
 
 
 const user = JSON.parse(localStorage.getItem('user'))
@@ -34,27 +36,26 @@ const user = JSON.parse(localStorage.getItem('user'))
 const checklist = [
     {
         icon: <InfoOutlinedIcon color="primary" />,
-        title: "Share how you plan to use Fiverr",
-        desc: "Tell us if you’re here to find services or offer them.",
-        percent: 75,
-        done: false
+        title: "...",
+        desc: "...",
+        action: "Add"
     },
     {
-        icon: <AddCircleOutlineIcon color="action" />,
+        icon: <AddCircleOutlineIcon color="primary" />,
         title: "Add details for your profile",
-        desc: "Upload a photo and info for a more tailored experience.",
+        desc: "Upload a photo and info for more experience...",
         action: "Add"
     },
     {
-        icon: <WorkOutlineIcon color="action" />,
-        title: "Tell us about your business",
-        desc: "Get tailored recommendations and tips to help it grow.",
+        icon: <WorkOutlineIcon color="primary" />,
+        title: "...",
+        desc: "...",
         action: "Add"
     },
     {
-        icon: <AccessTimeIcon color="action" />,
-        title: "Set your communication preferences",
-        desc: "Let freelancers know your collaboration preferences.",
+        icon: <AccessTimeIcon color="primary" />,
+        title: "...",
+        desc: "...",
         action: "Add"
     }
 ];
@@ -97,10 +98,19 @@ function RenderLeftArea(){
                             variant="outlined"
                             fullWidth
                             endIcon={<ArrowForwardIcon />}
-                            sx={{ borderRadius: 2, textTransform: "none", fontWeight: "bold" }}
+                            sx={{ mb:1, borderRadius: 2, textTransform: "none", fontWeight: "bold" }}
                             onClick={() => navigate("/home")}
                         >
                             Explore UniSew
+                        </Button>
+                        <Button
+                            variant="outlined"
+                            fullWidth
+                            startIcon={<EditIcon />}
+                            sx={{ borderRadius: 2, textTransform: "none", fontWeight: "bold" }}
+                            onClick={() => navigate("/home")}
+                        >
+                            Edit profile
                         </Button>
                     </CardContent>
                 </Card>
@@ -128,11 +138,6 @@ function RenderRightArea(){
                             <Typography variant="subtitle1" fontWeight="bold" mb={1.5}>
                                 Profile checklist
                             </Typography>
-                            <LinearProgress
-                                variant="determinate"
-                                value={25}
-                                sx={{ height: 7, borderRadius: 5, mb: 2, bgcolor: "#e0e8ef" }}
-                            />
                             <List disablePadding>
                                 {checklist.map((item, i) => (
                                     <ListItem key={i} disablePadding sx={{ alignItems: "flex-start", mb: 1.5 }}>
@@ -200,11 +205,11 @@ function RenderRightArea(){
     )
 }
 
-export default function FiverrBuyerProfile() {
+export default function SchoolProfile() {
     return (
         <Box sx={{minHeight: "100vh", py: 5 }}>
 
-            <Box sx={{ maxWidth: 1200, mx: "auto" }}>
+            <Box sx={{ maxWidth: 1400, mx: "auto" }}>
                 <Grid container spacing={3} >
                     <RenderLeftArea/>
                     <RenderRightArea/>
