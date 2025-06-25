@@ -1,4 +1,4 @@
-import '../../styles/ui/DashBoardWebUILayout.css'
+import '../../styles/ui/DashboardWebUILayout.css'
 import {Outlet} from 'react-router-dom'
 import {Link, Typography} from "@mui/material";
 
@@ -61,7 +61,7 @@ function RenderPage({navigation}) {
     )
 }
 
-export default function DashBoardWebUILayout({navigation}) {
+export default function DashboardWebUILayout({navigation}) {
     return (
         <RenderPage navigation={navigation}/>
     )
