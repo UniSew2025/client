@@ -56,7 +56,7 @@ function Accounts() {
         email: '',
         role: '',
         registerDate: '',
-        status: 'ACTIVE'
+        status: 'active'
     });
 
     useEffect(() => {
@@ -96,7 +96,7 @@ function Accounts() {
                 email: account.email || '',
                 role: account.role || '',
                 registerDate: account.registerDate || '',
-                status: account.status || 'ACCOUNT_ACTIVE'
+                status: account.status || 'active'
             });
         } else {
             setFormData({
@@ -104,7 +104,7 @@ function Accounts() {
                 email: '',
                 role: '',
                 registerDate: '',
-                status: 'ACCOUNT_ACTIVE'
+                status: 'active'
             });
         }
         
@@ -119,7 +119,7 @@ function Accounts() {
             email: '',
             role: '',
             registerDate: '',
-            status: 'ACCOUNT_ACTIVE'
+            status: 'active'
         });
     };
 
@@ -182,7 +182,7 @@ function Accounts() {
     };
 
     const getStatusColor = (status) => {
-        return status === 'ACCOUNT_ACTIVE' ? 'success' : 'error';
+        return status === 'active' ? 'success' : 'error';
     };
 
     // Filter accounts based on search term
@@ -374,7 +374,7 @@ function Accounts() {
                             value={formData.role}
                             onChange={handleInputChange}
                             margin="normal"
-                            disabled={dialogMode === 'view'}
+                            disabled={dialogMode === 'view' || dialogMode === 'edit'}
                             required
                         >
                             <option value="">Select Role</option>
@@ -391,7 +391,7 @@ function Accounts() {
                             value={formData.registerDate}
                             onChange={handleInputChange}
                             margin="normal"
-                            disabled={dialogMode === 'view'}
+                            disabled={dialogMode === 'view' || dialogMode === 'edit'}
                             InputLabelProps={{
                                 shrink: true,
                             }}
@@ -408,8 +408,8 @@ function Accounts() {
                             disabled={dialogMode === 'view'}
                             required
                         >
-                            <option value="ACCOUNT_ACTIVE">Active</option>
-                            <option value="ACCOUNT_INACTIVE">Inactive</option>
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
                         </TextField>
                     </Box>
                 </DialogContent>
