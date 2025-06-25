@@ -34,7 +34,7 @@ const router = createBrowserRouter([
         )
     },
     {
-        path: "/school-profile",
+        path: "/school/profile",
         element: (
             <WebAppUILayout title={"Profile"}>
                 <SchoolProfile/>
@@ -42,7 +42,7 @@ const router = createBrowserRouter([
         )
     },
     {
-        path: "/designer-profile",
+        path: "/designer/profile",
         element: (
             <WebAppUILayout title={"Profile"}>
                 <DesignerProfile/>
@@ -50,7 +50,7 @@ const router = createBrowserRouter([
         )
     },
     {
-        path: "/garment-profile",
+        path: "/garment/profile",
         element: (
             <WebAppUILayout title={"Profile"}>
                 <GarmentProfile/>
@@ -99,7 +99,7 @@ const router = createBrowserRouter([
         )
     },
     {
-        path: "/sign-in",
+        path: "/signin",
         element: (
             <SignIn/>
         )

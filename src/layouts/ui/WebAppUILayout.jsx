@@ -144,7 +144,7 @@ function RenderHeaderProfileButton({children}) {
 function RenderHeader() {
     const navigate = useNavigate()
     const existedUser = JSON.parse(localStorage.getItem("user"));
-    const profileLink = existedUser ? '/' + existedUser.role + "-profile" : null
+    const profileLink = existedUser ? '/' + existedUser.role + "/profile" : null
     const notification = 0
     return (
         <div className="home-header">
@@ -159,11 +159,11 @@ function RenderHeader() {
                         title="Become Partner"
                         children={[
                             {
-                                link: '/partner/designer',
+                                link: '/home',
                                 title: 'Join Designer'
                             },
                             {
-                                link: '/partner/garment',
+                                link: '/home',
                                 title: 'Join Garment Factory'
                             }
                         ]}
@@ -182,7 +182,7 @@ function RenderHeader() {
             <div className="header-buttons">
                 {!existedUser ? (
                     <Button variant={"outlined"} sx={{color: "black", borderColor: "black"}}
-                            onClick={() => navigate("/sign-in")}>Sign in</Button>
+                            onClick={() => navigate("/signin")}>Sign in</Button>
                 ) : (
                     <>
                         <IconButton>
@@ -210,7 +210,7 @@ function RenderHeader() {
                                             icon: <Inventory fontSize={"small"} color={"secondary"}/>
                                         },
                                         {
-                                            link: '/sign-in',
+                                            link: '/signin',
                                             title: 'Sign out',
                                             icon: <Logout fontSize={"small"} color={"error"}/>
                                         }

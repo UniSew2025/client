@@ -43,14 +43,14 @@ function HandleResponse() {
                         window.location.href = '/home'
                         break;
                     default:
-                        window.location.href = '/sign-in'
+                        window.location.href = '/signin'
                         break;
                 }
             }
         }).catch(err => {
             enqueueSnackbar(err.response.data.message, {variant: "error"})
             setTimeout(() => {
-                window.location.href = '/sign-in'
+                window.location.href = '/signin'
             }, 1500)
         })
     }
