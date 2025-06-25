@@ -32,3 +32,8 @@ export const getAllComments = async (requestId) => {
     const response = await axiosClient.get(`/design/design-request/${requestId}/comments`);
     return response?.data || null;
 }
+
+export const getCompleteDesignRequest = async () => {
+    const response = await axiosClient.get('/design/complete-list')
+    return response || null;
+}

@@ -520,6 +520,30 @@ const PhysicalForm = ({onClothChange, sharedLogo, onSharedLogoChange, steps}) =>
     )
 };
 
+function RenderTooltip({title, children}){
+    return (
+        <Tooltip
+            title={title}
+            slots={{
+                transition: Fade,
+            }}
+            slotProps={{
+                transition: {timeout: 600},
+                popper: {
+                    sx: {
+                        [`&.${tooltipClasses.popper}[data-popper-placement*="bottom"] .${tooltipClasses.tooltip}`]:
+                            {
+                                marginTop: '30px',
+                            }
+                    },
+                },
+            }}
+            followCursor
+        >
+            {children}
+        </Tooltip>
+    )
+}
 
 const RequestHistory = () => {
     const [open, setOpen] = useState(localStorage.getItem("createDesignPopup") || false);
@@ -671,24 +695,7 @@ const RequestHistory = () => {
     function RenderRadioSelection() {
         return (
             <div className={'d-flex justify-content-center align-content-center mb-lg-5 gap-3'}>
-                <Tooltip
-                    title={designTypes.regular ? "Click to unselect regular uniform" : "Click to select regular uniform"}
-                    slots={{
-                        transition: Fade,
-                    }}
-                    slotProps={{
-                        transition: {timeout: 600},
-                        popper: {
-                            sx: {
-                                [`&.${tooltipClasses.popper}[data-popper-placement*="bottom"] .${tooltipClasses.tooltip}`]:
-                                    {
-                                        marginTop: '30px',
-                                    }
-                            },
-                        },
-                    }}
-                    followCursor
-                >
+                <RenderTooltip title={designTypes.regular ? "Click to unselect regular uniform" : "Click to select regular uniform"}>
                     <Card>
                         <CardActionArea
                             onClick={() => handleCheckboxChange('regular')}
@@ -719,26 +726,9 @@ const RequestHistory = () => {
                             </CardContent>
                         </CardActionArea>
                     </Card>
-                </Tooltip>
+                </RenderTooltip>
 
-                <Tooltip
-                    title={designTypes.physical ? "Click to unselect physical education uniform" : "Click to select physical education uniform"}
-                    slots={{
-                        transition: Fade,
-                    }}
-                    slotProps={{
-                        transition: {timeout: 600},
-                        popper: {
-                            sx: {
-                                [`&.${tooltipClasses.popper}[data-popper-placement*="bottom"] .${tooltipClasses.tooltip}`]:
-                                    {
-                                        marginTop: '30px',
-                                    }
-                            },
-                        },
-                    }}
-                    followCursor
-                >
+                <RenderTooltip title={designTypes.physical ? "Click to unselect physical education uniform" : "Click to select physical education uniform"}>
                     <Card>
                         <CardActionArea
                             onClick={() => handleCheckboxChange('physical')}
@@ -769,7 +759,7 @@ const RequestHistory = () => {
                             </CardContent>
                         </CardActionArea>
                     </Card>
-                </Tooltip>
+                </RenderTooltip>
             </div>
         )
     }
@@ -806,7 +796,7 @@ const RequestHistory = () => {
             </Box>
 
             <Paper elevation={2}>
-                <TableContainer component={"table"} sx={{mt: 3}}>
+                <TableContainer sx={{mt: 3}}>
                     <Table>
                         <TableHead>
                             <TableRow>
@@ -839,37 +829,21 @@ const RequestHistory = () => {
                                     <TableCell align={"center"}>
                                         {
                                             item.status.toLowerCase() === 'completed' ?
-                                                <IconButton>
-                                                    <AddCircleOutline
-                                                        color={'success'}
-                                                    />
-                                                </IconButton>
+                                                <RenderTooltip title={"Create order with this request"}>
+                                                    <IconButton>
+                                                        <AddCircleOutline
+                                                            color={'success'}
+                                                        />
+                                                    </IconButton>
+                                                </RenderTooltip>
                                                 :
-                                                <Tooltip
-                                                    title={"Current status is " + item.status.toUpperCase() + ". Required COMPLETED status to create order"}
-                                                    followCursor
-                                                    slots={{
-                                                        transition: Fade,
-                                                    }}
-                                                    slotProps={{
-                                                        transition: {timeout: 600},
-                                                        popper: {
-                                                            sx: {
-                                                                [`&.${tooltipClasses.popper}[data-popper-placement*="bottom"] .${tooltipClasses.tooltip}`]:
-                                                                    {
-                                                                        marginTop: '30px',
-                                                                    }
-                                                            },
-                                                        },
-                                                    }}
-
-                                                >
+                                                <RenderTooltip title={"Current status is " + item.status.toUpperCase() + ". Required COMPLETED status to create order"}>
                                                     <IconButton>
                                                         <RemoveCircleOutline
                                                             color={'disabled'}
                                                         />
                                                     </IconButton>
-                                                </Tooltip>
+                                                </RenderTooltip>
                                         }
                                     </TableCell>
                                 </TableRow>
