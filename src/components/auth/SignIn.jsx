@@ -2,6 +2,7 @@ import '../../styles/auth/SignIn.css'
 import {Button, Typography, Link} from "@mui/material";
 import {KeyboardBackspace} from '@mui/icons-material';
 import {getGoogleUrl} from "../../services/AuthService.jsx";
+import {enqueueSnackbar} from "notistack";
 
 const signIn = async () => {
     const response = await getGoogleUrl()
@@ -38,6 +39,11 @@ function RenderPage() {
 
     if(localStorage.length > 0) {
         localStorage.clear()
+        enqueueSnackbar("Logout successfully", {variant: 'success'})
+        enqueueSnackbar("Redirect to homepage in a second", {variant: 'warning'})
+        setTimeout(() => {
+            window.location.href = '/home'
+        }, 300)
     }
 
     return (
