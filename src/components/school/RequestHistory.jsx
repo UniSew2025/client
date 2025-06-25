@@ -8,12 +8,12 @@ import {
     Card,
     CardActionArea,
     CardContent,
-    CardMedia,
+    CardMedia, Chip,
     Dialog,
     DialogActions,
     DialogContent,
     DialogTitle,
-    Divider,
+    Divider, Fade,
     MenuItem,
     Paper,
     Step,
@@ -26,12 +26,12 @@ import {
     TableHead,
     TablePagination,
     TableRow,
-    TextField,
+    TextField, Tooltip, tooltipClasses,
     Typography
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import {createDesignRequest, getSampleImages, viewListHistory} from "../../services/DesignService.jsx";
-import {Add} from '@mui/icons-material';
+import {Add, AddCircleOutline, Info, RemoveCircleOutline} from '@mui/icons-material';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
 import CircularProgress from '@mui/material/CircularProgress';
@@ -64,7 +64,6 @@ const ClothItem = ({
     const [zoomDialogOpen, setZoomDialogOpen] = useState(false);
     const imageInputRef = useRef();
     const logoInputRef = useRef();
-
 
 
     const [logoPart1, setLogoPart1] = useState('front');
@@ -368,7 +367,8 @@ const ClothItem = ({
 
                             {sharedLogo?.logoImage && (
                                 <Box mt={1} position="relative" display="inline-block" width={80} height={80}>
-                                    <img src={sharedLogo.logoImage} alt="logo" width={80} height={80} style={{ borderRadius: 4, border: '1px solid #ccc', objectFit: 'cover' }} />
+                                    <img src={sharedLogo.logoImage} alt="logo" width={80} height={80}
+                                         style={{borderRadius: 4, border: '1px solid #ccc', objectFit: 'cover'}}/>
                                     <IconButton
                                         size="small"
                                         onClick={() => {
@@ -385,10 +385,10 @@ const ClothItem = ({
                                             top: 0,
                                             right: 0,
                                             background: 'rgba(255,255,255,0.8)',
-                                            '&:hover': { background: 'rgba(255,0,0,0.7)' }
+                                            '&:hover': {background: 'rgba(255,0,0,0.7)'}
                                         }}
                                     >
-                                        <CloseIcon fontSize="small" />
+                                        <CloseIcon fontSize="small"/>
                                     </IconButton>
                                 </Box>
                             )}
@@ -665,72 +665,128 @@ const RequestHistory = () => {
     };
 
     const handleViewDetail = (item) => {
-        navigate('/school/detail', { state: { requestId: item.id , packageId: item.package } });
+        navigate('/school/detail', {state: {requestId: item.id, packageId: item.package}});
     }
 
     function RenderRadioSelection() {
         return (
             <div className={'d-flex justify-content-center align-content-center mb-lg-5 gap-3'}>
-                <Card>
-                    <CardActionArea
-                        onClick={() => handleCheckboxChange('regular')}
-                        data-active={designTypes.regular ? '' : undefined}
-                        sx={{
-                            height: '100%',
-                            width: '25vw',
-                            '&[data-active]': {
-                                backgroundColor: 'action.selected',
-                                '&:hover': {
-                                    backgroundColor: 'action.selectedHover',
-                                },
+                <Tooltip
+                    title={designTypes.regular ? "Click to unselect regular uniform" : "Click to select regular uniform"}
+                    slots={{
+                        transition: Fade,
+                    }}
+                    slotProps={{
+                        transition: {timeout: 600},
+                        popper: {
+                            sx: {
+                                [`&.${tooltipClasses.popper}[data-popper-placement*="bottom"] .${tooltipClasses.tooltip}`]:
+                                    {
+                                        marginTop: '30px',
+                                    }
                             },
-                        }}
-                    >
-                        <CardContent sx={{height: '100%'}}>
-                            <CardMedia
-                                component="img"
-                                height="400"
-                                image="/regular.png"
-                                alt="Regular"
-                            />
-                            <Typography variant="h5" component="div" align={"center"} sx={{marginTop: '3vh'}}>
-                                Regular Uniform {designTypes.regular ?
-                                <Typography fontWeight={"bold"} color={"success"}>Selected</Typography> : ''}
-                            </Typography>
-                        </CardContent>
-                    </CardActionArea>
-                </Card>
+                        },
+                    }}
+                    followCursor
+                >
+                    <Card>
+                        <CardActionArea
+                            onClick={() => handleCheckboxChange('regular')}
+                            data-active={designTypes.regular ? '' : undefined}
+                            sx={{
+                                height: '100%',
+                                width: '25vw',
+                                '&[data-active]': {
+                                    backgroundColor: 'action.selected',
+                                    '&:hover': {
+                                        backgroundColor: 'action.selectedHover',
+                                    },
+                                },
+                            }}
+                        >
+                            <CardContent sx={{height: '100%'}}>
+                                <CardMedia
+                                    component="img"
+                                    height="400"
+                                    image="/regular.png"
+                                    alt="Regular"
+                                />
+                                <Typography variant="h5" component="div" align={"center"} sx={{marginTop: '3vh'}}>
+                                    Regular Uniform {designTypes.regular ?
+                                    <Typography fontWeight={"bold"} color={"success"}>Selected</Typography> :
+                                    <Typography fontWeight={"bold"} color={"error"}>Unselected</Typography>}
+                                </Typography>
+                            </CardContent>
+                        </CardActionArea>
+                    </Card>
+                </Tooltip>
 
-                <Card>
-                    <CardActionArea
-                        onClick={() => handleCheckboxChange('physical')}
-                        data-active={designTypes.physical ? '' : undefined}
-                        sx={{
-                            height: '100%',
-                            width: '25vw',
-                            '&[data-active]': {
-                                backgroundColor: 'action.selected',
-                                '&:hover': {
-                                    backgroundColor: 'action.selectedHover',
-                                },
+                <Tooltip
+                    title={designTypes.physical ? "Click to unselect physical education uniform" : "Click to select physical education uniform"}
+                    slots={{
+                        transition: Fade,
+                    }}
+                    slotProps={{
+                        transition: {timeout: 600},
+                        popper: {
+                            sx: {
+                                [`&.${tooltipClasses.popper}[data-popper-placement*="bottom"] .${tooltipClasses.tooltip}`]:
+                                    {
+                                        marginTop: '30px',
+                                    }
                             },
-                        }}
-                    >
-                        <CardContent sx={{height: '100%'}}>
-                            <CardMedia
-                                component="img"
-                                height="400"
-                                image="/PE.jpg"
-                                alt="Physical Education"
-                            />
-                            <Typography variant="h5" component="div" align={"center"} sx={{marginTop: '3vh'}}>
-                                Physical Education Uniform {designTypes.physical ?
-                                <Typography fontWeight={"bold"} color={"success"}>Selected</Typography> : ''}
-                            </Typography>
-                        </CardContent>
-                    </CardActionArea>
-                </Card>
+                        },
+                    }}
+                    followCursor
+                >
+                    <Card>
+                        <CardActionArea
+                            onClick={() => handleCheckboxChange('physical')}
+                            data-active={designTypes.physical ? '' : undefined}
+                            sx={{
+                                height: '100%',
+                                width: '25vw',
+                                '&[data-active]': {
+                                    backgroundColor: 'action.selected',
+                                    '&:hover': {
+                                        backgroundColor: 'action.selectedHover',
+                                    },
+                                },
+                            }}
+                        >
+                            <CardContent sx={{height: '100%'}}>
+                                <CardMedia
+                                    component="img"
+                                    height="400"
+                                    image="/PE.jpg"
+                                    alt="Physical Education"
+                                />
+                                <Typography variant="h5" component="div" align={"center"} sx={{marginTop: '3vh'}}>
+                                    Physical Education Uniform {designTypes.physical ?
+                                    <Typography fontWeight={"bold"} color={"success"}>Selected</Typography> :
+                                    <Typography fontWeight={"bold"} color={"error"}>Unselected</Typography>}
+                                </Typography>
+                            </CardContent>
+                        </CardActionArea>
+                    </Card>
+                </Tooltip>
             </div>
+        )
+    }
+
+    function RenderStatusDisplay({status}) {
+        const color = status === 'created' ? 'secondary' :
+            status === 'paid' ? 'primary' :
+                status === 'designing' ? 'info' : 'success'
+
+        return (
+            <Chip
+                color={color}
+                variant={"filled"}
+                label={status}
+                size={"small"}
+                sx={{textTransform: 'capitalize'}}
+            />
         )
     }
 
@@ -738,7 +794,7 @@ const RequestHistory = () => {
 
         <Box p={4}>
             <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
-                <Typography variant="h5">History</Typography>
+                <Typography variant="h4">Design History</Typography>
                 <Button
                     variant="contained"
                     onClick={handleOpen}
@@ -749,51 +805,92 @@ const RequestHistory = () => {
                 </Button>
             </Box>
 
-            <TableContainer component={Paper} sx={{mt: 3}}>
-                <Table>
-                    <TableHead>
-                        <TableRow>
-                            <TableCell align={"center"}><strong>ID</strong></TableCell>
-                            <TableCell align={"center"}><strong>Private</strong></TableCell>
-                            <TableCell align={"center"}><strong>Feedback</strong></TableCell>
-                            <TableCell align={"center"}><strong>Status</strong></TableCell>
-                            <TableCell align={"center"}><strong>Detail</strong></TableCell>
-                        </TableRow>
-                    </TableHead>
-                    <TableBody>
-                        {paginatedData.map((item, index) => (
-                            <TableRow key={`${item.id}-${index}`}>
-                                <TableCell align={"center"}>{item.id}</TableCell>
-                                <TableCell align={"center"}>{item.private ? "Yes" : "No"}</TableCell>
-                                <TableCell align={"center"}>{item.feedback ? item.feedback : "N/A"}</TableCell>
-                                <TableCell align={"center"}>{item.status}</TableCell>
-                                <TableCell align={"center"}>
-                                    <IconButton
-                                        size="small"
-                                        variant="outlined"
-                                        onClick={() => handleViewDetail(item)}
-                                    >
-                                        View Detail
-                                    </IconButton>
-                                </TableCell>
+            <Paper elevation={2}>
+                <TableContainer component={"table"} sx={{mt: 3}}>
+                    <Table>
+                        <TableHead>
+                            <TableRow>
+                                <TableCell align={"center"}><strong>ID</strong></TableCell>
+                                <TableCell align={"center"}><strong>Design Type</strong></TableCell>
+                                <TableCell align={"center"}><strong>Feedback</strong></TableCell>
+                                <TableCell align={"center"}><strong>Status</strong></TableCell>
+                                <TableCell align={"center"}><strong>View Detail</strong></TableCell>
+                                <TableCell align={"center"}><strong>Create Order</strong></TableCell>
                             </TableRow>
-                        ))}
-                    </TableBody>
-                </Table>
+                        </TableHead>
+                        <TableBody>
+                            {paginatedData.map((item, index) => (
+                                <TableRow key={`${item.id}-${index}`}>
+                                    <TableCell align={"center"}>{item.id}</TableCell>
+                                    <TableCell align={"center"}>{item.private ? "Private" : "Public"}</TableCell>
+                                    <TableCell align={"center"}>{item.feedback ? item.feedback : "N/A"}</TableCell>
+                                    <TableCell align={"center"}>
+                                        <RenderStatusDisplay status={item.status.toLowerCase()}/>
+                                    </TableCell>
+                                    <TableCell align={"center"}>
+                                        <IconButton
+                                            size="small"
+                                            variant="outlined"
+                                            onClick={() => handleViewDetail(item)}
+                                        >
+                                            <Info fontSize={"medium"} color={"info"}/>
+                                        </IconButton>
+                                    </TableCell>
+                                    <TableCell align={"center"}>
+                                        {
+                                            item.status.toLowerCase() === 'completed' ?
+                                                <IconButton>
+                                                    <AddCircleOutline
+                                                        color={'success'}
+                                                    />
+                                                </IconButton>
+                                                :
+                                                <Tooltip
+                                                    title={"Current status is " + item.status.toUpperCase() + ". Required COMPLETED status to create order"}
+                                                    followCursor
+                                                    slots={{
+                                                        transition: Fade,
+                                                    }}
+                                                    slotProps={{
+                                                        transition: {timeout: 600},
+                                                        popper: {
+                                                            sx: {
+                                                                [`&.${tooltipClasses.popper}[data-popper-placement*="bottom"] .${tooltipClasses.tooltip}`]:
+                                                                    {
+                                                                        marginTop: '30px',
+                                                                    }
+                                                            },
+                                                        },
+                                                    }}
 
-                <TablePagination
-                    component="div"
-                    count={historyList.length}
-                    page={page}
-                    onPageChange={(e, newPage) => setPage(newPage)}
-                    rowsPerPage={rowsPerPage}
-                    onRowsPerPageChange={(e) => {
-                        setRowsPerPage(parseInt(e.target.value, 5));
-                        setPage(0);
-                    }}
-                    rowsPerPageOptions={[5, 10, 25]}
-                />
-            </TableContainer>
+                                                >
+                                                    <IconButton>
+                                                        <RemoveCircleOutline
+                                                            color={'disabled'}
+                                                        />
+                                                    </IconButton>
+                                                </Tooltip>
+                                        }
+                                    </TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+
+                    <TablePagination
+                        component="div"
+                        count={historyList.length}
+                        page={page}
+                        onPageChange={(e, newPage) => setPage(newPage)}
+                        rowsPerPage={rowsPerPage}
+                        onRowsPerPageChange={(e) => {
+                            setRowsPerPage(parseInt(e.target.value, 5));
+                            setPage(0);
+                        }}
+                        rowsPerPageOptions={[5, 10, 25]}
+                    />
+                </TableContainer>
+            </Paper>
 
             <Dialog open={open} onClose={handleClose} fullWidth maxWidth="lg" scroll={'paper'}>
                 <DialogTitle variant={"h4"}>Create Design Request</DialogTitle>
@@ -802,14 +899,6 @@ const RequestHistory = () => {
                 <DialogContent>
                     {step === 0 && (
                         <>
-                            {/*<FormGroup>*/}
-                            {/*    <FormControlLabel*/}
-                            {/*        control={<Checkbox checked={designTypes.regular} onChange={handleCheckboxChange}*/}
-                            {/*                           name="regular"/>} label="Regular Uniform"/>*/}
-                            {/*    <FormControlLabel*/}
-                            {/*        control={<Checkbox checked={designTypes.physical} onChange={handleCheckboxChange}*/}
-                            {/*                           name="physical"/>} label="Physical Education"/>*/}
-                            {/*</FormGroup>*/}
                             <Typography variant={"h5"} sx={{marginBottom: '1vh'}}>Choose uniform type you want to design
                                 <Typography color={"error"}>
                                     Select at least 1 type *

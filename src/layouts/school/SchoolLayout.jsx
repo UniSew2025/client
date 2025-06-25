@@ -1,4 +1,4 @@
-import DashBoardWebUILayout from "../ui/DashBoardWebUILayout.jsx";
+import DashboardWebUILayout from "../ui/DashboardWebUILayout.jsx";
 
 const navigation = [
     {
@@ -23,7 +23,7 @@ const navigation = [
 
 function RenderPage(){
     return (
-        <DashBoardWebUILayout navigation={navigation}/>
+        <DashboardWebUILayout navigation={navigation}/>
     )
 }
 
