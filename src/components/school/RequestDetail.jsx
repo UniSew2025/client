@@ -11,13 +11,17 @@ import {
     Avatar,
     Paper,
     Divider,
-    Stack
+    Stack, TableContainer, Table, TableHead, TableRow, TableCell, TableBody, Dialog,
+    DialogTitle,
+    DialogContent,
+    Grid
 } from '@mui/material';
 import {useLocation} from "react-router-dom";
-import {getAllComments} from "../../services/DesignService.jsx";
+import {getAllComments, getClothByRequestId} from "../../services/DesignService.jsx";
+import {getPackageInfo} from "../../services/ProfileService.jsx";
 
 function TabPanel(props) {
-    const { children, value, index, ...other } = props;
+    const {children, value, index, ...other} = props;
     return (
         <div
             role="tabpanel"
@@ -40,7 +44,6 @@ const ActivityTab = ({
     const [listComment, setListComment] = useState([]);
     const location = useLocation();
     const requestId = location.state?.requestId;
-    const packageId = location.state?.packageId;
 
     const user = JSON.parse(localStorage.getItem("user") || "{}");
 
@@ -48,8 +51,8 @@ const ActivityTab = ({
         if (!requestId) return;
         const fetchComments = async () => {
             try {
-                const data = await getAllComments(requestId);
-                setListComment(Array.isArray(data) ? data : []);
+                const res = await getAllComments(requestId);
+                setListComment(Array.isArray(res?.data) ? res.data : []);
             } catch (error) {
                 console.error('Error loading comments:', error);
                 setListComment([]);
@@ -58,42 +61,42 @@ const ActivityTab = ({
         fetchComments();
     }, [requestId]);
 
-    // Nếu chưa assign designer
-    if (packageId == null || packageId === 0) {
-        return (
-            <Box mt={2}>
-                <Typography color="gray" textAlign="center" mb={2}>
-                    This request has not been assigned yet.
-                </Typography>
-                <Stack direction="column" spacing={2} alignItems="center">
-                    <Button variant="contained" color="primary">
-                        Find the designer for this request
-                    </Button>
-                    <Button variant="outlined" color="secondary">
-                        Find garment to do this request
-                    </Button>
-                </Stack>
-            </Box>
-        );
-    }
-
     return (
         <Box>
             <List>
-                {(Array.isArray(listComment) ? listComment : []).length === 0 ? (
+                {listComment.length === 0 ? (
                     <Typography color="gray" textAlign="center" mb={2}>
                         Waiting for designer response...
                     </Typography>
                 ) : (
-                    (listComment || []).map((c, i) => (
-                        <ListItem key={i} alignItems="flex-start">
-                            <Box ml={2}>
-                                <Typography fontWeight="bold">{c.user || c.senderRole}</Typography>
-                                <Typography>{c.text || c.content}</Typography>
-                                <Typography variant="caption" color="gray">{c.time || c.createdAt}</Typography>
-                            </Box>
-                        </ListItem>
-                    ))
+                    listComment.map((c, i) => {
+                        const isSystem = c.senderRole === "System";
+                        const isSchool = c.senderRole === "School";
+                        const align = isSystem ? "center" : isSchool ? "right" : "left";
+                        const bgColor = isSystem ? "#f0f0f0" : isSchool ? "#e3f2fd" : "#fce4ec";
+
+                        return (
+                            <ListItem key={i} sx={{ justifyContent: align }}>
+                                <Box
+                                    p={1.5}
+                                    maxWidth="70%"
+                                    borderRadius={2}
+                                    bgcolor={bgColor}
+                                    textAlign={align}
+                                >
+                                    {!isSystem && (
+                                        <Typography fontWeight="bold" fontSize={13}>
+                                            {c.senderRole}
+                                        </Typography>
+                                    )}
+                                    <Typography>{c.content}</Typography>
+                                    <Typography variant="caption" color="text.secondary" display="block">
+                                        {new Date(c.createdAt).toLocaleString()}
+                                    </Typography>
+                                </Box>
+                            </ListItem>
+                        );
+                    })
                 )}
             </List>
 
@@ -126,49 +129,192 @@ const ActivityTab = ({
     );
 };
 
-const DetailsTab = ({ details }) => (
-    <Box>
-        <Typography variant="h6" mb={1}>{details.packageName}</Typography>
-        <Typography>Price: <b>{details.price}</b></Typography>
-        <Typography>Delivery Time: <b>{details.deliveryTime}</b></Typography>
-        <Typography mt={1} fontWeight="bold">Includes:</Typography>
-        <ul>
-            {details.includes.map((inc, i) => (
-                <li key={i}><Typography>{inc}</Typography></li>
-            ))}
-        </ul>
-    </Box>
-);
 
-const RequirementsTab = ({ requirements }) => (
-    <Box>
-        <Typography variant="h6" mb={1}>Your Requirements</Typography>
-        <List>
-            {requirements.map((r, i) => (
-                <ListItem key={i}>
-                    <Box>
-                        <Typography fontWeight="bold">{r.label}</Typography>
-                        <Typography>Type: {r.type}</Typography>
-                        <Typography>Color: {r.color}</Typography>
-                        <Typography>Note: {r.note}</Typography>
-                    </Box>
-                </ListItem>
-            ))}
-        </List>
-    </Box>
-);
+const DetailsTab = () => {
+    const location = useLocation();
+    const packageId = location.state?.packageId;
 
-const DeliveryTab = ({ delivery }) => (
+    const [packageInfo, setPackageInfo] = useState(null);
+
+
+    useEffect(() => {
+        if (!packageId) return;
+        const fetchPackage = async () => {
+            try {
+                const res = await getPackageInfo(packageId);
+                if (res && res.data) {
+                    setPackageInfo(res.data);
+                }
+            } catch (error) {
+                console.error("Failed to load package info:", error);
+            }
+        };
+        fetchPackage();
+    }, [packageId]);
+
+    if (!packageInfo) {
+        return <Typography>Loading package info...</Typography>;
+    }
+
+    return (
+        <>
+            <Typography variant="h6" fontWeight="bold" gutterBottom>
+                {packageInfo.pkgName}
+            </Typography>
+
+            <Typography color="text.secondary" mb={2}>
+                {packageInfo.headerContent}
+            </Typography>
+
+            <Typography><b>Fee:</b> ${packageInfo.fee}</Typography>
+            <Typography><b>Delivery:</b> {packageInfo.deliveryDuration} days</Typography>
+            <Typography><b>Revisions:</b> {packageInfo.revisionTime}</Typography>
+        </>
+    );
+};
+
+
+const RequirementsTab = () => {
+    const [designDetails, setDesignDetails] = useState([]);
+    const [open, setOpen] = useState(false);
+    const [selectedImages, setSelectedImages] = useState([]);
+    const [zoomedImage, setZoomedImage] = useState(null);
+
+    const location = useLocation();
+    const requestId = location.state?.requestId;
+
+    useEffect(() => {
+        const fetchDesign = async () => {
+            try {
+                const res = await getClothByRequestId(requestId);
+                if (res && Array.isArray(res)) {
+                    setDesignDetails(res);
+
+                }
+            } catch (error) {
+                console.error("Failed to load design details:", error);
+            }
+        };
+        if (requestId) fetchDesign();
+    }, [requestId]);
+    console.log(designDetails);
+
+    const handleViewImages = (images) => {
+        setSelectedImages(images);
+        setOpen(true);
+    };
+
+    const handleClose = () => {
+        setOpen(false);
+        setSelectedImages([]);
+    };
+
+    return (
+        <Box>
+            <Typography variant="h6" mb={2}>Your Requirements</Typography>
+            {designDetails.length === 0 ? (
+                <Typography color="gray">No design requirements found.</Typography>
+            ) : (
+                <TableContainer component={Paper}>
+                    <Table size="small">
+                        <TableHead>
+                            <TableRow>
+                                <TableCell><b>Type</b></TableCell>
+                                <TableCell><b>Category</b></TableCell>
+                                <TableCell><b>Color</b></TableCell>
+                                <TableCell><b>Fabric</b></TableCell>
+                                <TableCell><b>Note</b></TableCell>
+                                <TableCell><b>Logo Image</b></TableCell>
+                                <TableCell><b>Cloth Image</b></TableCell>
+                            </TableRow>
+                        </TableHead>
+                        <TableBody>
+                            {designDetails.map((item, index) => (
+                                <TableRow key={index}>
+                                    <TableCell>{item.cloth_type}</TableCell>
+                                    <TableCell>{item.cloth_category}</TableCell>
+                                    <TableCell>{item.color}</TableCell>
+                                    <TableCell>{item.fabric}</TableCell>
+                                    <TableCell>{item.note}</TableCell>
+                                    <TableCell>
+                                        {item.logo_image ? (
+                                            <img
+                                                src={item.logo_image}
+                                                alt="Logo"
+                                                style={{width: 50, height: 'auto', borderRadius: 4}}
+                                            />
+                                        ) : (
+                                            <Typography variant="caption" color="text.secondary">No logo</Typography>
+                                        )}
+                                    </TableCell>
+                                    <TableCell>
+                                        <Button
+                                            variant="outlined"
+                                            size="small"
+                                            onClick={() => handleViewImages(item.images || [])}
+                                            disabled={!item.images || item.images.length === 0}
+                                        >
+                                            View Images
+                                        </Button>
+                                    </TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                </TableContainer>
+            )}
+            <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth>
+                <DialogTitle>Cloth Images</DialogTitle>
+                <DialogContent>
+                    {selectedImages.length > 0 ? (
+                        <Box display="flex" flexWrap="wrap" gap={2}>
+                            {selectedImages.map((img, i) => (
+                                <Box
+                                    key={i}
+                                    p={1}
+                                    border="1px solid #ccc"
+                                    borderRadius={2}
+                                    sx={{ backgroundColor: '#f9f9f9', cursor: 'pointer' }}
+                                    onClick={() => setZoomedImage(img.url)}
+                                >
+                                    <img
+                                        src={img.url}
+                                        alt={`Cloth ${i}`}
+                                        style={{ width: 140, height: 'auto', borderRadius: 4 }}
+                                    />
+                                </Box>
+                            ))}
+                        </Box>
+                    ) : (
+                        <Typography>No images available.</Typography>
+                    )}
+                </DialogContent>
+            </Dialog>
+            <Dialog open={!!zoomedImage} onClose={() => setZoomedImage(null)} maxWidth="md">
+                <DialogContent sx={{ textAlign: 'center' }}>
+                    <img
+                        src={zoomedImage}
+                        alt="Zoomed"
+                        style={{ maxWidth: '100%', maxHeight: '80vh', borderRadius: 8 }}
+                    />
+                </DialogContent>
+            </Dialog>
+        </Box>
+    );
+};
+
+const DeliveryTab = ({delivery}) => (
     <Box>
         <Typography variant="h6" mb={1}>Delivery #1</Typography>
         <Box bgcolor="#f7f7f7" p={2} borderRadius={2} mb={2}>
-            <Typography variant="body2" dangerouslySetInnerHTML={{__html: delivery.message}} />
+            <Typography variant="body2" dangerouslySetInnerHTML={{__html: delivery.message}}/>
         </Box>
         <Typography fontWeight="bold">Attachments:</Typography>
         <Box display="flex" gap={2} mt={1}>
             {delivery.files.map((file, i) => (
                 <Box key={i} textAlign="center">
-                    <img src={file.preview} alt={file.name} width={70} style={{borderRadius:8, border:'1px solid #eee'}} />
+                    <img src={file.preview} alt={file.name} width={70}
+                         style={{borderRadius: 8, border: '1px solid #eee'}}/>
                     <Typography fontSize={12}>{file.name}</Typography>
                     <a href={file.url} download>
                         <Button size="small" variant="outlined" sx={{mt: 0.5}}>Download</Button>
@@ -179,29 +325,45 @@ const DeliveryTab = ({ delivery }) => (
     </Box>
 );
 
-export default function RequestDetail({ details, requirements, delivery, initComments }) {
+export default function RequestDetail({details, requirements, delivery, initComments}) {
     const [tab, setTab] = useState(0);
-
     const [comments, setComments] = useState(initComments || []);
     const [commentInput, setCommentInput] = useState('');
 
-    // Handler for sending comment
+    const location = useLocation();
+    const packageId = location.state?.packageId;
+
+    if (!packageId || packageId === 0) {
+        return (
+            <Box mt={4} textAlign="center">
+                <Typography color="gray" mb={2}>
+                    This request has not been assigned yet.
+                </Typography>
+                <Stack direction="column" spacing={2} alignItems="center">
+                    <Button variant="contained" color="primary">
+                        Find the designer for this request
+                    </Button>
+                </Stack>
+            </Box>
+        );
+    }
+
     const handleSendComment = () => {
         if (commentInput.trim()) {
-            setComments([...comments, { user: "You", text: commentInput, time: "just now" }]);
+            setComments([...comments, {user: "You", text: commentInput, time: "just now"}]);
             setCommentInput('');
         }
     };
 
     return (
-        <Paper elevation={2} sx={{ width: "100%", maxWidth: 700, mx: "auto", mt: 3 }}>
+        <Paper elevation={2} sx={{width: "100%", maxWidth: 700, mx: "auto", mt: 3}}>
             <Tabs value={tab} onChange={(_, v) => setTab(v)} variant="fullWidth">
-                <Tab label="Activity" />
-                <Tab label="Details" />
-                <Tab label="Requirements" />
-                <Tab label="Delivery" />
+                <Tab label="Activity"/>
+                <Tab label="Details"/>
+                <Tab label="Requirements"/>
+                <Tab label="Delivery"/>
             </Tabs>
-            <Divider />
+            <Divider/>
             <TabPanel value={tab} index={0}>
                 <ActivityTab
                     comments={comments}
@@ -211,13 +373,13 @@ export default function RequestDetail({ details, requirements, delivery, initCom
                 />
             </TabPanel>
             <TabPanel value={tab} index={1}>
-                <DetailsTab details={details} />
+                <DetailsTab details={details}/>
             </TabPanel>
             <TabPanel value={tab} index={2}>
-                <RequirementsTab requirements={requirements} />
+                <RequirementsTab requirements={requirements}/>
             </TabPanel>
             <TabPanel value={tab} index={3}>
-                <DeliveryTab delivery={delivery} />
+                <DeliveryTab delivery={delivery}/>
             </TabPanel>
         </Paper>
     );

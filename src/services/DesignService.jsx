@@ -33,6 +33,11 @@ export const getAllComments = async (requestId) => {
     return response?.data || null;
 }
 
+export const getDesignById = async (id) => {
+    const res = await axiosClient.post(`/design/cloth-list`, { id });
+    return res?.data?.data || [];
+};
+
 export const getCompleteDesignRequest = async () => {
     const response = await axiosClient.get('/design/complete-list')
     return response || null;
