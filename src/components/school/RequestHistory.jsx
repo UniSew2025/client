@@ -681,15 +681,15 @@ const RequestHistory = () => {
             const data = response.data;
 
             const filtered = data.filter(item => item.school === schoolId);
-            setHistoryList(filtered);
-            console.log(filtered);
+            setHistoryList( filtered);
+            console.log("filtered",filtered);
         } catch (error) {
             console.error("Failed to fetch design requests:", error);
         }
     };
 
     const handleViewDetail = (item) => {
-        navigate('/school/detail', {state: {requestId: item.id, packageId: item.package}});
+        navigate('/school/detail', {state: {requestId: item.id, requestStatus: item.status , packageId: item.package}});
     }
 
     function RenderRadioSelection() {
