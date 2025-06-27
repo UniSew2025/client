@@ -1,19 +1,18 @@
-import '../../styles/ui/DashBoardWebUILayout.css'
+import '../../styles/ui/DashboardWebUILayout.css'
 import {Outlet} from 'react-router-dom'
 import {Link, Typography} from "@mui/material";
 
 function RenderNav({navigation}) {
 
-    function RenderNavCaption({label, key}) {
+    function RenderNavCaption({label}) {
         return (
-            <Typography key={key} variant={"h6"} sx={{marginTop: '2vh'}}>{label}</Typography>
+            <Typography variant={"h6"} sx={{marginTop: '2vh'}}>{label}</Typography>
         )
     }
 
-    function RenderNavSub({label, segment, key}) {
+    function RenderNavSub({label, segment}) {
         return (
             <Link
-                key={key}
                 href={segment}
                 variant={"body2"}
                 underline={"none"}
@@ -36,11 +35,11 @@ function RenderNav({navigation}) {
                 navigation.map((el, index) => {
                     if (el.type === 'caption') {
                         return (
-                            <RenderNavCaption label={el.label} key={index}/>
+                            <div key={index}><RenderNavCaption label={el.label}/></div>
                         )
                     } else {
                         return (
-                            <RenderNavSub label={el.label} segment={el.segment} key={index}/>
+                            <div key={index}><RenderNavSub label={el.label} segment={el.segment}/></div>
                         )
                     }
                 })
@@ -62,7 +61,7 @@ function RenderPage({navigation}) {
     )
 }
 
-export default function DashBoardWebUILayout({navigation}) {
+export default function DashboardWebUILayout({navigation}) {
     return (
         <RenderPage navigation={navigation}/>
     )

@@ -115,7 +115,7 @@ function RenderHeaderProfileButton({children}) {
                         alt={""}
                     />
                 }
-                sx={{color: "black"}}
+                sx={{color: "black", whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'}}
             >
                 {JSON.parse(localStorage.getItem('user')).profile.name}
             </Button>

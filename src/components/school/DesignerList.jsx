@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import { Box, Typography, Grid, Card, CardContent, CardMedia, Button, Avatar } from '@mui/material';
 import WebAppUILayout from "../../layouts/ui/WebAppUILayout.jsx";
-import {viewListDesigner} from "../../services/DesignerService.jsx";
+import {viewListDesigner} from "../../services/ProfileService.jsx";
 import {useNavigate} from "react-router-dom";
 
 const DesignerList = () => {
