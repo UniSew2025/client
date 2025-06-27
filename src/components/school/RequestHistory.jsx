@@ -780,6 +780,15 @@ const RequestHistory = () => {
         )
     }
 
+    function HandleCreateOrder(request){
+        if(request.status === "completed"){
+            localStorage.setItem("sRequest", request.id)
+            navigate('/school/order')
+        }else{
+            console.error("!!! UniSew warning !!!: Do not use F12 to unlock the button")
+        }
+    }
+
     return (
 
         <Box p={4}>
@@ -830,7 +839,7 @@ const RequestHistory = () => {
                                         {
                                             item.status.toLowerCase() === 'completed' ?
                                                 <RenderTooltip title={"Create order with this request"}>
-                                                    <IconButton>
+                                                    <IconButton onClick={() => HandleCreateOrder(item)}>
                                                         <AddCircleOutline
                                                             color={'success'}
                                                         />
