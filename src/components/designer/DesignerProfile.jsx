@@ -6,7 +6,6 @@ import {
     Chip,
     Divider,
     Grid,
-    LinearProgress,
     List,
     ListItem,
     ListItemIcon,
@@ -16,8 +15,9 @@ import {
     Typography
 } from "@mui/material";
 import PublicIcon from "@mui/icons-material/Public";
+import CallIcon from '@mui/icons-material/Call';
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
-import WorkOutlineIcon from "@mui/icons-material/WorkOutline";
+import EditIcon from '@mui/icons-material/Edit';
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import RemoveRedEyeIcon from "@mui/icons-material/RemoveRedEye";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
@@ -28,43 +28,32 @@ import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import '../../styles/school/SchoolProfile.css'
 import {dateFormatter} from "../../utils/DateFormatter.jsx";
 import {useNavigate} from "react-router-dom";
-import EditIcon from "@mui/icons-material/Edit";
 
 
 const user = JSON.parse(localStorage.getItem('user'))
 
-const checklist = [
-    {
-        icon: <InfoOutlinedIcon color="primary" />,
-        title: "...",
-        desc: "...",
-        action: "Add"
-    },
-    {
-        icon: <AddCircleOutlineIcon color="primary" />,
-        title: "Add details for your profile",
-        desc: "Upload a photo and info for more experience...",
-        action: "Add"
-    },
-    {
-        icon: <WorkOutlineIcon color="primary" />,
-        title: "...",
-        desc: "...",
-        action: "Add"
-    },
-    {
-        icon: <AccessTimeIcon color="primary" />,
-        title: "...",
-        desc: "...",
-        action: "Add"
-    }
-];
+function formatTimeToAMPM(timeStr) {
+    if (!timeStr) return "";
+    const [h, m, s] = timeStr.split(":").map(Number);
+    let hour = h % 12 || 12;
+    let period = h < 12 ? "am" : "pm";
+    let minStr = String(m).padStart(2, "0");
+    return `${hour}:${minStr} ${period}`;
+}
+
+function formatPhoneDash(phone) {
+    if (!phone) return "";
+    phone = phone.replace(/\D/g, "");
+    if (phone.length === 10)
+        return `${phone.slice(0,4)}-${phone.slice(4,7)}-${phone.slice(7,10)}`;
+    return phone;
+}
 
 function RenderLeftArea(){
     const navigate = useNavigate()
     return (
         <>
-            <Paper elevation={6}>
+            <Paper elevation={6} sx={{ maxWidth: "500px", maxHeight: "440px" }}>
                 <Card className={'profile-left-card'}>
                     <CardContent>
                         <img src={user.profile.avatar} referrerPolicy={"no-referrer"} alt={user.profile.name}/>
@@ -73,16 +62,16 @@ function RenderLeftArea(){
                         <Divider sx={{ my: 1.5 }} />
                         <Stack spacing={1} sx={{ textAlign: "left", pl: 2, mb: 2 }}>
                             <Stack direction="row" spacing={1} alignItems="center">
-                                <PublicIcon fontSize="small" color="action" />
-                                <Typography variant="body2">Located in {user.profile.partner.province}</Typography>
+                                <CallIcon fontSize="small" color="action" />
+                                <Typography variant="body2">Contact: {formatPhoneDash(user.profile.phone)}</Typography>
                             </Stack>
                             <Stack direction="row" spacing={1} alignItems="center">
                                 <CalendarMonthIcon fontSize="small" color="action" />
-                                <Typography variant="body2">Joined in {dateFormatter(user.registerDate)}</Typography>
+                                <Typography variant="body2">Joined date: {dateFormatter(user.registerDate)}</Typography>
                             </Stack>
                             <Stack direction="row" spacing={1} alignItems="center">
                                 <AccessTimeIcon fontSize="small" color="action" />
-                                <Typography variant="body2">Work from {"6am to 5pm"}</Typography>
+                                <Typography variant="body2">Working time: {formatTimeToAMPM(user.profile.designer.startTime)} - {formatTimeToAMPM(user.profile.designer.endTime)}</Typography>
                             </Stack>
                         </Stack>
                         <Button
@@ -90,18 +79,18 @@ function RenderLeftArea(){
                             fullWidth
                             startIcon={<RemoveRedEyeIcon />}
                             sx={{ mb: 1, borderRadius: 2, textTransform: "none", fontWeight: "bold" }}
-                            onClick={() => navigate("/school/order")}
+                            onClick={() => navigate("/designer/requests")}
                         >
-                            View my orders
+                            View my designs
                         </Button>
                         <Button
                             variant="outlined"
                             fullWidth
                             endIcon={<ArrowForwardIcon />}
-                            sx={{ mb:1, borderRadius: 2, textTransform: "none", fontWeight: "bold" }}
+                            sx={{ mb: 1, borderRadius: 2, textTransform: "none", fontWeight: "bold" }}
                             onClick={() => navigate("/home")}
                         >
-                            Explore UniSew
+                            Explore your packages
                         </Button>
                         <Button
                             variant="outlined"
@@ -135,48 +124,20 @@ function RenderRightArea(){
                 <Paper elevation={6}>
                     <Card sx={{ mb: 3}}>
                         <CardContent>
-                            <Typography variant="subtitle1" fontWeight="bold" mb={1.5}>
-                                Profile checklist
+                            <Typography variant="h6" fontWeight="bold" mb={1.5}>
+                                About
                             </Typography>
-                            <List disablePadding>
-                                {checklist.map((item, i) => (
-                                    <ListItem key={i} disablePadding sx={{ alignItems: "flex-start", mb: 1.5 }}>
-                                        <ListItemIcon sx={{ mt: 0.5 }}>{item.icon}</ListItemIcon>
-                                        <ListItemText
-                                            primary={
-                                                <Stack direction="row" spacing={1} alignItems="center">
-                                                    <Typography variant="body1" fontWeight="bold">
-                                                        {item.title}
-                                                    </Typography>
-                                                    {item.percent && (
-                                                        <Chip
-                                                            label={`${item.percent}%`}
-                                                            color={item.percent === 100 ? "success" : "primary"}
-                                                            size="small"
-                                                            sx={{ fontWeight: 600 }}
-                                                        />
-                                                    )}
-                                                </Stack>
-                                            }
-                                            secondary={item.desc}
-                                            secondaryTypographyProps={{ color: "text.secondary" }}
-                                        />
-                                        <Box>
-                                            {item.percent === 75 ? (
-                                                <Typography variant="body2" color="primary" fontWeight="bold">75%</Typography>
-                                            ) : (
-                                                <Button
-                                                    size="small"
-                                                    sx={{ textTransform: "none", fontWeight: 600, color: "#3488e2" }}
-                                                    endIcon={<ChevronRightIcon fontSize="small" />}
-                                                >
-                                                    {item.action}
-                                                </Button>
-                                            )}
-                                        </Box>
-                                    </ListItem>
-                                ))}
-                            </List>
+                            <Typography variant="body2" color="text.secondary">
+                                {user.profile.designer.bio}
+                            </Typography>
+                        </CardContent>
+                        <CardContent>
+                            <Typography variant="h6" fontWeight="bold" mb={1.5}>
+                                Short review
+                            </Typography>
+                            <Typography variant="body2" color="text.secondary">
+                                {user.profile.designer.shortPreview || "You haven't added a short review yet."}
+                            </Typography>
                         </CardContent>
                     </Card>
                 </Paper>
@@ -185,11 +146,16 @@ function RenderRightArea(){
                     <Card sx={{textAlign: "center" }}>
                         <CardContent>
                             <Typography variant="subtitle1" fontWeight="bold" mb={2}>
-                                My feedback history
+                                Reviews from schools
                             </Typography>
                             <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+                                <Stack direction="row" spacing={0.3} mb={1.5}>
+                                    {[...Array(5)].map((_, i) => (
+                                        <StarRateIcon key={i} color="warning" />
+                                    ))}
+                                </Stack>
                                 <Typography variant="body2" color="text.secondary">
-                                    You haven't left any feedback yet.
+                                    You don't have any reviews yet.
                                 </Typography>
                             </Box>
                         </CardContent>
@@ -200,7 +166,7 @@ function RenderRightArea(){
     )
 }
 
-export default function SchoolProfile() {
+export default function DesignerProfile() {
     return (
         <Box sx={{minHeight: "100vh", py: 5 }}>
 

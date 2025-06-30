@@ -38,9 +38,13 @@ function HandleResponse() {
                         window.location.href = '/admin/dashboard'
                         break;
                     case "school":
-                    case "designer":
-                    case "garment":
                         window.location.href = '/home'
+                        break;
+                    case "designer":
+                        window.location.href = '/designer/dashboard'
+                        break;
+                    case "garment":
+                        window.location.href = '/garment/dashboard'
                         break;
                     default:
                         window.location.href = '/signin'
