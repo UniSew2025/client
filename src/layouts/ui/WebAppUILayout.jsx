@@ -284,9 +284,9 @@ function RenderPage({children, title}) {
 }
 
 export default function WebAppUILayout({children, title}) {
-    // if(localStorage.getItem('user') && JSON.parse(localStorage.getItem('user')).role !== 'school'){
-    //     window.location.href = "/signin"
-    // }
+     if(localStorage.getItem('user') && JSON.parse(localStorage.getItem('user')).role !== 'school'){
+         window.location.href = "/signin"
+     }
     return (
         <RenderPage children={children} title={title}/>
     )
