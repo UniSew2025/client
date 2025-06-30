@@ -11,6 +11,8 @@ import {dateFormatter} from "../../utils/DateFormatter.jsx";
 import {useNavigate} from "react-router-dom";
 import {useState} from "react";
 import {motion, AnimatePresence} from "framer-motion";
+import { updateDesignerProfile } from "../../services/ProfileService.jsx";
+import { enqueueSnackbar } from "notistack";
 
 const user = JSON.parse(localStorage.getItem('user'))
 
@@ -29,6 +31,36 @@ function formatPhoneDash(phone) {
     if (phone.length === 10)
         return `${phone.slice(0, 4)}-${phone.slice(4, 7)}-${phone.slice(7, 10)}`;
     return phone;
+}
+
+async function handleUpdateDesignerProfile(updatedUser, setUserData, setShowEdit) {
+    try {
+
+        const req = {
+            accountId: updatedUser.accountId || updatedUser.id || updatedUser.profile.accountId,
+            name: updatedUser.profile.name,
+            phone: updatedUser.profile.phone,
+            bio: updatedUser.profile.designer.bio,
+            shortProfile: updatedUser.profile.designer.shortPreview,
+            startDate: updatedUser.profile.designer.startTime?.slice(0, 5),
+            endDate: updatedUser.profile.designer.endTime?.slice(0, 5),
+            // thumbnail: updatedUser.profile.designer.thumbnail_img,
+        };
+        console.log("request", req);
+
+        const res = await updateDesignerProfile(req);
+
+        if (res && res.message && res.message.toLowerCase().includes("success")) {
+            enqueueSnackbar("Profile updated!", { variant: "success" });
+            setUserData(updatedUser);
+            setShowEdit(false);
+            localStorage.setItem('user', JSON.stringify(updatedUser));
+        } else {
+            enqueueSnackbar(res?.message || "Update failed!", { variant: "error" });
+        }
+    } catch (err) {
+        enqueueSnackbar("Error updating profile", { variant: "error" });
+    }
 }
 
 function EditProfileForm({user, onClose, onSave}) {
@@ -165,7 +197,7 @@ function EditProfileForm({user, onClose, onSave}) {
     );
 }
 
-function RenderLeftArea({onEditProfile}) {
+function RenderLeftArea({onEditProfile, user}) {
     const navigate = useNavigate()
     return (
         <>
@@ -226,7 +258,7 @@ function RenderLeftArea({onEditProfile}) {
     )
 }
 
-function RenderRightArea() {
+function RenderRightArea({user}) {
     return (
         <>
             <Grid item xs={12} md={8}>
@@ -288,21 +320,26 @@ function RenderRightArea() {
 
 export default function DesignerProfile() {
     const [showEdit, setShowEdit] = useState(false);
+    const [userData, setUserData] = useState(user); // dùng cho UI
+
+    const handleSave = (updatedUser) => {
+        handleUpdateDesignerProfile(updatedUser, setUserData, setShowEdit);
+    };
     return (
         <Box sx={{minHeight: "100vh", py: 5}}>
 
             <Box sx={{maxWidth: 1400, mx: "auto"}}>
                 <Grid container spacing={3}>
-                    <RenderLeftArea onEditProfile={() => setShowEdit(true)}/>
-                    <RenderRightArea/>
+                    <RenderLeftArea onEditProfile={() => setShowEdit(true)} user={userData} />
+                    <RenderRightArea user={userData} />
                 </Grid>
             </Box>
             <AnimatePresence>
                 {showEdit && (
                     <EditProfileForm
-                        user={user}
+                        user={userData}
                         onClose={() => setShowEdit(false)}
-                        onSave={"saveChanges"}
+                        onSave={handleSave}
                     />
                 )}
             </AnimatePresence>
