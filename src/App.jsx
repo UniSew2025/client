@@ -23,6 +23,13 @@ import RequestDetail from "./components/school/RequestDetail.jsx";
 import RequestList from "./components/school/RequestList.jsx";
 import AdminAccount from "./components/admin/AdminAccount.jsx";
 import UploadZip from "./components/school/UploadZip.jsx";
+import DashboardUILayout from "./layouts/ui/DashboardUILayout.jsx";
+import DesignerLayout from "./layouts/designer/DesignerLayout.jsx";
+import DesignerDashboard from "./components/designer/DesignerDashboard.jsx";
+import GarmentDashboard from "./components/garment/GarmentDashboard.jsx";
+import GarmentLayout from "./layouts/garment/GarmenntLayout.jsx";
+import DesignerRequest from "./components/designer/DesignerRequest.jsx";
+import DesignerPackage from "./components/designer/DesignerPackage.jsx";
 
 const router = createBrowserRouter([
     {
@@ -42,28 +49,56 @@ const router = createBrowserRouter([
         )
     },
     {
-        path: "/designer/profile",
-        element: (
-            <WebAppUILayout title={"Profile"}>
-                <DesignerProfile/>
-            </WebAppUILayout>
-        )
-    },
-    {
-        path: "/garment/profile",
-        element: (
-            <WebAppUILayout title={"Profile"}>
-                <GarmentProfile/>
-            </WebAppUILayout>
-        )
-    },
-    {
         path: "/request-list",
         element: (
             <WebAppUILayout title={"Request List"}>
                 <RequestList/>
             </WebAppUILayout>
         )
+    },
+    {
+        path: "/designer",
+        element: <DesignerLayout/>,
+        children: [
+            {
+                index: true,
+                element: <Navigate to={'/designer/dashboard'}/>
+            },
+            {
+                path: 'dashboard',
+                element: <DesignerDashboard/>
+            },
+            {
+                path: 'profile',
+                element: <DesignerProfile/>
+            },
+            {
+                path: 'requests',
+                element: <DesignerRequest/>
+            },
+            {
+                path: 'packages',
+                element: <DesignerPackage/>
+            }
+        ]
+    },
+    {
+        path: "/garment",
+        element: <GarmentLayout/>,
+        children: [
+            {
+                index: true,
+                element: <Navigate to={'/garment/dashboard'}/>
+            },
+            {
+                path: 'dashboard',
+                element: <GarmentDashboard/>
+            },
+            {
+                path: 'profile',
+                element: <GarmentProfile/>
+            }
+        ]
     },
     {
         path: "/school",
@@ -76,7 +111,7 @@ const router = createBrowserRouter([
             {
                 index: true,
                 element: <Navigate to={"/school/design"}/>
-            },{
+            }, {
                 path: 'design',
                 element: <RequestHistory/>
             },

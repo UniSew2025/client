@@ -53,7 +53,7 @@ function RenderLeftArea(){
     const navigate = useNavigate()
     return (
         <>
-            <Paper elevation={6}>
+            <Paper elevation={6} sx={{ maxWidth: "500px", maxHeight: "440px" }}>
                 <Card className={'profile-left-card'}>
                     <CardContent>
                         <img src={user.profile.avatar} referrerPolicy={"no-referrer"} alt={user.profile.name}/>
@@ -79,7 +79,7 @@ function RenderLeftArea(){
                             fullWidth
                             startIcon={<RemoveRedEyeIcon />}
                             sx={{ mb: 1, borderRadius: 2, textTransform: "none", fontWeight: "bold" }}
-                            onClick={() => navigate("/school/order")}
+                            onClick={() => navigate("/designer/requests")}
                         >
                             View my designs
                         </Button>

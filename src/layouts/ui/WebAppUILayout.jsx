@@ -223,7 +223,7 @@ function RenderHeader() {
                                             icon: <AccountBox fontSize={"small"} color={"info"}/>
                                         },
                                         {
-                                            link: '/sign-in',
+                                            link: '/signin',
                                             title: 'Sign out',
                                             icon: <Logout fontSize={"small"} color={"error"}/>
                                         }
@@ -284,9 +284,9 @@ function RenderPage({children, title}) {
 }
 
 export default function WebAppUILayout({children, title}) {
-    if(localStorage.getItem('user') && JSON.parse(localStorage.getItem('user')).role !== 'school'){
-        window.location.href = "/sign-in"
-    }
+    // if(localStorage.getItem('user') && JSON.parse(localStorage.getItem('user')).role !== 'school'){
+    //     window.location.href = "/signin"
+    // }
     return (
         <RenderPage children={children} title={title}/>
     )

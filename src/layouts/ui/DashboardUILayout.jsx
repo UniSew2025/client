@@ -2,10 +2,13 @@ import {ReactRouterAppProvider} from "@toolpad/core/react-router";
 import {Outlet, useNavigate} from 'react-router-dom'
 import {useMemo, useState} from "react";
 import {Account, AccountPreview, DashboardLayout, SignOutButton} from "@toolpad/core";
-import {Chip, createTheme, Divider, IconButton, Stack, Typography} from "@mui/material";
+import {Button, Chip, createTheme, Divider, IconButton, Stack, Typography} from "@mui/material";
 import '../../styles/ui/DashboardUILayout.css'
 import {Logout} from '@mui/icons-material';
 import {enqueueSnackbar} from "notistack";
+import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
+
+
 
 function CustomAppTitle(title) {
     return(
@@ -53,6 +56,7 @@ const createPreviewComponent = (mini) => {
 };
 
 function SidebarFooterAccount({mini}) {
+
     const PreviewComponent = useMemo(() => createPreviewComponent(mini), [mini]);
     return (
         <div>
@@ -72,6 +76,7 @@ function SidebarFooterAccount({mini}) {
 }
 
 export default function DashboardUILayout({navigation, header, title}) {
+
     document.title = title;
 
     const user = JSON.parse(localStorage.getItem('user'))
