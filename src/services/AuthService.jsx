@@ -5,11 +5,12 @@ export const getGoogleUrl = async () => {
     return response ? response : null
 }
 
-export const login = async (email, avatar, name) => {
+export const login = async (email, avatar, name, refreshToken) => {
     const response = await axiosClient.post("/auth/login", {
         email: email,
         avatar: avatar,
-        name: name
+        name: name,
+        refreshToken: refreshToken
     })
     return response ? response : null
 }
