@@ -1,23 +1,33 @@
 import '../../styles/school/SchoolOrder.css'
 import {
-    Button, Checkbox,
+    Box,
+    Button,
+    Checkbox,
     Dialog,
     DialogActions,
     DialogContent,
-    DialogTitle, Divider,
-    Fade, FormControlLabel,
+    DialogTitle,
+    Divider,
+    Fade,
+    FormControlLabel,
+    IconButton,
     Paper,
-    Slide, Step, StepLabel, Stepper,
+    Slide,
+    Step,
+    StepLabel,
+    Stepper, Tab, Tabs,
     TextField,
     Tooltip,
     tooltipClasses,
     Typography
 } from "@mui/material";
-import {Add} from "@mui/icons-material";
+import {ColorPicker} from 'antd'
+import {Add, Cancel, CheckCircle, RestartAlt} from "@mui/icons-material";
 import {forwardRef, useEffect, useState} from "react";
 import {getCompleteDesignRequest} from "../../services/DesignService.jsx";
 import {useNavigate} from "react-router-dom";
 import {enqueueSnackbar} from "notistack";
+import ModalImage from "react-modal-image";
 
 const lucky = false
 
@@ -50,7 +60,6 @@ function RenderStepper({step}) {
     const steps = [
         "Review design request information",
         "Fill quantity for uniform",
-        "Recheck information",
         "Complete create order"
     ]
 
@@ -65,7 +74,84 @@ function RenderStepper({step}) {
     )
 }
 
-function RenderFillSizeArea({cloth}) {
+function RenderFillSizeArea({cloth, UpdateSizeFunc, initQty}) {
+
+    const [qty, setQty] = useState(initQty ? initQty : {
+        S: 0,
+        M: 0,
+        L: 0,
+        XL: 0,
+        XXL: 0,
+        XXXL: 0,
+        XXXXL: 0
+    })
+
+    const totalQty = qty.S + qty.M + qty.L + qty.XL + qty.XXL + qty.XXXL + qty.XXXXL
+
+    function RenderSize({name, size, minH, maxH, minW, maxW}) {
+
+        const handleChangeQty = (e, resetValue) => {
+            const value = resetValue === 0 ? resetValue : (e.target.value < 0 ? 0 : e.target.value)
+            const newQty = {...qty, [name]: parseInt(value)}
+
+            setQty(newQty)
+            if (
+                newQty.S === 0 &&
+                newQty.M === 0 &&
+                newQty.L === 0 &&
+                newQty.XL === 0 &&
+                newQty.XXL === 0 &&
+                newQty.XXXL === 0 &&
+                newQty.XXXXL === 0
+            ) {
+                UpdateSizeFunc(cloth.gender, cloth.clothCategory === 'regular' ? 're' : 'pe', cloth.clothType === 'shirt' ? 'upper' : 'lower', null)
+            } else {
+                UpdateSizeFunc(cloth.gender, cloth.clothCategory === 'regular' ? 're' : 'pe', cloth.clothType === 'shirt' ? 'upper' : 'lower', newQty)
+            }
+
+        }
+
+        return (
+            <Paper elevation={6} className={'w-100 p-2 mb-2'}>
+                <Typography variant={'body1'} fontWeight={'bold'} fontSize={20}
+                            sx={{marginBottom: '0.5vh'}}>Size {size.toUpperCase()}</Typography>
+                <Divider sx={{borderTop: '1px solid black'}} variant={'fullWidth'}/>
+                <div className={'d-flex justify-content-start my-2'}>
+                    <Typography variant={'subtitle1'} fontSize={12} sx={{flex: 1}}><span className={'fw-bold'}>Height range:</span> {minH}cm
+                        - {maxH}cm</Typography>
+                    <Divider sx={{borderTop: '1px solid black', marginRight: '1vw'}} orientation={'vertical'} flexItem/>
+                    <Typography variant={'subtitle1'} fontSize={12} sx={{flex: 1}}><span className={'fw-bold'}>Weight range:</span> {minW}kg
+                        - {maxW}kg</Typography>
+                </div>
+                <div className={'cloth-size d-flex align-items-center'}>
+                    <Typography variant={'subtitle1'} fontSize={12} sx={{marginBottom: '0.2vh'}}
+                                fontWeight={'bold'}>Quantity: </Typography>
+
+                    <TextField
+                        type={'number'}
+                        sx={{fontSize: '14px', marginX: '0.8vh', padding: 0}}
+                        value={qty[name]}
+                        hiddenLabel
+                        variant={'filled'}
+                        size={'small'}
+                        onChange={(e) => handleChangeQty(e, -1)}
+                    />
+
+                    <Typography variant={'subtitle1'} fontSize={12}>{cloth.clothType.toLowerCase()}</Typography>
+                    <RenderTooltip title={"Reset quantity"}>
+                        <IconButton
+                            size={'small'}
+                            sx={{marginRight: '2vw'}}
+                            onClick={(e) => handleChangeQty(e, 0)}
+                        >
+                            <RestartAlt sx={{fontSize: '20px'}}/>
+                        </IconButton>
+                    </RenderTooltip>
+                </div>
+            </Paper>
+        )
+    }
+
     return (
         <Paper
             variant={'outlined'}
@@ -88,21 +174,120 @@ function RenderFillSizeArea({cloth}) {
                             >
                                 {cloth.clothType.substring(0, 1).toUpperCase() + cloth.clothType.substring(1).toUpperCase()}
                             </Typography>
-                            <div className={'d-flex justify-content-center align-items-center'}>
-                                <div className={'d-flex flex-column justify-content-center align-items-start w-100 ps-2'}>
-                                    <p className={'h-100 w-100 mb-0'}>Info 1</p>
-                                    <p className={'h-100 w-100 mb-0'}>Info 2</p>
-                                    <p className={'h-100 w-100 mb-0'}>Info 3</p>
-                                    <p className={'h-100 w-100 mb-0'}>Info 4</p>
-                                    <p className={'h-100 w-100 mb-0'}>Info 5</p>
+                            <div className={'d-flex justify-content-start align-items-start'}>
+                                <div
+                                    className={'d-flex flex-column justify-content-center align-items-start w-50 px-2'}>
+                                    {/*Image*/}
+                                    <Typography variant={'body1'} fontWeight={'bold'} sx={{marginBottom: '4vh'}}>1.
+                                        Image: </Typography>
+                                    <ModalImage
+                                        className='uniform-img'
+                                        small={cloth.finalImages[0].url}
+                                        large={cloth.finalImages[0].url}
+                                        alt={""}
+                                        hideDownload={false}
+                                        hideZoom={true}
+                                    />
+
+                                    {/*Logo image*/}
+                                    <Typography
+                                        variant={'body1'}
+                                        fontWeight={'bold'}
+                                        sx={{
+                                            marginTop: '1vh',
+                                            marginBottom: '0.2vh'
+                                        }}>
+                                        2. Logo image:
+                                    </Typography>
+                                    <ModalImage
+                                        className='uniform-img-logo'
+                                        small={cloth.logoImage}
+                                        large={cloth.logoImage}
+                                        alt={""}
+                                        hideDownload={false}
+                                        hideZoom={true}
+                                    />
+
+                                    {/*Color*/}
+                                    <Typography
+                                        variant={'body1'}
+                                        fontWeight={'bold'}
+                                        sx={{
+                                            marginTop: '2vh',
+                                            marginBottom: '0.2vh'
+                                        }}>
+                                        3. Color:
+                                    </Typography>
+                                    <div className={'d-flex align-items-center gap-2'}>
+                                        <ColorPicker defaultValue={cloth.color} size={'small'} disabled/>
+                                        <span>{cloth.color}</span>
+                                    </div>
+
+                                    {/*Note*/}
+                                    <Typography
+                                        variant={'body1'}
+                                        sx={{
+                                            marginTop: '2vh',
+                                            fontWeight: 'bold',
+                                            marginBottom: '0.2vh'
+                                        }}>
+                                        4. Note:
+                                    </Typography>
+                                    <Typography variant={'body2'}>{cloth.note}</Typography>
+
+                                    {/*Cloth count*/}
+                                    <Typography
+                                        variant={'body1'}
+                                        sx={{
+                                            marginTop: '2vh',
+                                            marginBottom: '0.2vh'
+                                        }}>
+                                        <span
+                                            className={'fw-bold me-2'}>5. Total quantity:
+                                        </span>{totalQty} {cloth.clothType}
+                                    </Typography>
+                                    {
+                                        totalQty === 0 &&
+                                        <Typography variant={'body2'} fontSize={10} color={'error'}>* If the amount is 0
+                                            means you haven't selected the quantity on the right side</Typography>
+                                    }
+                                    {
+                                        totalQty > 0 &&
+                                        <>
+                                            <Typography variant={'body2'} fontSize={10}>Including: </Typography>
+                                            {qty.S > 0 && <Typography variant={'body2'} fontSize={10}>{qty.S} size
+                                                S</Typography>}
+                                            {qty.M > 0 && <Typography variant={'body2'} fontSize={10}>{qty.M} size
+                                                M</Typography>}
+                                            {qty.L > 0 && <Typography variant={'body2'} fontSize={10}>{qty.L} size
+                                                L</Typography>}
+                                            {qty.XL > 0 &&
+                                                <Typography variant={'body2'} fontSize={10}>{qty.XL} size
+                                                    XL</Typography>}
+                                            {qty.XXL > 0 &&
+                                                <Typography variant={'body2'} fontSize={10}>{qty.XXL} size
+                                                    XXL</Typography>}
+                                            {qty.XXXL > 0 &&
+                                                <Typography variant={'body2'} fontSize={10}>{qty.XXXL} size
+                                                    3Xl</Typography>}
+                                            {qty.XXXXL > 0 &&
+                                                <Typography variant={'body2'} fontSize={10}>{qty.XXXXL} size
+                                                    4XL</Typography>}
+                                        </>
+                                    }
                                 </div>
-                                <Divider orientation={"vertical"} sx={{borderRight: '1px solid black'}} flexItem variant={'middle'}/>
-                                <div className={'d-flex flex-column justify-content-center align-items-start w-100 ps-2'}>
-                                    <p className={'h-100 w-100 mb-0'}>Size 1</p>
-                                    <p className={'h-100 w-100 mb-0'}>Size 2</p>
-                                    <p className={'h-100 w-100 mb-0'}>Size 3</p>
-                                    <p className={'h-100 w-100 mb-0'}>Size 4</p>
-                                    <p className={'h-100 w-100 mb-0'}>Size 5</p>
+                                <Divider orientation={"vertical"}
+                                         sx={{borderLeft: '0.1px solid rgba(197, 198, 199, 0.1)'}} flexItem
+                                         variant={'fullWidth'}/>
+                                <div
+                                    className={'d-flex flex-column justify-content-start align-items-start w-100 ps-3'}>
+                                    <RenderSize name={'S'} size={'S'} minH={100} maxH={109} minW={18} maxW={27}/>
+                                    <RenderSize name={'M'} size={'M'} minH={110} maxH={119} minW={28} maxW={37}/>
+                                    <RenderSize name={'L'} size={'L'} minH={120} maxH={129} minW={38} maxW={47}/>
+                                    <RenderSize name={'XL'} size={'XL'} minH={130} maxH={139} minW={48} maxW={57}/>
+                                    <RenderSize name={'XXL'} size={'XXL'} minH={140} maxH={149} minW={58} maxW={67}/>
+                                    <RenderSize name={'XXXL'} size={'3XL'} minH={150} maxH={159} minW={68} maxW={77}/>
+                                    <RenderSize name={'XXXXL'} size={'4XL'} minH={160} maxH={180} minW={78} maxW={100}/>
                                 </div>
 
                             </div>
@@ -162,7 +347,7 @@ function RenderCreateOrderModal({open, CloseFunc, selectedRequest}) {
                                 fontStyle={"italic"}
                                 sx={{marginTop: '2vh', marginBottom: '3vh'}}
                     >
-                        Request Information
+                        Design Request Information
                     </Typography>
                     <Button
                         variant={'contained'}
@@ -198,16 +383,6 @@ function RenderCreateOrderModal({open, CloseFunc, selectedRequest}) {
                     variant={"standard"}
                     slotProps={{input: {readOnly: true}}}
                     size={"small"}
-                    label={'Delivery Type'}
-                    fullWidth
-                    sx={{marginBottom: '3vh'}}
-                    defaultValue={selectedRequest.private ? 'Private' : 'Public'}
-                />
-
-                <TextField
-                    variant={"standard"}
-                    slotProps={{input: {readOnly: true}}}
-                    size={"small"}
                     label={'Status'}
                     fullWidth
                     sx={{marginBottom: '3vh'}}
@@ -232,87 +407,130 @@ function RenderCreateOrderModal({open, CloseFunc, selectedRequest}) {
 
     function RenderSecondStep({cloths}) {
 
-        const boyUpperRE = cloths.find(cloth => cloth.clothCategory === 'regular' && cloth.gender === 'male' && cloth.clothType === 'shirt')
-        const boyLowerRE = cloths.find(cloth => cloth.clothCategory === 'regular' && cloth.gender === 'male' && cloth.clothType === 'pants')
-        const girlUpperRE = cloths.find(cloth => cloth.clothCategory === 'regular' && cloth.gender === 'female' && cloth.clothType === 'shirt')
-        const girlLowerRE = cloths.find(cloth => cloth.clothCategory === 'regular' && cloth.gender === 'female' && (cloth.clothType === 'pants' || cloth.clothType === 'skirt'))
+        const [tab, setTab] = useState('1')
 
-        const boyUpperPE = cloths.find(cloth => cloth.clothCategory === 'pe' && cloth.gender === 'male' && cloth.clothType === 'shirt')
-        const boyLowerPE = cloths.find(cloth => cloth.clothCategory === 'pe' && cloth.gender === 'male' && cloth.clothType === 'pants')
-        const girlUpperPE = cloths.find(cloth => cloth.clothCategory === 'pe' && cloth.gender === 'female' && cloth.clothType === 'shirt')
-        const girlLowerPE = cloths.find(cloth => cloth.clothCategory === 'pe' && cloth.gender === 'female' && cloth.clothType === 'pants')
+        const [subTab, setSubTab] = useState('1')
+
+        const [size, setSize] = useState({
+            reBoy: {upper: null, lower: null},
+            reGirl: {upper: null, lower: null},
+            peBoy: {upper: null, lower: null},
+            peGirl: {upper: null, lower: null}
+        })
+
+        function UpdateSizes(gender, type, position, newValue) {
+            switch (type) {
+                case 're':
+                    switch (gender) {
+                        case 'boy':
+                            switch (position) {
+                                case 'upper':
+                                    setSize(prevSize => ({...prevSize, reBoy: {...prevSize.reBoy, upper: newValue}}))
+                                    break
+                                default:
+                                    setSize(prevSize => ({...prevSize, reBoy: {...prevSize.reBoy, lower: newValue}}))
+                                    break
+                            }
+                            break
+                        default:
+                            switch (position) {
+                                case 'upper':
+                                    setSize(prevSize => ({...prevSize, reGirl: {...prevSize.reGirl, upper: newValue}}))
+                                    break
+                                default:
+                                    setSize(prevSize => ({...prevSize, reGirl: {...prevSize.reGirl, lower: newValue}}))
+                                    break
+                            }
+                            break
+                    }
+                    break
+                default:
+                    switch (gender) {
+                        case 'boy':
+                            setSize({...size, peBoy: newValue})
+                            break
+                        default:
+                            setSize({...size, peGirl: newValue})
+                            break
+                    }
+                    break
+            }
+        }
+
+        const changeTab = (e, newTab) => {
+            setTab(newTab)
+        }
+
+        const changeSubTab = (e, newSubTab) => {
+            setSubTab(newSubTab)
+        }
+
+        const boyUpperRE = cloths.find(cloth => cloth.clothCategory === 'regular' && cloth.gender === 'boy' && cloth.clothType === 'shirt')
+        const boyLowerRE = cloths.find(cloth => cloth.clothCategory === 'regular' && cloth.gender === 'boy' && cloth.clothType === 'pants')
+        const girlUpperRE = cloths.find(cloth => cloth.clothCategory === 'regular' && cloth.gender === 'girl' && cloth.clothType === 'shirt')
+        const girlLowerRE = cloths.find(cloth => cloth.clothCategory === 'regular' && cloth.gender === 'girl' && (cloth.clothType === 'pants' || cloth.clothType === 'skirt'))
+
+        const boyUpperPE = cloths.find(cloth => cloth.clothCategory === 'pe' && cloth.gender === 'boy' && cloth.clothType === 'shirt')
+        const boyLowerPE = cloths.find(cloth => cloth.clothCategory === 'pe' && cloth.gender === 'boy' && cloth.clothType === 'pants')
+        const girlUpperPE = cloths.find(cloth => cloth.clothCategory === 'pe' && cloth.gender === 'girl' && cloth.clothType === 'shirt')
+        const girlLowerPE = cloths.find(cloth => cloth.clothCategory === 'pe' && cloth.gender === 'girl' && cloth.clothType === 'pants')
+
+        const isREBoySizeFilled = tab === '1' && size.reBoy.upper !== null && size.reBoy.lower !== null // In RE tab and both boy upper and lower existed
+        const isREGirlSizeFilled = tab === '1' && size.reGirl.upper !== null && size.reGirl.lower !== null // In RE tab and both girl upper and lower existed
+        const isPEBoySizeFilled = tab === '2' && size.peBoy.upper !== null && size.peBoy.lower !== null // In PE tab and both boy upper and lower existed
+        const isPEGirlSizeFilled = tab === '2' && size.peGirl.upper !== null && size.peGirl.lower !== null // In PE tab and both girl upper and lower existed
+
+        const isBoySizeFilled = isREBoySizeFilled || isPEBoySizeFilled // Boy tab will green in case PE boy filled or RE boy filled
+        const isGirlSizeFilled = isREGirlSizeFilled || isPEGirlSizeFilled // Girl tab will green in case PE girl filled or RE girl filled
+
+        const isRESizeFilled = size.reBoy.upper !== null && size.reBoy.lower !== null && size.reGirl.upper !== null && size.reGirl.lower !== null
+        const isPESizeFilled = size.peBoy.upper !== null && size.peBoy.lower !== null && size.peGirl.upper !== null && size.peGirl.lower !== null
 
         return (
             <>
-                {/*Regular block*/}
-                {
-                    hasRegular &&
-                    <Paper
-                        elevation={4}
-                        sx={{
-                            width: '100%',
-                            marginTop: '3vh',
-                            paddingY: '2vh',
-                            paddingX: '2vw'
-                        }}
-                    >
-                        <Typography variant={"body1"}
-                                    fontSize={20}
-                                    fontWeight={500}
-                                    fontStyle={"italic"}
-                                    sx={{marginTop: '2vh', marginBottom: '2vh'}}
-                        >
-                            Regular Uniform
-                        </Typography>
-                        <Divider sx={{borderTop: '1px solid black'}} variant={"fullWidth"}/>
-                        <Paper
-                            variant={'outlined'}
-                            sx={{
-                                width: '100%',
-                                marginTop: '3vh',
-                                paddingY: '2vh',
-                                paddingX: '2vw'
-                            }}
-                        >
-                            <Typography variant={"body1"}
-                                        fontSize={20}
-                                        fontWeight={500}
-                                        fontStyle={"italic"}
-                                        sx={{marginTop: '2vh', marginBottom: '2vh'}}
-                            >
-                                Boy
-                            </Typography>
-                            <Divider sx={{borderTop: '1px solid black', marginBottom: '2vh'}} variant={"fullWidth"}/>
-                            <RenderFillSizeArea cloth={boyUpperRE}/>
-                            <RenderFillSizeArea cloth={boyLowerRE}/>
-                        </Paper>
-
-                        <Paper
-                            variant={'outlined'}
-                            sx={{
-                                width: '100%',
-                                marginTop: '3vh',
-                                paddingY: '2vh',
-                                paddingX: '2vw'
-                            }}>
-                            <Typography variant={"body1"}
-                                        fontSize={20}
-                                        fontWeight={500}
-                                        fontStyle={"italic"}
-                                        sx={{marginTop: '2vh', marginBottom: '2vh'}}
-                            >
-                                Girl
-                            </Typography>
-                            <Divider sx={{borderTop: '1px solid black', marginBottom: '2vh'}} variant={"fullWidth"}/>
-                            <RenderFillSizeArea cloth={girlUpperRE}/>
-                            <RenderFillSizeArea cloth={girlLowerRE}/>
-                        </Paper>
-                    </Paper>
-                }
-
-                {/*PE block*/}
-                {
-                    hasPE &&
+                <Paper
+                    elevation={4}
+                    sx={{
+                        width: '100%',
+                        marginTop: '3vh',
+                        paddingY: '2vh',
+                        paddingX: '2vw'
+                    }}
+                >
+                    <Box sx={{width: '100%'}} className={'tab-custom-border'}>
+                        <Box sx={{borderBottom: 1, borderColor: 'divider'}}>
+                            <Tabs
+                                value={tab}
+                                onChange={changeTab}
+                                variant={'fullWidth'}
+                                slotProps={{
+                                    indicator: {
+                                        style: {
+                                            backgroundColor: (tab === '1' && isRESizeFilled) || (tab === '2' && isPESizeFilled) ? "green" : "red"
+                                        }
+                                    }
+                                }}>
+                                {hasRegular &&
+                                    <Tab
+                                        label="Regular"
+                                        value={'1'}
+                                        className={isRESizeFilled ? 'tab-custom-done' : 'tab-custom-undone'}
+                                        icon={isRESizeFilled ? <CheckCircle/> : <Cancel/>}
+                                        iconPosition={'end'}
+                                    />
+                                }
+                                {hasPE &&
+                                    <Tab
+                                        label="Physical Education"
+                                        value={'2'}
+                                        className={isPESizeFilled ? 'tab-custom-done' : 'tab-custom-undone'}
+                                        icon={isPESizeFilled ? <CheckCircle/> : <Cancel/>}
+                                        iconPosition={'end'}
+                                    />
+                                }
+                            </Tabs>
+                        </Box>
+                    </Box>
                     <Paper
                         variant={'outlined'}
                         sx={{
@@ -322,59 +540,80 @@ function RenderCreateOrderModal({open, CloseFunc, selectedRequest}) {
                             paddingX: '2vw'
                         }}
                     >
-                        <Typography variant={"body1"}
-                                    fontSize={20}
-                                    fontWeight={500}
-                                    fontStyle={"italic"}
-                                    sx={{marginTop: '2vh', marginBottom: '2vh'}}
-                        >
-                            Physical Education Uniform
-                        </Typography>
+                        <Box sx={{width: '100%'}}>
+                            <Box sx={{borderBottom: 1, borderColor: 'divider'}}>
+                                <Tabs
+                                    value={subTab}
+                                    onChange={changeSubTab}
+                                    variant={'fullWidth'}
+                                    slotProps={{
+                                        indicator: {
+                                            style: {
+                                                backgroundColor:
+                                                    (subTab === '1' && isBoySizeFilled) || (subTab === '2' && isGirlSizeFilled) ? "green" : "red"
+                                            }
+                                        }
+                                    }}
+                                >
+                                    <Tab
+                                        label="Boy"
+                                        value={'1'}
+                                        className={isBoySizeFilled ? 'tab-custom-done' : 'tab-custom-undone'}
+                                        iconPosition={'end'}
+                                        icon={isBoySizeFilled ? <CheckCircle/> : <Cancel/>}
+                                    />
+                                    <Tab
+                                        label="Girl"
+                                        value={'2'}
+                                        className={isGirlSizeFilled ? 'tab-custom-done' : 'tab-custom-undone'}
+                                        iconPosition={'end'}
+                                        icon={isGirlSizeFilled ? <CheckCircle/> : <Cancel/>}
+                                    />
+                                </Tabs>
+                            </Box>
+                        </Box>
                         <Divider sx={{borderTop: '1px solid black', marginBottom: '2vh'}} variant={"fullWidth"}/>
-                        <Paper
-                            variant={'outlined'}
-                            sx={{
-                                width: '100%',
-                                marginTop: '3vh',
-                                paddingY: '2vh',
-                                paddingX: '2vw'
-                            }}
-                        >
-                            <Typography variant={"body1"}
-                                        fontSize={20}
-                                        fontWeight={500}
-                                        fontStyle={"italic"}
-                                        sx={{marginTop: '2vh', marginBottom: '2vh'}}
-                            >
-                                Boy
-                            </Typography>
-                            <Divider sx={{borderTop: '1px solid black', marginBottom: '2vh'}} variant={"fullWidth"}/>
-                            <RenderFillSizeArea cloth={boyUpperPE}/>
-                            <RenderFillSizeArea cloth={boyLowerPE}/>
-                        </Paper>
+                        {
+                            tab === '1' && subTab === '1' && hasRegular &&
+                            <>
+                                <RenderFillSizeArea cloth={boyUpperRE} UpdateSizeFunc={UpdateSizes}
+                                                    initQty={size.reBoy.upper}/>
+                                <RenderFillSizeArea cloth={boyLowerRE} UpdateSizeFunc={UpdateSizes}
+                                                    initQty={size.reBoy.lower}/>
+                            </>
+                        }
+                        {
+                            tab === '1' && subTab === '2' && hasRegular &&
+                            <>
 
-                        <Paper
-                            variant={'outlined'}
-                            sx={{
-                                width: '100%',
-                                marginTop: '3vh',
-                                paddingY: '2vh',
-                                paddingX: '2vw'
-                            }}>
-                            <Typography variant={"body1"}
-                                        fontSize={20}
-                                        fontWeight={500}
-                                        fontStyle={"italic"}
-                                        sx={{marginTop: '2vh', marginBottom: '2vh'}}
-                            >
-                                Girl
-                            </Typography>
-                            <Divider sx={{borderTop: '1px solid black', marginBottom: '2vh'}} variant={"fullWidth"}/>
-                            <RenderFillSizeArea cloth={girlUpperPE}/>
-                            <RenderFillSizeArea cloth={girlLowerPE}/>
-                        </Paper>
+                                <RenderFillSizeArea cloth={girlUpperRE} UpdateSizeFunc={UpdateSizes}
+                                                    initQty={size.reGirl.upper}/>
+                                <RenderFillSizeArea cloth={girlLowerRE} UpdateSizeFunc={UpdateSizes}
+                                                    initQty={size.reGirl.lower}/>
+                            </>
+                        }
+                        {
+                            tab === '2' && subTab === '1' && hasPE &&
+                            <>
+
+                                <RenderFillSizeArea cloth={boyUpperPE} UpdateSizeFunc={UpdateSizes}
+                                                    initQty={size.peBoy.upper}/>
+                                <RenderFillSizeArea cloth={boyLowerPE} UpdateSizeFunc={UpdateSizes}
+                                                    initQty={size.peBoy.lower}/>
+                            </>
+                        }
+                        {
+                            tab === '2' && subTab === '2' && hasPE &&
+                            <>
+
+                                <RenderFillSizeArea cloth={girlUpperPE} UpdateSizeFunc={UpdateSizes}
+                                                    initQty={size.peGirl.upper}/>
+                                <RenderFillSizeArea cloth={girlLowerPE} UpdateSizeFunc={UpdateSizes}
+                                                    initQty={size.peGirl.lower}/>
+                            </>
+                        }
                     </Paper>
-                }
+                </Paper>
             </>
         )
     }
@@ -390,7 +629,7 @@ function RenderCreateOrderModal({open, CloseFunc, selectedRequest}) {
                 transition: transition,
             }}
             sx={{
-                maxHeight: '90vh'
+                maxHeight: '95vh'
             }}
             keepMounted
         >
@@ -446,17 +685,18 @@ function RenderCreateOrderModal({open, CloseFunc, selectedRequest}) {
                     </RenderTooltip>
                 }
                 {
-                    currentStep < 3 &&
+                    currentStep < 2 &&
                     <RenderTooltip
                         title={!selectedRequest ? 'Select a design request first' : 'Move to step ' + (currentStep + 2)}>
                         <div>
-                            <Button variant={'contained'} color={'primary'} onClick={() => setCurrentStep(currentStep + 1)}
+                            <Button variant={'contained'} color={'primary'}
+                                    onClick={() => setCurrentStep(currentStep + 1)}
                                     disabled={!selectedRequest}>Next</Button>
                         </div>
                     </RenderTooltip>
                 }
                 {
-                    currentStep === 3 &&
+                    currentStep === 2 &&
                     <RenderTooltip title={''}>
                         <div>
                             <Button variant={'outlined'} color={'success'}
@@ -499,7 +739,9 @@ function RenderPage({selectedRequest}) {
                     </Button>
                 </div>
             </Paper>
-            {lucky && <Typography variant={"body2"} color={"error"} fontSize={20} fontWeight={500} sx={{marginTop: '10vh'}}>There is 50% you can not see the list. Good luck</Typography>}
+            {lucky &&
+                <Typography variant={"body2"} color={"error"} fontSize={20} fontWeight={500} sx={{marginTop: '10vh'}}>There
+                    is 50% you can not see the list. Good luck</Typography>}
             {modal && <RenderCreateOrderModal open={modal} CloseFunc={HandleClose} selectedRequest={selectedRequest}/>}
         </div>
     )
