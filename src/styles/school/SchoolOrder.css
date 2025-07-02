@@ -1,0 +1,28 @@
+.uniform-img{
+    height: 200px !important;
+    width: 200px !important;
+}
+
+.uniform-img-logo{
+    height: 100px !important;
+    width: 100px !important;
+}
+
+.cloth-size .css-1gpgt6h-MuiFormControl-root-MuiTextField-root{
+    width: 5vw !important;
+}
+
+.cloth-size .css-1bss9pl-MuiInputBase-input-MuiFilledInput-input{
+    padding: 0.2vh 0 0 0.5vw !important;
+    width: 100% !important;
+}
+
+.tab-custom-done{
+    color: green !important;
+    fill: green !important;
+}
+
+.tab-custom-undone{
+    color: red !important;
+    fill: red !important;
+}
