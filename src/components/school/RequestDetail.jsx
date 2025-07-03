@@ -1,7 +1,7 @@
 import {useLocation} from "react-router-dom";
 import ChatUI from "../ui/chat/ChatUI.jsx";
 
-export default function RequestDetail({ initComments}) {
+export default function RequestDetail() {
 
     const location = useLocation();
 
@@ -11,7 +11,6 @@ export default function RequestDetail({ initComments}) {
 
         <ChatUI requestId={location.state?.requestId}
                 packageId={location.state?.packageId}
-                initComments={initComments}
                 />
     );
 }
