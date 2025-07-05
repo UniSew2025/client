@@ -22,7 +22,7 @@ import SchoolLayout from "./layouts/school/SchoolLayout.jsx";
 import RequestDetail from "./components/school/RequestDetail.jsx";
 import RequestList from "./components/school/RequestList.jsx";
 import AdminAccount from "./components/admin/AdminAccount.jsx";
-import UploadZip from "./components/school/UploadZip.jsx";
+import UploadZip from "./components/designer/UploadZip.jsx";
 import DashboardUILayout from "./layouts/ui/DashboardUILayout.jsx";
 import DesignerLayout from "./layouts/designer/DesignerLayout.jsx";
 import DesignerDashboard from "./components/designer/DesignerDashboard.jsx";
@@ -79,6 +79,9 @@ const router = createBrowserRouter([
             {
                 path: 'packages',
                 element: <DesignerPackage/>
+            },{
+                path: 'detail',
+                element: <RequestDetail/>
             }
         ]
     },
@@ -126,7 +129,7 @@ const router = createBrowserRouter([
         ]
     },
     {
-        path: "/designer/detail",
+        path: "/school/designer/detail",
         element: (
             <WebAppUILayout title={"Profile"}>
                 <DesignerDetail/>
