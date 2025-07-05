@@ -19,7 +19,7 @@ const DesignerList = () => {
 
 
     const handleViewProfile = (designer) => {
-        navigate("/designer/detail", {
+        navigate("/school/designer/detail", {
             state: { designer }
         });
     };

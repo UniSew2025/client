@@ -10,6 +10,12 @@ export const getPackageInfo = async (id) => {
     return response?.data || null;
 }
 
+export const getALlPackageByDesignerId = async (id) => {
+    const response = await axiosClient.get(`/profile/designer/package/${id}`);
+    return response?.data || null;
+}
+
+
 export const updateDesignerProfile = async (request) => {
     const response = await axiosClient.put("/profile/designer", request);
     return response?.data || null;
