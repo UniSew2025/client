@@ -238,7 +238,7 @@ function RenderLeftArea({onEditProfile, user}) {
                             fullWidth
                             endIcon={<ArrowForwardIcon/>}
                             sx={{mb: 1, borderRadius: 2, textTransform: "none", fontWeight: "bold"}}
-                            onClick={() => navigate("/home")}
+                            onClick={() => navigate("/designer/packages")}
                         >
                             Explore your packages
                         </Button>

@@ -1,317 +1,271 @@
-import React, {useState} from "react";
-import {useLocation, useNavigate} from "react-router-dom";
+import React, { useState } from "react";
 import {
-    Button,
-    Dialog,
-    DialogTitle,
-    DialogContent,
-    DialogActions,
-    Typography,
     Box,
-    ListItemText,
-    CircularProgress,
-    ListItem,
+    Grid,
+    Typography,
+    Paper,
+    Tabs,
+    Tab,
+    Button,
+    Divider,
+    Avatar,
+    Stack,
     List,
-    IconButton,
-    ListItemSecondaryAction,
-    Table,
-    TableHead,
-    TableRow,
-    TableCell,
-    TableBody
+    ListItem,
+    ListItemText,
+    MobileStepper,
+    useTheme
 } from "@mui/material";
-import {chooseDesignPackage, getClothByRequestId, viewListHistory} from "../../services/DesignService.jsx";
-import VisibilityIcon from "@mui/icons-material/Visibility";
+import KeyboardArrowLeft from "@mui/icons-material/KeyboardArrowLeft";
+import KeyboardArrowRight from "@mui/icons-material/KeyboardArrowRight";
 
-export default function DesignerDetail() {
-
-    const [selectedPackage, setSelectedPackage] = useState(null);
-    const [openDialog, setOpenDialog] = useState(false);
-    const [openRequestDialog, setOpenRequestDialog] = useState(false);
-    const [requestList, setRequestList] = useState([]);
-    const [loadingRequests, setLoadingRequests] = useState(false);
-    const [openDetailDialog, setOpenDetailDialog] = useState(false);
-    const [clothList, setClothList] = useState([]);
-    const [selectedRequestId, setSelectedRequestId] = useState(null);
-    const navigate = useNavigate();
-
-    const location = useLocation();
-    const designer = location.state?.designer;
-
-
-    if (!designer) {
-        return <div style={{padding: 40}}>No designer data found.</div>;
+const mockDesigner = {
+    title: "I will do modern custom logo design for your brand in 24hrs",
+    bio: "Experienced logo & uniform designer, creative and professional service for your brand!",
+    profile: {
+        avatar: "https://randomuser.me/api/portraits/men/44.jpg",
+        name: "San",
+        level: 2,
+        rating: 4.9,
+        reviewCount: 102,
+        country: "Vietnam",
+        joined: "2022",
+    },
+    portfolioImages: [
+        "https://www.shutterstock.com/image-vector/technical-flat-sketch-girls-school-260nw-2287745045.jpg",
+        "https://thumbs.dreamstime.com/b/baby-girl-s-school-uniform-design-template-vector-design-baby-girl-s-school-uniform-design-button-down-short-sleeves-template-382461332.jpg",
+        "https://static.vecteezy.com/system/resources/previews/033/952/505/non_2x/work-or-school-uniform-front-and-back-view-illustration-vector.jpg",
+        "https://media.istockphoto.com/id/1321431524/vector/vector-sketch-set-of-school-uniform-clothes.jpg?s=1024x1024&w=is&k=20&c=MWasRYc5U_v3Co7Ggp6CNC1DJLoVZbA4KZRw5n1OMWA="
+    ],
+    packages: [
+        {
+            name: "Basic",
+            fee: 100000,
+            header_content: "1 HQ Basic Logo + Logo Transparency",
+            delivery_duration: 2,
+            revision_time: 5,
+            description: "No AI generated artwork. Get a high quality basic logo for your business, with transparency."
+        },
+        {
+            name: "Standard",
+            fee: 200000,
+            header_content: "2 HQ Logo Concepts + Vector File",
+            delivery_duration: 3,
+            revision_time: 10,
+            description: "Standard package includes two concepts, vector files, and unlimited minor revisions."
+        },
+        {
+            name: "Premium",
+            fee: 300000,
+            header_content: "3 HQ Logo Concepts + Full Brand Kit",
+            delivery_duration: 5,
+            revision_time: 20,
+            description: "Best for brand identity! Three logo concepts, source files, social kit, and much more."
+        }
+    ],
+    stats: {
+        "Orders Completed": "98%",
+        "Response Time": "1 Hour",
+        "Delivered on Time": "On Time",
+        "Repeat Clients": "21%"
     }
-    const handleSelectPackage = (pkg) => {
-        setSelectedPackage(pkg);
-        setOpenDialog(true);
+};
+
+function GallerySection({ images = [] }) {
+    const theme = useTheme();
+    const [activeStep, setActiveStep] = useState(0);
+
+    const maxSteps = images.length;
+
+    const handleNext = () => {
+        setActiveStep((prevActiveStep) => prevActiveStep + 1);
     };
 
-    const handleConfirmPay = async () => {
-        setLoadingRequests(true);
-        setOpenRequestDialog(true);
-        try {
-            const res = await viewListHistory();
-            const createdRequests = res.data.filter(item => item.status === "CREATED" && item.package == null);
-            setRequestList(createdRequests);
-        } catch (error) {
-            console.error("Failed to fetch requests:", error);
-        } finally {
-            setLoadingRequests(false);
-        }
+    const handleBack = () => {
+        setActiveStep((prevActiveStep) => prevActiveStep - 1);
     };
 
-    const handleViewRequestDetail = async (requestId) => {
-        try {
-            setSelectedRequestId(requestId);
-            const res = await getClothByRequestId(requestId);
-            setClothList(res);
-            setOpenDetailDialog(true);
-        } catch (err) {
-            console.error("Failed to fetch cloths", err);
-        }
-    };
-
-    const handleChooseRequest = async () => {
-        try {
-            const res = await chooseDesignPackage({
-                designRequestId: selectedRequestId,
-                packageId: selectedPackage.id
-            });
-
-            console.log("Package selected successfully:", res);
-            setOpenDetailDialog(false);
-            setOpenDialog(false);
-            alert("You have successfully selected a package!");
-        } catch (error) {
-            console.error("Error choosing package:", error);
-            alert("Failed to choose package");
-        }
-    };
-
-    const handleCreateRequest = () => {
-        localStorage.setItem("createDesignPopup", "open")
-        localStorage.setItem("pageInfo", JSON.stringify({designer: designer, url: "/designer-profile"}))
-        navigate("/school");
-    }
-
+    if (images.length === 0) return null;
 
     return (
-        <div className="profile-page bg-light pb-5">
-            <div
-                className="profile-banner"
-                style={{
-                    backgroundImage: `url(https://png.pngtree.com/thumb_back/fh260/background/20221011/pngtree-blue-gold-background-banner-idea-modern-simple-free-download-image_1467602.jpg)`,
-                    backgroundSize: "cover",
-                    backgroundPosition: "center",
-                    height: 240,
-                    position: "relative"
+        <Box sx={{ maxWidth: 520, flexGrow: 1, mx: "auto", mb: 3 }}>
+            <Box
+                sx={{
+                    width: "100%",
+                    height: 0,
+                    paddingTop: "75%",
+                    position: "relative",
+                    borderRadius: 2,
+                    overflow: "hidden",
+                    boxShadow: 2,
+                    background: "#f9f9f9",
                 }}
             >
-                <div className="profile-avatar-box"
-                     style={{position: "absolute", left: 40, bottom: -50, display: "flex", alignItems: "center"}}>
-                    <img
-                        src={designer.profile.avatar}
-                        alt="Avatar"
-                        className="rounded-circle border border-4 border-white shadow"
-                        style={{width: 100, height: 100, objectFit: "cover"}}
-                    />
-                    <div className="ms-4 d-none d-md-block">
-                        <h2 className="fw-bold mb-1">{designer.profile.name}</h2>
-                        <div className="text-muted mb-1">Graphic Designer</div>
-                        <div className="d-flex align-items-center gap-3">
-                            <span><i className="bi bi-geo-alt-fill me-1"></i>Vietnam</span>
-                            <span className="text-muted">Joined 2022</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div className="container" style={{marginTop: 70}}>
-                <div className="row">
-                    <div className="col-lg-8">
-                        <div className="mb-4 d-flex gap-3">
-                            <button className="btn btn-success rounded-pill fw-semibold px-4">
-                                Contact
-                            </button>
-                        </div>
-
-                        <div className="mb-4">
-                            <h5 className="fw-bold mb-2">About</h5>
-                            <p className="text-dark">{designer.bio}</p>
-                        </div>
-                        <div className="mb-4">
-                            <h5 className="fw-bold mb-2">My Portfolio</h5>
-                        </div>
-
-                        <div className="mb-4">
-                            <h5 className="fw-bold mb-3">Packages</h5>
-                            <div className="row g-3">
-                                {designer.package?.map(pkg => (
-                                    <div className="col-md-6" key={pkg.id}>
-                                        <div className="card h-100 shadow-sm">
-                                            <div className="card-body">
-                                                <h6 className="card-title fw-semibold">{pkg.name}</h6>
-                                                <div className="text-muted small mb-2">{pkg.header_content}</div>
-                                                <div><strong>Fee:</strong> ${pkg.fee}</div>
-                                                <div><strong>Delivery:</strong> {pkg.delivery_duration} days</div>
-                                                <div><strong>Revisions:</strong> {pkg.revision_time}</div>
-                                            </div>
-                                            <div className="card-footer d-flex justify-content-center">
-                                                <Button variant="outlined" onClick={() => handleSelectPackage(pkg)}>
-                                                    Select
-                                                </Button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-
-                        <div className="text-muted">/* Reviews section /</div>
-                    </div>
-
-                    <div className="col-lg-4 mt-4 mt-lg-0">
-                        <div className="card p-4 shadow-sm mb-4">
-                            <h6 className="fw-bold mb-3">Profile Stats</h6>
-                            <div className="d-flex justify-content-between mb-2">
-                                <span>Orders Completed</span>
-                                <span className="fw-semibold text-success">98%</span>
-                            </div>
-                            <div className="d-flex justify-content-between mb-2">
-                                <span>Response Time</span>
-                                <span>1 Hour</span>
-                            </div>
-                            <div className="d-flex justify-content-between mb-2">
-                                <span>Delivered on Time</span>
-                                <span>On Time</span>
-                            </div>
-                            <div className="d-flex justify-content-between">
-                                <span>Repeat Clients</span>
-                                <span>21%</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <Dialog open={openDialog} onClose={() => setOpenDialog(false)} maxWidth="sm" fullWidth>
-                <DialogTitle>Confirm Your Package</DialogTitle>
-                <DialogContent dividers>
-                    {selectedPackage && (
-                        <Box>
-                            <Typography variant="h6">{selectedPackage.name}</Typography>
-                            <Typography variant="body2" gutterBottom color="text.secondary">
-                                {selectedPackage.header_content}
-                            </Typography>
-                            <Typography><strong>Fee:</strong> ${selectedPackage.fee}</Typography>
-                            <Typography><strong>Delivery:</strong> {selectedPackage.delivery_duration} days</Typography>
-                            <Typography><strong>Revisions:</strong> {selectedPackage.revision_time}</Typography>
-                        </Box>
-                    )}
-                </DialogContent>
-                <DialogActions sx={{justifyContent: "space-between", px: 3}}>
-                    <Typography variant="h6" fontWeight="bold">
-                        Total: ${selectedPackage?.fee || 0}
-                    </Typography>
-                    <Button variant="contained" onClick={handleConfirmPay}>
-                        Confirm
-                    </Button>
-                </DialogActions>
-            </Dialog>
-
-            <Dialog open={openRequestDialog} onClose={() => setOpenRequestDialog(false)} maxWidth="sm" fullWidth>
-                <DialogTitle>Select a Design Request</DialogTitle>
-                <DialogContent dividers>
-                    {loadingRequests ? (
-                        <Box display="flex" justifyContent="center" alignItems="center" p={2}>
-                            <CircularProgress/>
-                        </Box>
-                    ) : requestList.length === 0 ? (
-                        <div>
-                            <Typography>No request with status found.</Typography>
-                            <Button onClick={handleCreateRequest}>Crete new Request</Button>
-                        </div>
-                    ) : (
-                        <List>
-                            {requestList.map((req) => (
-                                <ListItem button key={req.id}>
-                                    <ListItemText
-                                        primary={`Request ID: ${req.id}`}
-                                        secondary={`Private: ${req.private ? "Yes" : "No"} | School: ${req.school}`}
-                                    />
-                                    <ListItemSecondaryAction>
-                                        <IconButton
-                                            edge="end"
-                                            onClick={() => handleViewRequestDetail(req.id)}
-                                        >
-                                            <VisibilityIcon />
-                                        </IconButton>
-                                    </ListItemSecondaryAction>
-                                </ListItem>
-                            ))}
-                        </List>
-                    )}
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={() => setOpenRequestDialog(false)}>Cancel</Button>
-                </DialogActions>
-            </Dialog>
-
-            <Dialog open={openDetailDialog} onClose={() => setOpenDetailDialog(false)} maxWidth="md" fullWidth>
-                <DialogTitle>Cloth Details</DialogTitle>
-                <DialogContent dividers>
-                    <Table size="small">
-                        <TableHead>
-                            <TableRow>
-                                <TableCell>Category</TableCell>
-                                <TableCell>Type</TableCell>
-                                <TableCell>Color</TableCell>
-                                <TableCell>Logo Pos</TableCell>
-                                <TableCell>Logo Img</TableCell>
-                                <TableCell>Logo Width</TableCell>
-                                <TableCell>Logo Height</TableCell>
-                                <TableCell>Note</TableCell>
-                            </TableRow>
-                        </TableHead>
-                        <TableBody>
-                            {clothList.map((cloth, idx) => (
-                                <TableRow key={idx}>
-                                    <TableCell>{cloth.cloth_category}</TableCell>
-                                    <TableCell>{cloth.cloth_type}</TableCell>
-                                    <TableCell>{cloth.color}</TableCell>
-                                    <TableCell>{cloth.logo_position}</TableCell>
-                                    <TableCell>
-                                        {cloth.logo_image ? (
-                                            <img
-                                                src={cloth.logo_image}
-                                                alt="Logo"
-                                                style={{ width: '50px', height: 'auto' }}
-                                            />
-                                        ) : (
-                                            <span style={{ display: 'none' }}></span>
-                                        )}
-                                    </TableCell>
-                                    <TableCell>{cloth.logo_width}</TableCell>
-                                    <TableCell>{cloth.logo_height}</TableCell>
-                                    <TableCell>{cloth.note}</TableCell>
-                                </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={() => setOpenDetailDialog(false)}>Close</Button>
-
+                <Box
+                    component="img"
+                    src={images[activeStep]}
+                    alt={`Portfolio ${activeStep + 1}`}
+                    sx={{
+                        width: "100%",
+                        height: "100%",
+                        objectFit: "contain",
+                        position: "absolute",
+                        left: 0,
+                        top: 0,
+                        borderRadius: 2,
+                        transition: "0.2s"
+                    }}
+                />
+            </Box>
+            <MobileStepper
+                steps={maxSteps}
+                position="static"
+                activeStep={activeStep}
+                sx={{ bgcolor: "transparent", justifyContent: "center", mt: 1 }}
+                nextButton={
                     <Button
-                        variant="contained"
-                        color="primary"
-                        onClick={handleChooseRequest}
+                        size="small"
+                        onClick={handleNext}
+                        disabled={activeStep === maxSteps - 1}
                     >
-                        Choose
+                        Next
+                        {theme.direction === "rtl" ? <KeyboardArrowLeft /> : <KeyboardArrowRight />}
                     </Button>
-                </DialogActions>
-            </Dialog>
-        </div>
+                }
+                backButton={
+                    <Button
+                        size="small"
+                        onClick={handleBack}
+                        disabled={activeStep === 0}
+                    >
+                        {theme.direction === "rtl" ? <KeyboardArrowRight /> : <KeyboardArrowLeft />}
+                        Back
+                    </Button>
+                }
+            />
+        </Box>
     );
 }
+
+
+
+function PackageTabs({ packages, onContinue }) {
+    const [tab, setTab] = useState(0);
+    const pkg = packages[tab];
+
+    return (
+        <Paper elevation={4} sx={{ maxWidth: "500px" , p: 3, borderRadius: 2, position: "sticky", top: 40 }}>
+            <Tabs
+                value={tab}
+                onChange={(_, v) => setTab(v)}
+                variant="fullWidth"
+                textColor="primary"
+                indicatorColor="primary"
+                sx={{ mb: 2 }}
+            >
+                {packages.map((p, idx) => (
+                    <Tab key={idx} label={p.name} sx={{ fontWeight: "bold" }} />
+                ))}
+            </Tabs>
+            <Typography variant="subtitle2" fontWeight="bold" mb={0.5}>
+                {pkg.name} Package
+            </Typography>
+            <Typography color="text.secondary" mb={1}>
+                {pkg.header_content}
+            </Typography>
+            <Typography fontWeight="bold" fontSize={24} mb={1}>
+                {pkg.fee} VND
+            </Typography>
+            <Divider sx={{ my: 1 }} />
+            <Box display="flex" alignItems="center" gap={2} mb={1}>
+                <Typography fontSize={15}>⏱ {pkg.delivery_duration} day{pkg.delivery_duration > 1 ? "s" : ""}</Typography>
+                <Typography fontSize={15}>🔄 {pkg.revision_time} Revisions</Typography>
+            </Box>
+            <Typography color="text.secondary" mb={2}>{pkg.description}</Typography>
+            <Button
+                fullWidth
+                variant="contained"
+                sx={{ borderRadius: 2, fontWeight: "bold", py: 1.2 }}
+                onClick={() => onContinue(pkg)}
+            >
+                Continue
+            </Button>
+            <Button
+                fullWidth
+                variant="outlined"
+                sx={{ mt: 1, borderRadius: 2, textTransform: "none", py: 1.2 }}
+            >
+                Contact me
+            </Button>
+        </Paper>
+    );
+}
+
+function ProfileStats({ stats }) {
+    return (
+        <Paper elevation={4} sx={{ p: 3, borderRadius: 2, mb: 2 }}>
+            <Typography fontWeight="bold" mb={2}>Profile Stats</Typography>
+            <List dense disablePadding>
+                {Object.entries(stats).map(([label, value], idx) => (
+                    <ListItem key={idx} disableGutters sx={{ px: 0, py: 0.5 }}>
+                        <ListItemText primary={label} />
+                        <Typography fontWeight="bold">{value}</Typography>
+                    </ListItem>
+                ))}
+            </List>
+        </Paper>
+    );
+}
+
+export default function DesignerDetail() {
+    const [designer] = useState(mockDesigner);
+
+    const handleContinue = (pkg) => {
+        alert(`You have selected package "${pkg.name}" with price $${pkg.fee}`);
+    };
+
+    return (
+        <Box sx={{ background: "#fff", minHeight: "100vh", pb: 8 }}>
+            <Box sx={{ maxWidth: 1300, mx: "auto", pt: 4 }}>
+                <Typography color="text.secondary" fontSize={14} mb={1}>
+                    Graphics & Design / Logo Design
+                </Typography>
+
+                <Grid container spacing={4}>
+                    <Grid item xs={12} md={8}>
+                        <Typography variant="h5" fontWeight="bold" mb={1}>
+                            {designer.title}
+                        </Typography>
+                        <Stack direction="row" alignItems="center" gap={2} mb={2}>
+                            <Avatar src={designer.profile.avatar} sx={{ width: 54, height: 54 }} />
+                            <Box>
+                                <Typography fontWeight="bold" fontSize={18}>{designer.profile.name}</Typography>
+                                <Stack direction="row" alignItems="center" gap={1} fontSize={14}>
+                                    <span style={{ color: "#F59E42" }}>★ {designer.profile.rating}</span>
+                                    <span style={{ color: "#aaa" }}>({designer.profile.reviewCount} reviews)</span>
+                                    <span style={{ color: "#aaa" }}>Level {designer.profile.level}</span>
+                                    <span style={{ color: "#aaa" }}>{designer.profile.country}</span>
+                                    <span style={{ color: "#aaa" }}>Joined {designer.profile.joined}</span>
+                                </Stack>
+                            </Box>
+                        </Stack>
+                        <GallerySection images={designer.portfolioImages} />
+
+                        <Typography variant="h6" fontWeight="bold" mt={2} mb={1}>
+                            About
+                        </Typography>
+                        <Typography color="text.secondary" mb={3}>
+                            {designer.bio}
+                        </Typography>
+                    </Grid>
+
+                    <Grid item xs={12} md={4}>
+                        <PackageTabs packages={designer.packages} onContinue={handleContinue} />
+                        <ProfileStats stats={designer.stats} />
+                    </Grid>
+                </Grid>
+            </Box>
+        </Box>
+    );
+}
+
