@@ -22,7 +22,7 @@ import {
     Typography,
     CircularProgress
 } from '@mui/material';
-import {useLocation} from "react-router-dom";
+import {useLocation, useNavigate} from "react-router-dom";
 import {
     getAllComments,
     getAllDelivery,
@@ -537,6 +537,11 @@ function DeliveryList({ deliveries, userRole }) {
 export default function ChatUI({ packageId, requestId }) {
     const [tab, setTab] = useState(0);
     const userRole = JSON.parse(localStorage.getItem('user')).role;
+    const navigate = useNavigate();
+    function handleViewDesignList() {
+
+        navigate("/designer/list")
+    }
 
 
     if (userRole === 'school') {
@@ -547,7 +552,7 @@ export default function ChatUI({ packageId, requestId }) {
                         This request has not been assigned yet.
                     </Typography>
                     <Stack direction="column" spacing={2} alignItems="center">
-                        <Button variant="contained" color="primary">
+                        <Button variant="contained" color="primary" onClick={handleViewDesignList}>
                             Find the designer for this request
                         </Button>
                     </Stack>

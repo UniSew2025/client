@@ -129,7 +129,7 @@ const router = createBrowserRouter([
         ]
     },
     {
-        path: "/designer/detail",
+        path: "/school/designer/detail",
         element: (
             <WebAppUILayout title={"Profile"}>
                 <DesignerDetail/>

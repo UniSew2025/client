@@ -824,7 +824,7 @@ const RequestHistory = () => {
                                     <TableCell align={"center"}>{item.private ? "Private" : "Public"}</TableCell>
                                     <TableCell align={"center"}>{item.feedback ? item.feedback : "N/A"}</TableCell>
                                     <TableCell align={"center"}>
-                                        <RenderStatusDisplay status={item.status.toLowerCase()}/>
+                                        <RenderStatusDisplay status={item.status}/>
                                     </TableCell>
                                     <TableCell align={"center"}>
                                         <IconButton
