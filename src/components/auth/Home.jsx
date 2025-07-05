@@ -363,6 +363,10 @@ function RenderPage() {
         localStorage.removeItem("variant")
     }
 
+    if(sessionStorage.length > 0){
+        sessionStorage.clear()
+    }
+
     return (
         <>
             <HeroSection />

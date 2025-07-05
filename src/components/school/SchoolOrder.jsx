@@ -11,11 +11,19 @@ import {
     Fade,
     FormControlLabel,
     IconButton,
+    Link,
+    List,
+    ListItem,
+    ListItemIcon,
+    ListItemText,
+    ListSubheader,
     Paper,
     Slide,
     Step,
     StepLabel,
-    Stepper, Tab, Tabs,
+    Stepper,
+    Tab,
+    Tabs,
     TextField,
     Tooltip,
     tooltipClasses,
@@ -23,13 +31,17 @@ import {
 } from "@mui/material";
 import {ColorPicker} from 'antd'
 import {Add, Cancel, CheckCircle, RestartAlt} from "@mui/icons-material";
+import {GiPoloShirt, GiSkirt} from "react-icons/gi"
+import {PiPantsFill} from "react-icons/pi";
 import {forwardRef, useEffect, useState} from "react";
 import {getCompleteDesignRequest} from "../../services/DesignService.jsx";
 import {useNavigate} from "react-router-dom";
 import {enqueueSnackbar} from "notistack";
 import ModalImage from "react-modal-image";
 
-const lucky = false
+function SumSizeQty(size) {
+    return size.S + size.M + size.L + size.XL + size.XXL + size.XXXL + size.XXXXL
+}
 
 function RenderTooltip({title, children}) {
     return (
@@ -74,7 +86,74 @@ function RenderStepper({step}) {
     )
 }
 
-function RenderFillSizeArea({cloth, UpdateSizeFunc, initQty}) {
+function RenderSummarySizeQuantityArea({upper, lower, upperQty, lowerQty}) {
+
+    const handleClickScroll = (id) => {
+        const element = document.getElementById(id);
+        if (element) {
+            element.scrollIntoView({behavior: 'smooth', block: 'start'});
+        }
+    };
+
+    return (
+        <Paper variant={"outlined"} sx={{padding: '5px'}}>
+            <Typography color={upperQty > 0 && lowerQty > 0 && upperQty === lowerQty ? 'success' : 'error'}>
+                {
+                    upperQty === 0 && lowerQty === 0 ?
+                        '* Require at least 1 ' + upper.clothType.toLowerCase() + ' and 1 ' + lower.clothType.toLowerCase()
+                        :
+                        upperQty !== lowerQty ?
+                            '* The quantity of ' + upper.clothType.toLowerCase() + ' must the same as ' + lower.clothType.toLowerCase()
+                            :
+                            'Valid Quantity'
+                }
+            </Typography>
+            <List
+                subheader={<ListSubheader sx={{height: '5vh', position: 'static'}}>Quantity:</ListSubheader>}
+            >
+                {/*Upper*/}
+                <ListItem sx={{paddingY: 0}}>
+                    <ListItemIcon sx={{minWidth: '1.8vw'}}>
+                        <GiPoloShirt/>
+                    </ListItemIcon>
+                    <Link
+                        href="#cloth1"
+                        underline={"none"}
+                        variant={'body1'}
+                        color={'textPrimary'}
+                        onClick={(e) => {
+                            e.preventDefault()
+                            handleClickScroll('cloth1')
+                        }}
+                    >
+                        <ListItemText primary={upper.clothType.toLowerCase() + ': ' + upperQty}/>
+                    </Link>
+                </ListItem>
+
+                {/*Lower*/}
+                <ListItem sx={{paddingY: 0}}>
+                    <ListItemIcon sx={{minWidth: '1.8vw'}}>
+                        {lower.clothType.toLowerCase() === 'pants' ? <PiPantsFill/> : <GiSkirt/>}
+                    </ListItemIcon>
+                    <Link
+                        href="#cloth2"
+                        underline={"none"}
+                        variant={'body1'}
+                        color={'textPrimary'}
+                        onClick={(e) => {
+                            e.preventDefault()
+                            handleClickScroll('cloth2')
+                        }}
+                    >
+                        <ListItemText primary={lower.clothType.toLowerCase() + ': ' + lowerQty}/>
+                    </Link>
+                </ListItem>
+            </List>
+        </Paper>
+    )
+}
+
+function RenderFillSizeArea({cloth, UpdateSizeFunc, initQty, id}) {
 
     const [qty, setQty] = useState(initQty ? initQty : {
         S: 0,
@@ -86,7 +165,7 @@ function RenderFillSizeArea({cloth, UpdateSizeFunc, initQty}) {
         XXXXL: 0
     })
 
-    const totalQty = qty.S + qty.M + qty.L + qty.XL + qty.XXL + qty.XXXL + qty.XXXXL
+    const totalQty = SumSizeQty(qty)
 
     function RenderSize({name, size, minH, maxH, minW, maxW}) {
 
@@ -154,6 +233,7 @@ function RenderFillSizeArea({cloth, UpdateSizeFunc, initQty}) {
 
     return (
         <Paper
+            id={id}
             variant={'outlined'}
             sx={{
                 width: '100%',
@@ -166,14 +246,23 @@ function RenderFillSizeArea({cloth, UpdateSizeFunc, initQty}) {
                 cloth ?
                     (
                         <>
-                            <Typography variant={"body1"}
-                                        fontSize={18}
-                                        fontWeight={500}
-                                        fontStyle={"italic"}
-                                        sx={{marginTop: '2vh', marginBottom: '2vh'}}
-                            >
-                                {cloth.clothType.substring(0, 1).toUpperCase() + cloth.clothType.substring(1).toUpperCase()}
-                            </Typography>
+                            <div className={'d-flex justify-content-between'}>
+                                <Typography variant={"body1"}
+                                            fontSize={20}
+                                            fontWeight={600}
+                                            fontStyle={"italic"}
+                                            sx={{marginTop: '2vh', marginBottom: '2vh'}}
+                                >
+                                    {cloth.clothType.substring(0, 1).toUpperCase() + cloth.clothType.substring(1).toUpperCase()}
+                                </Typography>
+                                <Typography variant={"body1"}
+                                            fontSize={20}
+                                            fontWeight={600}
+                                            fontStyle={"italic"}
+                                            sx={{marginTop: '2vh', marginBottom: '2vh'}}>
+                                    Added Quantity: {totalQty} {cloth.clothType.toLowerCase()}
+                                </Typography>
+                            </div>
                             <div className={'d-flex justify-content-start align-items-start'}>
                                 <div
                                     className={'d-flex flex-column justify-content-center align-items-start w-50 px-2'}>
@@ -308,29 +397,259 @@ function RenderFillSizeArea({cloth, UpdateSizeFunc, initQty}) {
     )
 }
 
-function RenderCreateOrderModal({open, CloseFunc, selectedRequest}) {
-    const navigate = useNavigate()
-
-    const [currentStep, setCurrentStep] = useState(0)
-
-    const transition = forwardRef(function Transition(props, ref) {
-        return <Slide direction="up" ref={ref} {...props} />;
-    });
-
+function RenderFirstStep({selectedRequest, hasRegular, hasPE}) {
     const vietnamLocale = 'vi-VN';
-
     const shortDate = {
         year: 'numeric',
         month: '2-digit',
         day: '2-digit',
     };
+    const navigate = useNavigate()
 
-    const hasRegular = !!(selectedRequest && selectedRequest.cloth.find(item => item.clothCategory === 'regular'))
+    return (
+        <Paper
+            elevation={4}
+            sx={{
+                width: '100%',
+                marginTop: '3vh',
+                paddingY: '2vh',
+                paddingX: '2vw'
+            }}
+        >
+            <div className={'d-flex justify-content-between align-items-center gap-2 w-100'}>
+                <Typography variant={"body1"}
+                            fontSize={20}
+                            fontWeight={500}
+                            fontStyle={"italic"}
+                            sx={{marginTop: '2vh', marginBottom: '3vh'}}
+                >
+                    Design Request Information
+                </Typography>
+                <Button
+                    variant={'contained'}
+                    color={'secondary'}
+                    onClick={() => navigate('/school/design')}
+                    size={"small"}
+                    sx={{height: '4vh', width: '10vw', fontSize: '0.7rem', marginTop: '5vh', marginBottom: '2vh'}}
+                >
+                    Choose another
+                </Button>
+            </div>
+            <TextField
+                variant={"standard"}
+                slotProps={{input: {readOnly: true}}}
+                size={"small"}
+                label={'ID'}
+                fullWidth
+                sx={{marginBottom: '3vh'}}
+                defaultValue={selectedRequest.id}
+            />
 
-    const hasPE = !!(selectedRequest && selectedRequest.cloth.find(item => item.clothCategory === 'pe'))
+            <TextField
+                variant={"standard"}
+                slotProps={{input: {readOnly: true}}}
+                size={"small"}
+                label={'Creation Date'}
+                fullWidth
+                sx={{marginBottom: '3vh'}}
+                defaultValue={new Intl.DateTimeFormat(vietnamLocale, shortDate).format(new Date(selectedRequest.creationDate))}
+            />
 
-    function RenderFirstStep() {
-        return (
+            <TextField
+                variant={"standard"}
+                slotProps={{input: {readOnly: true}}}
+                size={"small"}
+                label={'Status'}
+                fullWidth
+                sx={{marginBottom: '3vh'}}
+                defaultValue={selectedRequest.status.substring(0, 1).toUpperCase() + selectedRequest.status.substring(1).toLowerCase()}
+            />
+            <div className={'d-flex flex-column justify-content-center'}>
+                <Typography sx={{marginRight: '1vw'}} fontSize={18}>Selected Uniform Type:</Typography>
+                <FormControlLabel
+                    control={<Checkbox checked={hasRegular} slotProps={{input: {readOnly: true}}}
+                                       color={hasRegular ? 'success' : 'default'}/>}
+                    label="Regular"
+                />
+                <FormControlLabel
+                    control={<Checkbox checked={hasPE} slotProps={{input: {readOnly: true}}}
+                                       color={hasPE ? 'success' : 'default'}/>}
+                    label="Physical Education"
+                />
+            </div>
+        </Paper>
+    )
+}
+
+function RenderSecondStep({cloths, hasRegular, hasPE, SetLockFunc}) {
+
+    const [tab, setTab] = useState({
+        main: '1',
+        sub: '1'
+    })
+
+    const [size, setSize] = useState(localStorage.getItem('size') ? JSON.parse(localStorage.getItem('size')) : {
+        reBoy: {upper: null, lower: null},
+        reGirl: {upper: null, lower: null},
+        peBoy: {upper: null, lower: null},
+        peGirl: {upper: null, lower: null}
+    })
+
+    //Get list for size
+    const boyUpperRE = cloths.find(cloth => cloth.clothCategory === 'regular' && cloth.gender === 'boy' && cloth.clothType === 'shirt')
+    const boyLowerRE = cloths.find(cloth => cloth.clothCategory === 'regular' && cloth.gender === 'boy' && cloth.clothType === 'pants')
+    const girlUpperRE = cloths.find(cloth => cloth.clothCategory === 'regular' && cloth.gender === 'girl' && cloth.clothType === 'shirt')
+    const girlLowerRE = cloths.find(cloth => cloth.clothCategory === 'regular' && cloth.gender === 'girl' && (cloth.clothType === 'pants' || cloth.clothType === 'skirt'))
+
+    const boyUpperPE = cloths.find(cloth => cloth.clothCategory === 'pe' && cloth.gender === 'boy' && cloth.clothType === 'shirt')
+    const boyLowerPE = cloths.find(cloth => cloth.clothCategory === 'pe' && cloth.gender === 'boy' && cloth.clothType === 'pants')
+    const girlUpperPE = cloths.find(cloth => cloth.clothCategory === 'pe' && cloth.gender === 'girl' && cloth.clothType === 'shirt')
+    const girlLowerPE = cloths.find(cloth => cloth.clothCategory === 'pe' && cloth.gender === 'girl' && cloth.clothType === 'pants')
+
+    //Condition for displaying
+    const isREBoySizeFilled = size.reBoy.upper !== null && size.reBoy.lower !== null // Both upper and lower existed
+    const isREGirlSizeFilled = size.reGirl.upper !== null && size.reGirl.lower !== null
+    const isPEBoySizeFilled = size.peBoy.upper !== null && size.peBoy.lower !== null
+    const isPEGirlSizeFilled = size.peGirl.upper !== null && size.peGirl.lower !== null
+
+    const isREBoyTabChecked = tab.main === '1' && isREBoySizeFilled
+    const isREGirlTabChecked = tab.main === '1' && isREGirlSizeFilled
+    const isPEBoyTabChecked = tab.main === '2' && isPEBoySizeFilled
+    const isPEGirlTabChecked = tab.main === '2' && isPEGirlSizeFilled
+
+    const isRESizeFilled = isREBoySizeFilled && isREGirlSizeFilled
+    const isPESizeFilled = isPEBoySizeFilled && isPEGirlSizeFilled
+
+    const checkLock = (newSize) => {
+        const isRENewSizeFilled = newSize.reBoy.upper !== null && newSize.reBoy.lower !== null && newSize.reGirl.upper !== null && newSize.reGirl.lower !== null
+        const isPENewSizeFilled = newSize.peBoy.upper !== null && newSize.peBoy.lower !== null && newSize.peGirl.upper !== null && newSize.peGirl.lower !== null
+
+        const condition1 = hasRegular && hasPE && (!isRENewSizeFilled || !isPENewSizeFilled)
+        const condition2 = hasRegular && !hasPE && !isRENewSizeFilled
+        const condition3 = !hasRegular && hasPE && !isPENewSizeFilled
+
+        return condition1 || condition2 || condition3
+    }
+
+    function UpdateSizes(gender, type, position, newValue) {
+        switch (type) {
+            case 're':
+                switch (gender) {
+                    case 'boy':
+                        switch (position) {
+                            case 'upper': {
+                                const newSize = (prevSize) => ({
+                                    ...prevSize,
+                                    reBoy: {...prevSize.reBoy, upper: newValue}
+                                })
+                                setSize(newSize(size))
+                                localStorage.setItem("size", JSON.stringify(newSize(size)))
+                                SetLockFunc(checkLock(newSize(size)))
+                                break
+                            }
+                            default: {
+                                const newSize = (prevSize) => ({
+                                    ...prevSize,
+                                    reBoy: {...prevSize.reBoy, lower: newValue}
+                                })
+                                setSize(newSize(size))
+                                localStorage.setItem("size", JSON.stringify(newSize(size)))
+                                SetLockFunc(checkLock(newSize(size)))
+                                break
+                            }
+                        }
+                        break
+                    default:
+                        switch (position) {
+                            case 'upper': {
+                                const newSize = (prevSize) => ({
+                                    ...prevSize,
+                                    reGirl: {...prevSize.reGirl, upper: newValue}
+                                })
+                                setSize(newSize(size))
+                                localStorage.setItem("size", JSON.stringify(newSize(size)))
+                                SetLockFunc(checkLock(newSize(size)))
+                                break
+                            }
+                            default: {
+                                const newSize = (prevSize) => ({
+                                    ...prevSize,
+                                    reGirl: {...prevSize.reGirl, lower: newValue}
+                                })
+                                setSize(newSize(size))
+                                localStorage.setItem("size", JSON.stringify(newSize(size)))
+                                SetLockFunc(checkLock(newSize(size)))
+                                break
+                            }
+                        }
+                        break
+                }
+                break
+            default:
+                switch (gender) {
+                    case 'boy':
+                        switch (position) {
+                            case 'upper': {
+                                const newSize = (prevSize) => ({
+                                    ...prevSize,
+                                    peBoy: {...prevSize.peBoy, upper: newValue}
+                                })
+                                setSize(newSize(size))
+                                localStorage.setItem("size", JSON.stringify(newSize(size)))
+                                SetLockFunc(checkLock(newSize(size)))
+                                break
+                            }
+                            default: {
+                                const newSize = (prevSize) => ({
+                                    ...prevSize,
+                                    peBoy: {...prevSize.peBoy, lower: newValue}
+                                })
+                                setSize(newSize(size))
+                                localStorage.setItem("size", JSON.stringify(newSize(size)))
+                                SetLockFunc(checkLock(newSize(size)))
+                                break
+                            }
+                        }
+                        break
+                    default:
+                        switch (position) {
+                            case 'upper': {
+                                const newSize = (prevSize) => ({
+                                    ...prevSize,
+                                    peGirl: {...prevSize.peGirl, upper: newValue}
+                                })
+                                setSize(newSize(size))
+                                localStorage.setItem("size", JSON.stringify(newSize(size)))
+                                SetLockFunc(checkLock(newSize(size)))
+                                break
+                            }
+                            default: {
+                                const newSize = (prevSize) => ({
+                                    ...prevSize,
+                                    peGirl: {...prevSize.peGirl, lower: newValue}
+                                })
+                                setSize(newSize(size))
+                                localStorage.setItem("size", JSON.stringify(newSize(size)))
+                                SetLockFunc(checkLock(newSize(size)))
+                                break
+                            }
+                        }
+                        break
+                }
+                break
+        }
+    }
+
+    const changeTab = (e, isMainChange, newValue) => {
+        if (isMainChange) {// main not change
+            setTab({...tab, main: newValue})
+        } else {
+            setTab({...tab, sub: newValue})
+        }
+    }
+
+    return (
+        <>
             <Paper
                 elevation={4}
                 sx={{
@@ -340,156 +659,42 @@ function RenderCreateOrderModal({open, CloseFunc, selectedRequest}) {
                     paddingX: '2vw'
                 }}
             >
-                <div className={'d-flex justify-content-between align-items-center gap-2 w-100'}>
-                    <Typography variant={"body1"}
-                                fontSize={20}
-                                fontWeight={500}
-                                fontStyle={"italic"}
-                                sx={{marginTop: '2vh', marginBottom: '3vh'}}
-                    >
-                        Design Request Information
-                    </Typography>
-                    <Button
-                        variant={'contained'}
-                        color={'secondary'}
-                        onClick={() => navigate('/school/design')}
-                        size={"small"}
-                        sx={{height: '4vh', width: '10vw', fontSize: '0.7rem', marginTop: '5vh', marginBottom: '2vh'}}
-                    >
-                        Choose another
-                    </Button>
-                </div>
-                <TextField
-                    variant={"standard"}
-                    slotProps={{input: {readOnly: true}}}
-                    size={"small"}
-                    label={'ID'}
-                    fullWidth
-                    sx={{marginBottom: '3vh'}}
-                    defaultValue={selectedRequest.id}
-                />
-
-                <TextField
-                    variant={"standard"}
-                    slotProps={{input: {readOnly: true}}}
-                    size={"small"}
-                    label={'Creation Date'}
-                    fullWidth
-                    sx={{marginBottom: '3vh'}}
-                    defaultValue={new Intl.DateTimeFormat(vietnamLocale, shortDate).format(new Date(selectedRequest.creationDate))}
-                />
-
-                <TextField
-                    variant={"standard"}
-                    slotProps={{input: {readOnly: true}}}
-                    size={"small"}
-                    label={'Status'}
-                    fullWidth
-                    sx={{marginBottom: '3vh'}}
-                    defaultValue={selectedRequest.status.substring(0, 1).toUpperCase() + selectedRequest.status.substring(1).toLowerCase()}
-                />
-                <div className={'d-flex flex-column justify-content-center'}>
-                    <Typography sx={{marginRight: '1vw'}} fontSize={18}>Selected Uniform Type:</Typography>
-                    <FormControlLabel
-                        control={<Checkbox checked={hasRegular} slotProps={{input: {readOnly: true}}}
-                                           color={hasRegular ? 'success' : 'default'}/>}
-                        label="Regular"
-                    />
-                    <FormControlLabel
-                        control={<Checkbox checked={hasPE} slotProps={{input: {readOnly: true}}}
-                                           color={hasPE ? 'success' : 'default'}/>}
-                        label="Physical Education"
-                    />
-                </div>
-            </Paper>
-        )
-    }
-
-    function RenderSecondStep({cloths}) {
-
-        const [tab, setTab] = useState('1')
-
-        const [subTab, setSubTab] = useState('1')
-
-        const [size, setSize] = useState({
-            reBoy: {upper: null, lower: null},
-            reGirl: {upper: null, lower: null},
-            peBoy: {upper: null, lower: null},
-            peGirl: {upper: null, lower: null}
-        })
-
-        function UpdateSizes(gender, type, position, newValue) {
-            switch (type) {
-                case 're':
-                    switch (gender) {
-                        case 'boy':
-                            switch (position) {
-                                case 'upper':
-                                    setSize(prevSize => ({...prevSize, reBoy: {...prevSize.reBoy, upper: newValue}}))
-                                    break
-                                default:
-                                    setSize(prevSize => ({...prevSize, reBoy: {...prevSize.reBoy, lower: newValue}}))
-                                    break
+                <Box sx={{width: '100%'}} className={'tab-custom-border'}>
+                    <Box sx={{borderBottom: 1, borderColor: 'divider'}}>
+                        <Tabs
+                            value={tab.main}
+                            onChange={(e, newValue) => changeTab(e, true, newValue)}
+                            variant={'fullWidth'}
+                            slotProps={{
+                                indicator: {
+                                    style: {
+                                        backgroundColor: (tab.main === '1' && isRESizeFilled) || (tab.main === '2' && isPESizeFilled) ? "green" : "red"
+                                    }
+                                }
+                            }}>
+                            {hasRegular &&
+                                <Tab
+                                    label="Regular"
+                                    value={'1'}
+                                    className={isRESizeFilled ? 'tab-custom-done' : 'tab-custom-undone'}
+                                    icon={isRESizeFilled ? <CheckCircle/> : <Cancel/>}
+                                    iconPosition={'end'}
+                                />
                             }
-                            break
-                        default:
-                            switch (position) {
-                                case 'upper':
-                                    setSize(prevSize => ({...prevSize, reGirl: {...prevSize.reGirl, upper: newValue}}))
-                                    break
-                                default:
-                                    setSize(prevSize => ({...prevSize, reGirl: {...prevSize.reGirl, lower: newValue}}))
-                                    break
+                            {hasPE &&
+                                <Tab
+                                    label="Physical Education"
+                                    value={'2'}
+                                    className={isPESizeFilled ? 'tab-custom-done' : 'tab-custom-undone'}
+                                    icon={isPESizeFilled ? <CheckCircle/> : <Cancel/>}
+                                    iconPosition={'end'}
+                                />
                             }
-                            break
-                    }
-                    break
-                default:
-                    switch (gender) {
-                        case 'boy':
-                            setSize({...size, peBoy: newValue})
-                            break
-                        default:
-                            setSize({...size, peGirl: newValue})
-                            break
-                    }
-                    break
-            }
-        }
-
-        const changeTab = (e, newTab) => {
-            setTab(newTab)
-        }
-
-        const changeSubTab = (e, newSubTab) => {
-            setSubTab(newSubTab)
-        }
-
-        const boyUpperRE = cloths.find(cloth => cloth.clothCategory === 'regular' && cloth.gender === 'boy' && cloth.clothType === 'shirt')
-        const boyLowerRE = cloths.find(cloth => cloth.clothCategory === 'regular' && cloth.gender === 'boy' && cloth.clothType === 'pants')
-        const girlUpperRE = cloths.find(cloth => cloth.clothCategory === 'regular' && cloth.gender === 'girl' && cloth.clothType === 'shirt')
-        const girlLowerRE = cloths.find(cloth => cloth.clothCategory === 'regular' && cloth.gender === 'girl' && (cloth.clothType === 'pants' || cloth.clothType === 'skirt'))
-
-        const boyUpperPE = cloths.find(cloth => cloth.clothCategory === 'pe' && cloth.gender === 'boy' && cloth.clothType === 'shirt')
-        const boyLowerPE = cloths.find(cloth => cloth.clothCategory === 'pe' && cloth.gender === 'boy' && cloth.clothType === 'pants')
-        const girlUpperPE = cloths.find(cloth => cloth.clothCategory === 'pe' && cloth.gender === 'girl' && cloth.clothType === 'shirt')
-        const girlLowerPE = cloths.find(cloth => cloth.clothCategory === 'pe' && cloth.gender === 'girl' && cloth.clothType === 'pants')
-
-        const isREBoySizeFilled = tab === '1' && size.reBoy.upper !== null && size.reBoy.lower !== null // In RE tab and both boy upper and lower existed
-        const isREGirlSizeFilled = tab === '1' && size.reGirl.upper !== null && size.reGirl.lower !== null // In RE tab and both girl upper and lower existed
-        const isPEBoySizeFilled = tab === '2' && size.peBoy.upper !== null && size.peBoy.lower !== null // In PE tab and both boy upper and lower existed
-        const isPEGirlSizeFilled = tab === '2' && size.peGirl.upper !== null && size.peGirl.lower !== null // In PE tab and both girl upper and lower existed
-
-        const isBoySizeFilled = isREBoySizeFilled || isPEBoySizeFilled // Boy tab will green in case PE boy filled or RE boy filled
-        const isGirlSizeFilled = isREGirlSizeFilled || isPEGirlSizeFilled // Girl tab will green in case PE girl filled or RE girl filled
-
-        const isRESizeFilled = size.reBoy.upper !== null && size.reBoy.lower !== null && size.reGirl.upper !== null && size.reGirl.lower !== null
-        const isPESizeFilled = size.peBoy.upper !== null && size.peBoy.lower !== null && size.peGirl.upper !== null && size.peGirl.lower !== null
-
-        return (
-            <>
+                        </Tabs>
+                    </Box>
+                </Box>
                 <Paper
-                    elevation={4}
+                    variant={'outlined'}
                     sx={{
                         width: '100%',
                         marginTop: '3vh',
@@ -497,126 +702,130 @@ function RenderCreateOrderModal({open, CloseFunc, selectedRequest}) {
                         paddingX: '2vw'
                     }}
                 >
-                    <Box sx={{width: '100%'}} className={'tab-custom-border'}>
+                    <Box sx={{width: '100%'}}>
                         <Box sx={{borderBottom: 1, borderColor: 'divider'}}>
                             <Tabs
-                                value={tab}
-                                onChange={changeTab}
+                                value={tab.sub}
+                                onChange={(e, newValue) => changeTab(e, false, newValue)}
                                 variant={'fullWidth'}
                                 slotProps={{
                                     indicator: {
                                         style: {
-                                            backgroundColor: (tab === '1' && isRESizeFilled) || (tab === '2' && isPESizeFilled) ? "green" : "red"
+                                            backgroundColor:
+                                                (tab.sub === '1' && isREBoyTabChecked)
+                                                || (tab.sub === '1' && isPEBoyTabChecked)
+                                                || (tab.sub === '2' && isREGirlTabChecked)
+                                                || (tab.sub === '2' && isPEGirlTabChecked)
+                                                    ? "green" : "red"
                                         }
                                     }
-                                }}>
-                                {hasRegular &&
-                                    <Tab
-                                        label="Regular"
-                                        value={'1'}
-                                        className={isRESizeFilled ? 'tab-custom-done' : 'tab-custom-undone'}
-                                        icon={isRESizeFilled ? <CheckCircle/> : <Cancel/>}
-                                        iconPosition={'end'}
-                                    />
-                                }
-                                {hasPE &&
-                                    <Tab
-                                        label="Physical Education"
-                                        value={'2'}
-                                        className={isPESizeFilled ? 'tab-custom-done' : 'tab-custom-undone'}
-                                        icon={isPESizeFilled ? <CheckCircle/> : <Cancel/>}
-                                        iconPosition={'end'}
-                                    />
-                                }
+                                }}
+                            >
+                                <Tab
+                                    label="Boy"
+                                    value={'1'}
+                                    className={isREBoyTabChecked || isPEBoyTabChecked ? 'tab-custom-done' : 'tab-custom-undone'}
+                                    iconPosition={'end'}
+                                    icon={isREBoyTabChecked || isPEBoyTabChecked ? <CheckCircle/> : <Cancel/>}
+                                />
+                                <Tab
+                                    label="Girl"
+                                    value={'2'}
+                                    className={isREGirlTabChecked || isPEGirlTabChecked ? 'tab-custom-done' : 'tab-custom-undone'}
+                                    iconPosition={'end'}
+                                    icon={isREGirlTabChecked || isPEGirlTabChecked ? <CheckCircle/> : <Cancel/>}
+                                />
                             </Tabs>
                         </Box>
                     </Box>
-                    <Paper
-                        variant={'outlined'}
-                        sx={{
-                            width: '100%',
-                            marginTop: '3vh',
-                            paddingY: '2vh',
-                            paddingX: '2vw'
-                        }}
-                    >
-                        <Box sx={{width: '100%'}}>
-                            <Box sx={{borderBottom: 1, borderColor: 'divider'}}>
-                                <Tabs
-                                    value={subTab}
-                                    onChange={changeSubTab}
-                                    variant={'fullWidth'}
-                                    slotProps={{
-                                        indicator: {
-                                            style: {
-                                                backgroundColor:
-                                                    (subTab === '1' && isBoySizeFilled) || (subTab === '2' && isGirlSizeFilled) ? "green" : "red"
-                                            }
-                                        }
-                                    }}
-                                >
-                                    <Tab
-                                        label="Boy"
-                                        value={'1'}
-                                        className={isBoySizeFilled ? 'tab-custom-done' : 'tab-custom-undone'}
-                                        iconPosition={'end'}
-                                        icon={isBoySizeFilled ? <CheckCircle/> : <Cancel/>}
-                                    />
-                                    <Tab
-                                        label="Girl"
-                                        value={'2'}
-                                        className={isGirlSizeFilled ? 'tab-custom-done' : 'tab-custom-undone'}
-                                        iconPosition={'end'}
-                                        icon={isGirlSizeFilled ? <CheckCircle/> : <Cancel/>}
-                                    />
-                                </Tabs>
-                            </Box>
-                        </Box>
-                        <Divider sx={{borderTop: '1px solid black', marginBottom: '2vh'}} variant={"fullWidth"}/>
-                        {
-                            tab === '1' && subTab === '1' && hasRegular &&
-                            <>
-                                <RenderFillSizeArea cloth={boyUpperRE} UpdateSizeFunc={UpdateSizes}
-                                                    initQty={size.reBoy.upper}/>
-                                <RenderFillSizeArea cloth={boyLowerRE} UpdateSizeFunc={UpdateSizes}
-                                                    initQty={size.reBoy.lower}/>
-                            </>
-                        }
-                        {
-                            tab === '1' && subTab === '2' && hasRegular &&
-                            <>
-
-                                <RenderFillSizeArea cloth={girlUpperRE} UpdateSizeFunc={UpdateSizes}
-                                                    initQty={size.reGirl.upper}/>
-                                <RenderFillSizeArea cloth={girlLowerRE} UpdateSizeFunc={UpdateSizes}
-                                                    initQty={size.reGirl.lower}/>
-                            </>
-                        }
-                        {
-                            tab === '2' && subTab === '1' && hasPE &&
-                            <>
-
-                                <RenderFillSizeArea cloth={boyUpperPE} UpdateSizeFunc={UpdateSizes}
-                                                    initQty={size.peBoy.upper}/>
-                                <RenderFillSizeArea cloth={boyLowerPE} UpdateSizeFunc={UpdateSizes}
-                                                    initQty={size.peBoy.lower}/>
-                            </>
-                        }
-                        {
-                            tab === '2' && subTab === '2' && hasPE &&
-                            <>
-
-                                <RenderFillSizeArea cloth={girlUpperPE} UpdateSizeFunc={UpdateSizes}
-                                                    initQty={size.peGirl.upper}/>
-                                <RenderFillSizeArea cloth={girlLowerPE} UpdateSizeFunc={UpdateSizes}
-                                                    initQty={size.peGirl.lower}/>
-                            </>
-                        }
-                    </Paper>
+                    <Divider sx={{borderTop: '1px solid black', marginBottom: '2vh'}} variant={"fullWidth"}/>
+                    {
+                        tab.main === '1' && tab.sub === '1' && hasRegular &&
+                        <>
+                            <RenderSummarySizeQuantityArea
+                                upper={boyUpperRE}
+                                lower={boyLowerRE}
+                                upperQty={size.reBoy.upper ? SumSizeQty(size.reBoy.upper) : 0}
+                                lowerQty={size.reBoy.lower ? SumSizeQty(size.reBoy.lower) : 0}
+                            />
+                            <RenderFillSizeArea cloth={boyUpperRE} UpdateSizeFunc={UpdateSizes}
+                                                initQty={size.reBoy.upper} id={'cloth1'}/>
+                            <RenderFillSizeArea cloth={boyLowerRE} UpdateSizeFunc={UpdateSizes}
+                                                initQty={size.reBoy.lower} id={'cloth2'}/>
+                        </>
+                    }
+                    {
+                        tab.main === '1' && tab.sub === '2' && hasRegular &&
+                        <>
+                            <RenderSummarySizeQuantityArea
+                                upper={girlUpperRE}
+                                lower={girlLowerRE}
+                                upperQty={size.reGirl.upper ? SumSizeQty(size.reGirl.upper) : 0}
+                                lowerQty={size.reGirl.lower ? SumSizeQty(size.reGirl.lower) : 0}
+                            />
+                            <RenderFillSizeArea cloth={girlUpperRE} UpdateSizeFunc={UpdateSizes}
+                                                initQty={size.reGirl.upper} id={'cloth1'}/>
+                            <RenderFillSizeArea cloth={girlLowerRE} UpdateSizeFunc={UpdateSizes}
+                                                initQty={size.reGirl.lower} id={'cloth2'}/>
+                        </>
+                    }
+                    {
+                        tab.main === '2' && tab.sub === '1' && hasPE &&
+                        <>
+                            <RenderSummarySizeQuantityArea
+                                upper={boyUpperPE}
+                                lower={boyLowerPE}
+                                upperQty={size.peBoy.upper ? SumSizeQty(size.peBoy.upper) : 0}
+                                lowerQty={size.peBoy.lower ? SumSizeQty(size.peBoy.lower) : 0}
+                            />
+                            <RenderFillSizeArea cloth={boyUpperPE} UpdateSizeFunc={UpdateSizes}
+                                                initQty={size.peBoy.upper} id={'cloth1'}/>
+                            <RenderFillSizeArea cloth={boyLowerPE} UpdateSizeFunc={UpdateSizes}
+                                                initQty={size.peBoy.lower} id={'cloth2'}/>
+                        </>
+                    }
+                    {
+                        tab.main === '2' && tab.sub === '2' && hasPE &&
+                        <>
+                            <RenderSummarySizeQuantityArea
+                                upper={girlUpperPE}
+                                lower={girlLowerPE}
+                                upperQty={size.peGirl.upper ? SumSizeQty(size.peGirl.upper) : 0}
+                                lowerQty={size.peGirl.lower ? SumSizeQty(size.peGirl.lower) : 0}
+                            />
+                            <RenderFillSizeArea cloth={girlUpperPE} UpdateSizeFunc={UpdateSizes}
+                                                initQty={size.peGirl.upper} id={'cloth1'}/>
+                            <RenderFillSizeArea cloth={girlLowerPE} UpdateSizeFunc={UpdateSizes}
+                                                initQty={size.peGirl.lower} id={'cloth2'}/>
+                        </>
+                    }
                 </Paper>
-            </>
-        )
+            </Paper>
+        </>
+    )
+}
+
+function RenderCreateOrderModal({open, CloseFunc, selectedRequest}) {
+    const navigate = useNavigate()
+
+    const [currentStep, setCurrentStep] = useState(0)
+
+    const transition = forwardRef(function Transition(props, ref) {
+        return <Slide direction="up" ref={ref} {...props} />;
+    });
+
+    const hasRegular = !!(selectedRequest && selectedRequest.cloth.find(item => item.clothCategory === 'regular'))
+
+    const hasPE = !!(selectedRequest && selectedRequest.cloth.find(item => item.clothCategory === 'pe'))
+
+    const [lock, setLock] = useState(true)
+
+    function HandleSetLock(lockStatus) {
+        console.log("Input status: ", lockStatus)
+        setLock(lockStatus)
     }
+
+    console.log("Lock: ", lock)
 
     return (
         <Dialog
@@ -666,8 +875,21 @@ function RenderCreateOrderModal({open, CloseFunc, selectedRequest}) {
                             <div>
                                 <div className={'d-flex flex-column align-items-start'}>
                                     <RenderStepper step={currentStep}/>
-                                    {currentStep === 0 && <RenderFirstStep/>}
-                                    {currentStep === 1 && <RenderSecondStep cloths={selectedRequest.cloth}/>}
+                                    {
+                                        currentStep === 0 &&
+                                        <RenderFirstStep
+                                            selectedRequest={selectedRequest}
+                                            hasPE={hasPE}
+                                            hasRegular={hasRegular}/>
+                                    }
+                                    {currentStep === 1 &&
+                                        <RenderSecondStep
+                                            cloths={selectedRequest.cloth}
+                                            hasPE={hasPE}
+                                            hasRegular={hasRegular}
+                                            SetLockFunc={HandleSetLock}
+                                        />
+                                    }
                                 </div>
                             </div>
                     }
@@ -691,7 +913,12 @@ function RenderCreateOrderModal({open, CloseFunc, selectedRequest}) {
                         <div>
                             <Button variant={'contained'} color={'primary'}
                                     onClick={() => setCurrentStep(currentStep + 1)}
-                                    disabled={!selectedRequest}>Next</Button>
+                                    disabled={
+                                        !selectedRequest ||
+                                        (currentStep === 1 && lock)
+                                    }>
+                                Next
+                            </Button>
                         </div>
                     </RenderTooltip>
                 }
@@ -699,13 +926,13 @@ function RenderCreateOrderModal({open, CloseFunc, selectedRequest}) {
                     currentStep === 2 &&
                     <RenderTooltip title={''}>
                         <div>
-                            <Button variant={'outlined'} color={'success'}
+                            <Button variant={'contained'} color={'success'}
                                     onClick={() => {
                                         enqueueSnackbar('Create order successfully', {variant: 'success'})
                                         localStorage.removeItem('sRequest')
                                         CloseFunc()
                                         window.location.reload()
-                                    }}>Create Order</Button>
+                                    }}>Create</Button>
                         </div>
                     </RenderTooltip>
                 }
@@ -715,7 +942,7 @@ function RenderCreateOrderModal({open, CloseFunc, selectedRequest}) {
 }
 
 function RenderPage({selectedRequest}) {
-    const [modal, setModal] = useState(false)
+    const [modal, setModal] = useState(localStorage.getItem('sRequest'))
 
     function HandleClose() {
         setModal(false)
@@ -739,9 +966,6 @@ function RenderPage({selectedRequest}) {
                     </Button>
                 </div>
             </Paper>
-            {lucky &&
-                <Typography variant={"body2"} color={"error"} fontSize={20} fontWeight={500} sx={{marginTop: '10vh'}}>There
-                    is 50% you can not see the list. Good luck</Typography>}
             {modal && <RenderCreateOrderModal open={modal} CloseFunc={HandleClose} selectedRequest={selectedRequest}/>}
         </div>
     )
