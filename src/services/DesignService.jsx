@@ -42,3 +42,45 @@ export const getCompleteDesignRequest = async () => {
     const response = await axiosClient.get('/design/complete-list')
     return response || null;
 }
+
+export const sendComment = async (requestId, comment) => {
+    const response = await axiosClient.post(`/design/comment`, {
+        requestId,
+        comment
+    });
+    return response.data || [];
+}
+
+export const getAllRequestByListPackageId = async (packageIds) => {
+        const response = await axiosClient.post(`design/design-request/list-packageId`, {
+            packageIds
+        });
+        return response.data || [];
+};
+
+export const getAllDelivery = async (id) => {
+    const response = await axiosClient.get(`/design/list-delivery/${id}`);
+    return response?.data || null;
+}
+
+export const submitDelivery = async (requestId, fileUrl, note) => {
+    const response = await axiosClient.post(`/design/deliveries`, {
+        requestId,
+        fileUrl,
+        note
+    });
+    return response.data || [];
+}
+export const submitRevision = async (deliveryId, note, senderId,senderRole) => {
+    const response = axiosClient.post("/design/revision", {
+        deliveryId,
+        note,
+        senderId,
+        senderRole
+    });
+    return response.data || [];
+}
+
+
+
+
