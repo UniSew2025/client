@@ -1,265 +1,356 @@
-import React from "react";
-import {
-    Box,
-    Card,
-    CardContent,
-    Avatar,
-    Typography,
-    Button,
-    Grid,
-    Stack,
-    Divider,
-    LinearProgress,
-    List,
-    ListItem,
-    ListItemIcon,
-    ListItemText,
-    Chip
-} from "@mui/material";
-import PublicIcon from "@mui/icons-material/Public";
+import {Box, Button, Card, CardContent, Divider, Grid, Paper, Stack, TextField, Typography} from "@mui/material";
+import CallIcon from '@mui/icons-material/Call';
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
-import WorkOutlineIcon from "@mui/icons-material/WorkOutline";
-import LanguageIcon from "@mui/icons-material/Language";
+import EditIcon from '@mui/icons-material/Edit';
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import RemoveRedEyeIcon from "@mui/icons-material/RemoveRedEye";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
-import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import StarRateIcon from "@mui/icons-material/StarRate";
-import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
-import ChevronRightIcon from "@mui/icons-material/ChevronRight";
-import { Link as RouterLink } from "react-router-dom";
+import '../../styles/school/SchoolProfile.css'
+import {dateFormatter} from "../../utils/DateFormatter.jsx";
+import {useNavigate} from "react-router-dom";
+import {useState} from "react";
+import {motion, AnimatePresence} from "framer-motion";
+import { updateDesignerProfile } from "../../services/ProfileService.jsx";
+import { enqueueSnackbar } from "notistack";
 
-// ---- Dummy data ----
-const profile = {
-    name: "Your UniSew Name",
-    username: "@trieumn",
-    location: "Vietnam",
-    joined: "June 2025",
-    industry: "",
-    languages: "",
-    workingHours: "",
-};
+const user = JSON.parse(localStorage.getItem('user'))
 
-const checklist = [
-    {
-        icon: <InfoOutlinedIcon color="primary" />,
-        title: "Share how you plan to use UniSew",
-        desc: "Tell us if you’re here to find services or offer them.",
-        percent: 75,
-        done: false
-    },
-    {
-        icon: <AddCircleOutlineIcon color="action" />,
-        title: "Add details for your profile",
-        desc: "Upload a photo and info for a more tailored experience.",
-        action: "Add"
-    },
-    {
-        icon: <WorkOutlineIcon color="action" />,
-        title: "Tell us about your business",
-        desc: "Get tailored recommendations and tips to help it grow.",
-        action: "Add"
-    },
-    {
-        icon: <AccessTimeIcon color="action" />,
-        title: "Set your communication preferences",
-        desc: "Let freelancers know your collaboration preferences.",
-        action: "Add"
+function formatPhoneDash(phone) {
+    if (!phone) return "";
+    phone = phone.replace(/\D/g, "");
+    if (phone.length === 10)
+        return `${phone.slice(0, 4)}-${phone.slice(4, 7)}-${phone.slice(7, 10)}`;
+    return phone;
+}
+
+//api
+async function handleUpdateGarmentProfile(updatedUser, setUserData, setShowEdit) {
+    try {
+
+        const req = {
+            accountId: updatedUser.accountId || updatedUser.id || updatedUser.profile.accountId,
+            name: updatedUser.profile.name,
+            phone: updatedUser.profile.phone,
+            street: updatedUser.profile.partner.street,
+            ward: updatedUser.profile.partner.ward,
+            district: updatedUser.profile.partner.district,
+            province: updatedUser.profile.partner.province,
+        };
+
+        const res = await updateDesignerProfile(req);
+
+        if (res && res.message && res.message.toLowerCase().includes("success")) {
+            enqueueSnackbar("Profile updated!", { variant: "success" });
+            setUserData(updatedUser);
+            setShowEdit(false);
+            localStorage.setItem('user', JSON.stringify(updatedUser));
+        } else {
+            enqueueSnackbar(res?.message || "Update failed!", { variant: "error" });
+        }
+    } catch (error) {
+        enqueueSnackbar("Error updating profile", { variant: "error" });
     }
-];
-
-const LinkBehavior = React.forwardRef((props, ref) =>
-    <RouterLink ref={ref} {...props} />
-);
-
-// ---- Components ----
-
-function ProfileCard({ profile }) {
-    return (
-        <Card sx={{ borderRadius: 3, textAlign: "center", px: 2 }}>
-            <CardContent>
-                <Avatar sx={{ width: 70, height: 70, mx: "auto", mb: 2, fontSize: 34, bgcolor: "#e0e0e0", color: "#757575" }}>
-                    T
-                </Avatar>
-                <Typography variant="h6" fontWeight="bold">{profile.name}</Typography>
-                <Typography variant="body2" color="text.secondary" mb={2}>{profile.username}</Typography>
-                <Divider sx={{ my: 1.5 }} />
-                <Stack spacing={1} sx={{ textAlign: "left", pl: 2, mb: 2 }}>
-                    <Stack direction="row" spacing={1} alignItems="center">
-                        <PublicIcon fontSize="small" color="action" />
-                        <Typography variant="body2">Located in {profile.location}</Typography>
-                    </Stack>
-                    <Stack direction="row" spacing={1} alignItems="center">
-                        <CalendarMonthIcon fontSize="small" color="action" />
-                        <Typography variant="body2">Joined in {profile.joined}</Typography>
-                    </Stack>
-                    <Stack direction="row" spacing={1} alignItems="center">
-                        <WorkOutlineIcon fontSize="small" color="action" />
-                        <Typography variant="body2">{profile.industry || "Your industry"}</Typography>
-                    </Stack>
-                    <Stack direction="row" spacing={1} alignItems="center">
-                        <LanguageIcon fontSize="small" color="action" />
-                        <Typography variant="body2">{profile.languages || "Preferred languages"}</Typography>
-                    </Stack>
-                    <Stack direction="row" spacing={1} alignItems="center">
-                        <AccessTimeIcon fontSize="small" color="action" />
-                        <Typography variant="body2">{profile.workingHours || "Preferred working hours"}</Typography>
-                    </Stack>
-                </Stack>
-                <Button
-                    variant="outlined"
-                    fullWidth
-                    startIcon={<RemoveRedEyeIcon />}
-                    sx={{ mb: 1, borderRadius: 2, textTransform: "none", fontWeight: "bold" }}
-                    component={LinkBehavior}
-                    to="/designer/list"
-                >
-                    Preview public profile
-                </Button>
-                <Button
-                    variant="outlined"
-                    fullWidth
-                    endIcon={<ArrowForwardIcon />}
-                    sx={{ borderRadius: 2, textTransform: "none", fontWeight: "bold" }}
-                    component={LinkBehavior}
-                    to="/designer/list"
-                >
-                    Explore UniSew
-                </Button>
-                <Typography
-                    variant="caption"
-                    color="text.secondary"
-                    display="block"
-                    mt={2}
-                >
-                    You're currently on your buyer profile. To access your freelancer profile, switch to seller mode
-                </Typography>
-            </CardContent>
-        </Card>
-    );
 }
 
-function ProfileBreadcrumb() {
-    return (
-        <Box sx={{ maxWidth: 980, mx: "auto", mb: 1 }}>
-            <Typography variant="body2" color="text.secondary">
-                Home / My Profile
-            </Typography>
-        </Box>
-    );
-}
+function EditProfileForm({ user, onClose, onSave }) {
+    const [name, setName] = useState(user.profile.name || "");
+    const [phone, setPhone] = useState(user.profile.phone || "");
+    const [street, setStreet] = useState(user.profile.street || user.profile.partner?.street || "");
+    const [ward, setWard] = useState(user.profile.ward || user.profile.partner?.ward || "");
+    const [district, setDistrict] = useState(user.profile.district || user.profile.partner?.district || "");
+    const [province, setProvince] = useState(user.profile.province || user.profile.partner?.province || "");
 
-function ProfileHeadline() {
-    return (
-        <Box sx={{ mb: 2 }}>
-            <Typography variant="h5" fontWeight="bold" mb={1}>
-                Hi <span role="img" aria-label="wave">👋</span> Let’s help freelancers get to know you
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-                Get the most out of UniSew by sharing a bit more about yourself and how you prefer to work with freelancers.
-            </Typography>
-        </Box>
-    );
-}
+    const handleSave = () => {
+        const updatedUser = {
+            ...user,
+            profile: {
+                ...user.profile,
+                name,
+                phone,
+                partner: {
+                    ...user.profile.partner,
+                    street,
+                    ward,
+                    district,
+                    province,
+                }
+            },
+        };
+        onSave(updatedUser);
+        onClose();
+    };
 
-function ProfileChecklist({ checklist }) {
     return (
-        <Card sx={{ mb: 3, borderRadius: 3 }}>
-            <CardContent>
-                <Typography variant="subtitle1" fontWeight="bold" mb={1.5}>
-                    Profile checklist
-                </Typography>
-                <LinearProgress
-                    variant="determinate"
-                    value={25}
-                    sx={{ height: 7, borderRadius: 5, mb: 2, bgcolor: "#e0e8ef" }}
-                />
-                <List disablePadding>
-                    {checklist.map((item, i) => (
-                        <ListItem key={i} disablePadding sx={{ alignItems: "flex-start", mb: 1.5 }}>
-                            <ListItemIcon sx={{ mt: 0.5 }}>{item.icon}</ListItemIcon>
-                            <ListItemText
-                                primary={
-                                    <Stack direction="row" spacing={1} alignItems="center">
-                                        <Typography variant="body1" fontWeight="bold">
-                                            {item.title}
-                                        </Typography>
-                                        {item.percent && (
-                                            <Chip
-                                                label={`${item.percent}%`}
-                                                color={item.percent === 100 ? "success" : "primary"}
-                                                size="small"
-                                                sx={{ fontWeight: 600 }}
-                                            />
-                                        )}
-                                    </Stack>
-                                }
-                                secondary={item.desc}
-                                secondaryTypographyProps={{ color: "text.secondary" }}
+        <>
+            <Box
+                sx={{
+                    position: "fixed",
+                    inset: 0,
+                    bgcolor: "rgba(0,0,0,0.45)",
+                    zIndex: 1300
+                }}
+                onClick={onClose}
+            />
+            {/* Slide-in Form */}
+            <motion.div
+                initial={{ x: "100%" }}
+                animate={{ x: 0 }}
+                exit={{ x: "100%" }}
+                transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                style={{
+                    position: "fixed",
+                    top: 0,
+                    right: 0,
+                    width: "100vw",
+                    maxWidth: 480,
+                    height: "100vh",
+                    zIndex: 1301,
+                }}
+            >
+                <Paper
+                    elevation={24}
+                    sx={{
+                        width: "100%",
+                        height: "100vh",
+                        bgcolor: "background.paper",
+                        boxShadow: 12,
+                        borderRadius: 0,
+                        p: 0
+                    }}
+                >
+                    <Card sx={{
+                        minWidth: 400,
+                        maxWidth: 500,
+                        width: "90vw",
+                        p: 3,
+                        position: "relative",
+                        borderRadius: 3,
+                        mt: 3,
+                        mx: "auto"
+                    }}>
+                        <Typography variant="h6" fontWeight="bold" mb={2}>
+                            Edit Profile
+                        </Typography>
+                        <Divider sx={{ mb: 2 }} />
+
+                        <Stack spacing={2}>
+                            <TextField
+                                label="Name"
+                                fullWidth
+                                value={name}
+                                onChange={e => setName(e.target.value)}
+                                variant="outlined"
+                                sx={{ borderRadius: 2 }}
                             />
-                            <Box>
-                                {item.percent === 75 ? (
-                                    <Typography variant="body2" color="primary" fontWeight="bold">75%</Typography>
-                                ) : (
-                                    <Button
-                                        size="small"
-                                        sx={{ textTransform: "none", fontWeight: 600, color: "#3488e2" }}
-                                        endIcon={<ChevronRightIcon fontSize="small" />}
-                                    >
-                                        {item.action}
-                                    </Button>
-                                )}
-                            </Box>
-                        </ListItem>
-                    ))}
-                </List>
-            </CardContent>
-        </Card>
+                            <TextField
+                                label="Contact (Phone)"
+                                fullWidth
+                                value={phone}
+                                onChange={e => setPhone(e.target.value)}
+                                variant="outlined"
+                                sx={{ borderRadius: 2 }}
+                            />
+                        </Stack>
+
+                        <Typography variant="subtitle1" fontWeight="bold" sx={{ mt: 4, mb: 1 }}>
+                            Address
+                        </Typography>
+                        <Grid container spacing={2}>
+                            <Grid item xs={12}>
+                                <TextField
+                                    label="Street"
+                                    fullWidth
+                                    value={street}
+                                    onChange={e => setStreet(e.target.value)}
+                                    variant="outlined"
+                                    sx={{ borderRadius: 2 }}
+                                />
+                            </Grid>
+                            <Grid item xs={6}>
+                                <TextField
+                                    label="Ward"
+                                    fullWidth
+                                    value={ward}
+                                    onChange={e => setWard(e.target.value)}
+                                    variant="outlined"
+                                    sx={{ borderRadius: 2 }}
+                                />
+                            </Grid>
+                            <Grid item xs={6}>
+                                <TextField
+                                    label="District"
+                                    fullWidth
+                                    value={district}
+                                    onChange={e => setDistrict(e.target.value)}
+                                    variant="outlined"
+                                    sx={{ borderRadius: 2 }}
+                                />
+                            </Grid>
+                            <Grid item xs={12}>
+                                <TextField
+                                    label="Province"
+                                    fullWidth
+                                    value={province}
+                                    onChange={e => setProvince(e.target.value)}
+                                    variant="outlined"
+                                    sx={{ borderRadius: 2 }}
+                                />
+                            </Grid>
+                        </Grid>
+
+                        <Stack direction="row" spacing={2} justifyContent="flex-end" mt={4}>
+                            <Button variant="outlined" color="secondary" onClick={onClose}>
+                                Cancel
+                            </Button>
+                            <Button variant="contained" color="primary" onClick={handleSave}>
+                                Save
+                            </Button>
+                        </Stack>
+                    </Card>
+                </Paper>
+            </motion.div>
+        </>
     );
 }
 
-function ProfileReviews() {
+function RenderLeftArea({onEditProfile, user}) {
+    const navigate = useNavigate()
     return (
-        <Card sx={{ borderRadius: 3, textAlign: "center" }}>
-            <CardContent>
-                <Typography variant="subtitle1" fontWeight="bold" mb={2}>
-                    Reviews from freelancers
-                </Typography>
-                <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-                    <Stack direction="row" spacing={0.3} mb={1.5}>
-                        {[...Array(5)].map((_, i) => (
-                            <StarRateIcon key={i} color="warning" />
-                        ))}
-                    </Stack>
+        <>
+            <Paper elevation={6} sx={{maxWidth: "500px", maxHeight: "440px"}}>
+                <Card className={'profile-left-card'}>
+                    <CardContent>
+                        <img src={user.profile.avatar} referrerPolicy={"no-referrer"} alt={user.profile.name}/>
+                        <Typography variant="h6" fontWeight="bold">{user.profile.name}</Typography>
+                        <Typography variant="body2" color="text.secondary"
+                                    mb={2}>@{user.profile.name.normalize("NFD").replace(/[\u0300-\u036f]/g, "").split(" ").join("")}</Typography>
+                        <Divider sx={{my: 1.5}}/>
+                        <Stack spacing={1} sx={{textAlign: "left", pl: 2, mb: 2}}>
+                            <Stack direction="row" spacing={1} alignItems="center">
+                                <CallIcon fontSize="small" color="action"/>
+                                <Typography variant="body2">Contact: {formatPhoneDash(user.profile.phone)}</Typography>
+                            </Stack>
+                            <Stack direction="row" spacing={1} alignItems="center">
+                                <CalendarMonthIcon fontSize="small" color="action"/>
+                                <Typography variant="body2">Joined date: {dateFormatter(user.registerDate)}</Typography>
+                            </Stack>
+                        </Stack>
+                        <Button
+                            variant="outlined"
+                            fullWidth
+                            startIcon={<RemoveRedEyeIcon/>}
+                            sx={{mb: 1, borderRadius: 2, textTransform: "none", fontWeight: "bold"}}
+                            onClick={() => navigate("/designer/requests")}
+                        >
+                            View my designs
+                        </Button>
+                        <Button
+                            variant="outlined"
+                            fullWidth
+                            endIcon={<ArrowForwardIcon/>}
+                            sx={{mb: 1, borderRadius: 2, textTransform: "none", fontWeight: "bold"}}
+                            onClick={() => navigate("/designer/packages")}
+                        >
+                            Explore your packages
+                        </Button>
+                        <Button
+                            variant="outlined"
+                            fullWidth
+                            startIcon={<EditIcon/>}
+                            sx={{borderRadius: 2, textTransform: "none", fontWeight: "bold"}}
+                            onClick={onEditProfile}
+                        >
+                            Edit profile
+                        </Button>
+                    </CardContent>
+                </Card>
+            </Paper>
+        </>
+    )
+}
+
+function RenderRightArea({user}) {
+    return (
+        <>
+            <Grid item xs={12} md={8}>
+                <Box sx={{mb: 2}}>
+                    <Typography variant="h5" fontWeight="bold" mb={1}>
+                        Hi {user.profile.name} <span role="img" aria-label="wave">👋</span> Let’s help UniSew get to know
+                        you
+                    </Typography>
                     <Typography variant="body2" color="text.secondary">
-                        trieumn doesn't have any reviews yet.
+                        Get the most out of UniSew by sharing a bit more about yourself and how you prefer to work with
+                        us.
                     </Typography>
                 </Box>
-            </CardContent>
-        </Card>
-    );
+
+                <Paper elevation={6}>
+                    <Card sx={{mb: 3}}>
+                        <CardContent>
+                            <Typography variant="h6" fontWeight="bold" mb={1.5}>
+                                About
+                            </Typography>
+
+                        </CardContent>
+                        <CardContent>
+                            <Typography variant="h6" fontWeight="bold" mb={1.5}>
+                                Short review
+                            </Typography>
+
+                        </CardContent>
+                    </Card>
+                </Paper>
+
+                <Paper elevation={6}>
+                    <Card sx={{textAlign: "center"}}>
+                        <CardContent>
+                            <Typography variant="subtitle1" fontWeight="bold" mb={2}>
+                                Reviews from schools
+                            </Typography>
+                            <Box sx={{display: "flex", flexDirection: "column", alignItems: "center"}}>
+                                <Stack direction="row" spacing={0.3} mb={1.5}>
+                                    {[...Array(5)].map((_, i) => (
+                                        <StarRateIcon key={i} color="warning"/>
+                                    ))}
+                                </Stack>
+                                <Typography variant="body2" color="text.secondary">
+                                    You don't have any reviews yet.
+                                </Typography>
+                            </Box>
+                        </CardContent>
+                    </Card>
+                </Paper>
+            </Grid>
+        </>
+    )
 }
 
-// ---- Main Component ----
+export default function DesignerProfile() {
+    const [showEdit, setShowEdit] = useState(false);
+    const [userData, setUserData] = useState(user); // dùng cho UI
 
-export default function GarmentProfile() {
+    const handleSave = (updatedUser) => {
+        handleUpdateGarmentProfile(updatedUser, setUserData, setShowEdit);
+    };
     return (
-        <Box sx={{ bgcolor: "#f6fafd", minHeight: "100vh", py: 5 }}>
-            <Box sx={{ maxWidth: 1200, mx: "auto" }}>
+        <Box sx={{minHeight: "100vh", py: 5}}>
+
+            <Box sx={{maxWidth: 1400, mx: "auto"}}>
                 <Grid container spacing={3}>
-                    {/* Left: Card info */}
-                    <Grid item xs={12} md={4} maxWidth={400}>
-                        <ProfileCard profile={profile} />
-                    </Grid>
-                    {/* Right: Checklist & Review */}
-                    <Grid item xs={12} md={8}>
-                        <ProfileBreadcrumb />
-                        <ProfileHeadline />
-                        <ProfileChecklist checklist={checklist} />
-                        <ProfileReviews />
-                    </Grid>
+                    <RenderLeftArea onEditProfile={() => setShowEdit(true)} user={userData} />
+                    <RenderRightArea user={userData} />
                 </Grid>
             </Box>
+            <AnimatePresence>
+                {showEdit && (
+                    <EditProfileForm
+                        user={userData}
+                        onClose={() => setShowEdit(false)}
+                        onSave={handleSave}
+                    />
+                )}
+            </AnimatePresence>
         </Box>
     );
 }
