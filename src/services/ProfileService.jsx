@@ -20,3 +20,8 @@ export const updateDesignerProfile = async (request) => {
     const response = await axiosClient.put("/profile/designer", request);
     return response?.data || null;
 };
+
+export const updateSchoolProfile = async (request) => {
+    const response = await axiosClient.put("/profile/school", request);
+    return response?.data || null;
+};

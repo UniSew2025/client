@@ -30,6 +30,7 @@ import GarmentDashboard from "./components/garment/GarmentDashboard.jsx";
 import GarmentLayout from "./layouts/garment/GarmenntLayout.jsx";
 import DesignerRequest from "./components/designer/DesignerRequest.jsx";
 import DesignerPackage from "./components/designer/DesignerPackage.jsx";
+import FeedbackHistory from "./components/school/FeedbackHistory.jsx";
 
 const router = createBrowserRouter([
     {
@@ -125,6 +126,10 @@ const router = createBrowserRouter([
             {
                 path: 'order',
                 element: <SchoolOrder/>
+            },
+            {
+                path: 'feedback',
+                element: <FeedbackHistory/>
             }
         ]
     },

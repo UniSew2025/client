@@ -18,6 +18,15 @@ const navigation = [
         type: "sub",
         label: "Order History",
         segment: "/school/order"
+    },
+    {
+        type: "caption",
+        label: "Feedback",
+    },
+    {
+        type: "sub",
+        label: "Feedback history",
+        segment: "/school/feedback"
     }
 ]
 
