@@ -33,6 +33,7 @@ function formatPhoneDash(phone) {
     return phone;
 }
 
+//api
 async function handleUpdateDesignerProfile(updatedUser, setUserData, setShowEdit) {
     try {
 
@@ -44,9 +45,7 @@ async function handleUpdateDesignerProfile(updatedUser, setUserData, setShowEdit
             shortProfile: updatedUser.profile.designer.shortPreview,
             startDate: updatedUser.profile.designer.startTime?.slice(0, 5),
             endDate: updatedUser.profile.designer.endTime?.slice(0, 5),
-            // thumbnail: updatedUser.profile.designer.thumbnail_img,
         };
-        console.log("request", req);
 
         const res = await updateDesignerProfile(req);
 
@@ -58,7 +57,7 @@ async function handleUpdateDesignerProfile(updatedUser, setUserData, setShowEdit
         } else {
             enqueueSnackbar(res?.message || "Update failed!", { variant: "error" });
         }
-    } catch (err) {
+    } catch (error) {
         enqueueSnackbar("Error updating profile", { variant: "error" });
     }
 }
@@ -73,7 +72,6 @@ function EditProfileForm({user, onClose, onSave}) {
 
 
     const handleSave = () => {
-        // API here
         const updatedUser = {
             ...user,
             profile: {
@@ -320,7 +318,7 @@ function RenderRightArea({user}) {
 
 export default function DesignerProfile() {
     const [showEdit, setShowEdit] = useState(false);
-    const [userData, setUserData] = useState(user); // dùng cho UI
+    const [userData, setUserData] = useState(user);
 
     const handleSave = (updatedUser) => {
         handleUpdateDesignerProfile(updatedUser, setUserData, setShowEdit);
