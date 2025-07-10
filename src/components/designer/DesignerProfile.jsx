@@ -35,8 +35,6 @@ function formatPhoneDash(phone) {
 
 //api
 async function handleUpdateDesignerProfile(updatedUser, setUserData, setShowEdit) {
-    try {
-
         const req = {
             accountId: updatedUser.accountId || updatedUser.id || updatedUser.profile.accountId,
             name: updatedUser.profile.name,
@@ -48,8 +46,7 @@ async function handleUpdateDesignerProfile(updatedUser, setUserData, setShowEdit
         };
 
         const res = await updateDesignerProfile(req);
-
-        if (res && res.message && res.message.toLowerCase().includes("success")) {
+        if (res && res.status === 200) {
             enqueueSnackbar("Profile updated!", { variant: "success" });
             setUserData(updatedUser);
             setShowEdit(false);
@@ -57,9 +54,6 @@ async function handleUpdateDesignerProfile(updatedUser, setUserData, setShowEdit
         } else {
             enqueueSnackbar(res?.message || "Update failed!", { variant: "error" });
         }
-    } catch (error) {
-        enqueueSnackbar("Error updating profile", { variant: "error" });
-    }
 }
 
 function EditProfileForm({user, onClose, onSave}) {

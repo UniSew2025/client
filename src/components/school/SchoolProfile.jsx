@@ -125,8 +125,6 @@ function RenderLeftArea({onEditProfile, user}){
 
 //api
 async function handleUpdateSchoolProfile(updatedUser, setUserData, setShowEdit) {
-    try {
-
         const req = {
             accountId: updatedUser.accountId || updatedUser.id || updatedUser.profile.accountId,
             name: updatedUser.profile.name,
@@ -134,18 +132,14 @@ async function handleUpdateSchoolProfile(updatedUser, setUserData, setShowEdit) 
         };
 
         const res = await updateSchoolProfile(req);
-
-        if (res && res.message && res.message.toLowerCase().includes("success")) {
-            enqueueSnackbar("Profile updated!", { variant: "success" });
+        if (res && res.status === 200) {
+            enqueueSnackbar(res?.message || "Profile updated!", { variant: "success" });
             setUserData(updatedUser);
             setShowEdit(false);
             localStorage.setItem('user', JSON.stringify(updatedUser));
         } else {
             enqueueSnackbar(res?.message || "Update failed!", { variant: "error" });
         }
-    } catch (error) {
-        enqueueSnackbar("Error updating profile", { variant: "error" });
-    }
 }
 
 function EditProfileForm({user, onClose, onSave}) {

@@ -22,6 +22,7 @@ const DesignerList = () => {
         navigate("/school/designer/detail", {
             state: { designer }
         });
+        localStorage.setItem("designer", JSON.stringify(designer));
     };
 
     useEffect(() => {
