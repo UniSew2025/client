@@ -15,7 +15,7 @@ async function Login(email, avatar, name, refreshToken) {
 function HandleResponse() {
     const location = useLocation()
     const navigate = useNavigate()
-    const code = new URLSearchParams(location.search).get('code')//a.com?code=123SSS
+    const code = new URLSearchParams(location.search).get('code')
     const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID
     const clientSecret = import.meta.env.VITE_GOOGLE_CLIENT_SECRET
     const returnUri = import.meta.env.VITE_GOOGLE_RETURN_URI
