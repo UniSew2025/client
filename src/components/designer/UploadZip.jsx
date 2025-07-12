@@ -61,7 +61,7 @@ function UploadToDrive({ onUploadSuccess, accessToken }) {
 
                 const fileLink = `https://drive.google.com/file/d/${data.id}/view`;
                 setFileUrl(fileLink);
-                alert("Upload thành công!");
+                alert("Upload successful!");
                 if (typeof onUploadSuccess === "function") {
                     onUploadSuccess(fileLink);
                 }
@@ -75,7 +75,6 @@ function UploadToDrive({ onUploadSuccess, accessToken }) {
 
     return (
         <div style={{ maxWidth: 400, margin: "40px auto", textAlign: "center" }}>
-            <h3>Upload ZIP to Google Drive</h3>
             {!canUpload && (
                 <div style={{ color: "red", marginBottom: 10 }}>
                     You are not logged in to Google or the token has expired.<br />
@@ -92,7 +91,7 @@ function UploadToDrive({ onUploadSuccess, accessToken }) {
             {fileUrl && (
                 <div style={{ marginTop: 20 }}>
                     <a href={fileUrl} target="_blank" rel="noopener noreferrer">
-                        View uploaded files on Google Drive
+                        View uploaded files
                     </a>
                 </div>
             )}

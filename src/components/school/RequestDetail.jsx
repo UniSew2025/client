@@ -11,6 +11,7 @@ export default function RequestDetail() {
 
         <ChatUI requestId={location.state?.requestId}
                 packageId={location.state?.packageId}
+                request={location.state?.request}
                 />
     );
 }
