@@ -19,11 +19,11 @@ function HandleResponse() {
     const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID
     const clientSecret = import.meta.env.VITE_GOOGLE_CLIENT_SECRET
     const returnUri = import.meta.env.VITE_GOOGLE_RETURN_URI
-    const tokenResponse = localStorage.getItem("GGR") ? JSON.parse(localStorage.getItem("GGR")) : null
-    const profileResponse = localStorage.getItem("PR") ? JSON.parse(localStorage.getItem("PR")) : null
+    const tokenResponse = sessionStorage.getItem("tokenResponse") ? JSON.parse(sessionStorage.getItem("tokenResponse")) : null
+    const profileResponse = sessionStorage.getItem("profileResponse") ? JSON.parse(sessionStorage.getItem("profileResponse")) : null
     const progress = localStorage.getItem("user") ? 100 : (
-        localStorage.getItem("GGR") && localStorage.getItem("PR") ? 100 : (
-            localStorage.getItem("GGR") && !localStorage.getItem("PR") ? 50 : 0
+        sessionStorage.getItem("tokenResponse") && sessionStorage.getItem("profileResponse") ? 100 : (
+            sessionStorage.getItem("tokenResponse") && !sessionStorage.getItem("profileResponse") ? 50 : 0
         )
     )
 
@@ -36,17 +36,21 @@ function HandleResponse() {
                     code: code,
                     grant_type: 'authorization_code',
                     redirect_uri: returnUri
+                }, {
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    }
                 })
             }
 
             ExchangeTokens().then(res => {
                 if (res) {
-                    localStorage.setItem("GGR", JSON.stringify(res.data))
+                    sessionStorage.setItem("tokenResponse", JSON.stringify(res.data))
                     window.location.reload()
                 }
             })
         }
-    }, [code])
+    }, [])
 
     useEffect(() => {
         if (tokenResponse) {
@@ -59,12 +63,12 @@ function HandleResponse() {
 
             GetInfo().then(res => {
                 if (res) {
-                    localStorage.setItem("PR", JSON.stringify(res.data))
+                    sessionStorage.setItem("profileResponse", JSON.stringify(res.data))
                     window.location.reload()
                 }
             })
         }
-    }, [tokenResponse])
+    }, [])
 
     useEffect(() => {
         if (profileResponse) {
@@ -75,13 +79,10 @@ function HandleResponse() {
             Login(email, avatar, name, refresh)
                 .then(res => {
                         if (res.status === 200) {
+                            sessionStorage.clear()
                             localStorage.setItem("user", JSON.stringify(res.data.data))
                             localStorage.setItem("message", res.data.message)
                             localStorage.setItem("variant", "success")
-                            if(refresh){
-                                localStorage.removeItem("GGR")
-                                localStorage.removeItem("PR")
-                            }
                             switch (res.data.data.role) {
                                 case "admin":
                                     navigate('/admin/dashboard')
@@ -109,12 +110,12 @@ function HandleResponse() {
                 }
             )
         }
-    }, [profileResponse])
+    }, [])
 
     function CircularProgressWithLabel(props) {
         return (
             <Box sx={{position: 'relative', display: 'inline-flex'}}>
-                <CircularProgress variant="determinate" {...props} color={"secondary"} size={150}/>
+                <CircularProgress variant="determinate" {...props} color={"primary"} size={150}/>
                 <Box
                     sx={{
                         top: 0,
@@ -154,7 +155,7 @@ function HandleResponse() {
             gap: '2vh'
         }}>
             <CircularProgressWithLabel value={progress}/>
-            <Typography fontSize={40} color={'secondary'}>SIGNING IN...</Typography>
+            <Typography fontSize={40} color={'primary'}>SIGNING IN...</Typography>
         </Paper>
     )
 }

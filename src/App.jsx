@@ -31,6 +31,9 @@ import GarmentLayout from "./layouts/garment/GarmenntLayout.jsx";
 import DesignerRequest from "./components/designer/DesignerRequest.jsx";
 import DesignerPackage from "./components/designer/DesignerPackage.jsx";
 import FeedbackHistory from "./components/school/FeedbackHistory.jsx";
+import {LocalizationProvider} from "@mui/x-date-pickers";
+import {AdapterDayjs} from "@mui/x-date-pickers/AdapterDayjs";
+import {viVN} from "@mui/x-date-pickers/locales"
 
 const router = createBrowserRouter([
     {
@@ -201,9 +204,10 @@ function App() {
             anchorOrigin={{vertical: 'top', horizontal: 'right'}}
             autoHideDuration={1500}
             TransitionComponent={Grow}
-            // style={{marginTop: "7vh"}}
         >
-            <RouterProvider router={router}/>
+            <LocalizationProvider dateAdapter={AdapterDayjs} localeText={viVN.components.MuiLocalizationProvider.defaultProps.localeText}>
+                <RouterProvider router={router}/>
+            </LocalizationProvider>
         </SnackbarProvider>
     )
 }
