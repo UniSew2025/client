@@ -965,7 +965,7 @@ const RequestHistory = () => {
                                     </TableCell>
                                     <TableCell align={"center"}>
                                         {item.status === 'completed' ?
-                                            <RenderTooltip title={"Create order with this request"}>
+                                            <RenderTooltip title={"Create order with this design"}>
                                                 <IconButton onClick={() => HandleCreateOrder(item)}>
                                                     <AddCircleOutline color={'success'} />
                                                 </IconButton>
