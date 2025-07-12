@@ -5,7 +5,7 @@ import {Grow} from "@mui/material";
 import WebAppUILayout from "./layouts/ui/WebAppUILayout.jsx";
 import Home from "./components/auth/Home.jsx";
 import {useEffect} from "react";
-import UniSewConsole from "./components/ui/UniSewConsole.jsx";
+import {UniSewConsole} from "./components/ui/UniSewConsole.jsx";
 import 'bootstrap/dist/css/bootstrap.min.css'
 import PlatformAdminLayout from "./layouts/admin/PlatformAdminLayout.jsx";
 import AdminDashboard from "./components/admin/AdminDashboard.jsx";
@@ -193,6 +193,32 @@ const router = createBrowserRouter([
 ])
 
 function App() {
+
+    useEffect(() => {
+        const disableDevToolsShortcuts = (e) => {
+            if (
+                e.key === 'F12' ||
+                (e.ctrlKey && e.shiftKey && e.key === 'I') || // Ctrl+Shift+I
+                (e.ctrlKey && e.shiftKey && e.key === 'J') || // Ctrl+Shift+J
+                (e.ctrlKey && e.shiftKey && e.key === 'C') || // Ctrl+Shift+C
+                (e.metaKey && e.altKey && e.key === 'I') // Cmd+Option+I for Mac
+            ) {
+                e.preventDefault();
+            }
+        };
+
+        const handleBlockInspect = (e) => {
+            e.preventDefault()
+        }
+
+        window.addEventListener('contextmenu', handleBlockInspect);
+        window.addEventListener('keydown', disableDevToolsShortcuts);
+
+        return function cleanup() {
+            window.removeEventListener('contextmenu', handleBlockInspect);
+            window.removeEventListener('keydown', disableDevToolsShortcuts);
+        };
+    }, []);
 
     useEffect(() => {
         UniSewConsole()
