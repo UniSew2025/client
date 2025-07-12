@@ -12,7 +12,7 @@ import {
     ListItemIcon,
     ListItemText,
     Paper,
-    Stack,
+    Stack, TextField,
     Typography
 } from "@mui/material";
 import PublicIcon from "@mui/icons-material/Public";
@@ -25,10 +25,14 @@ import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import StarRateIcon from "@mui/icons-material/StarRate";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
-import '../../styles/school/SchoolProfile.css'
+import '../../styles/school/SchoolProfile.css';
 import {dateFormatter} from "../../utils/DateFormatter.jsx";
 import {useNavigate} from "react-router-dom";
 import EditIcon from "@mui/icons-material/Edit";
+import {motion, AnimatePresence} from "framer-motion";
+import {useState} from "react";
+import {enqueueSnackbar} from "notistack";
+import {updateSchoolProfile} from "../../services/ProfileService.jsx";
 
 
 const user = JSON.parse(localStorage.getItem('user'))
@@ -42,7 +46,7 @@ const checklist = [
     },
     {
         icon: <AddCircleOutlineIcon color="primary" />,
-        title: "Add details for your profile",
+        title: "Add contact for your profile",
         desc: "Upload a photo and info for more experience...",
         action: "Add"
     },
@@ -60,7 +64,7 @@ const checklist = [
     }
 ];
 
-function RenderLeftArea(){
+function RenderLeftArea({onEditProfile, user}){
     const navigate = useNavigate()
     return (
         <>
@@ -74,7 +78,7 @@ function RenderLeftArea(){
                         <Stack spacing={1} sx={{ textAlign: "left", pl: 2, mb: 2 }}>
                             <Stack direction="row" spacing={1} alignItems="center">
                                 <PublicIcon fontSize="small" color="action" />
-                                <Typography variant="body2">Located in {user.profile.partner.province}</Typography>
+                                <Typography variant="body2">Located in Viet Nam</Typography>
                             </Stack>
                             <Stack direction="row" spacing={1} alignItems="center">
                                 <CalendarMonthIcon fontSize="small" color="action" />
@@ -82,7 +86,7 @@ function RenderLeftArea(){
                             </Stack>
                             <Stack direction="row" spacing={1} alignItems="center">
                                 <AccessTimeIcon fontSize="small" color="action" />
-                                <Typography variant="body2">Work from {"6am to 5pm"}</Typography>
+                                <Typography variant="body2">Preferred working hours</Typography>
                             </Stack>
                         </Stack>
                         <Button
@@ -108,7 +112,7 @@ function RenderLeftArea(){
                             fullWidth
                             startIcon={<EditIcon />}
                             sx={{ borderRadius: 2, textTransform: "none", fontWeight: "bold" }}
-                            onClick={() => navigate("/home")}
+                            onClick={onEditProfile}
                         >
                             Edit profile
                         </Button>
@@ -117,6 +121,110 @@ function RenderLeftArea(){
             </Paper>
         </>
     )
+}
+
+//api
+async function handleUpdateSchoolProfile(updatedUser, setUserData, setShowEdit) {
+        const req = {
+            accountId: updatedUser.accountId || updatedUser.id || updatedUser.profile.accountId,
+            name: updatedUser.profile.name,
+            phone: updatedUser.profile.phone
+        };
+
+        const res = await updateSchoolProfile(req);
+        if (res && res.status === 200) {
+            enqueueSnackbar(res?.message || "Profile updated!", { variant: "success" });
+            setUserData(updatedUser);
+            setShowEdit(false);
+            localStorage.setItem('user', JSON.stringify(updatedUser));
+        } else {
+            enqueueSnackbar(res?.message || "Update failed!", { variant: "error" });
+        }
+}
+
+function EditProfileForm({user, onClose, onSave}) {
+    const [name, setName] = useState(user.profile.name || "");
+    const [phone, setPhone] = useState(user.profile.phone || "");
+
+    const handleSave = () => {
+        const updatedUser = {
+            ...user,
+            profile: {
+                ...user.profile,
+                name,
+                phone
+            },
+        };
+        onSave(updatedUser);
+        onClose();
+    };
+
+    return (
+        <>
+            <Box
+                sx={{
+                    position: "fixed",
+                    inset: 0,
+                    bgcolor: "rgba(0,0,0,0.45)",
+                    zIndex: 1300
+                }}
+                onClick={onClose}
+            />
+            <motion.div
+                initial={{x: "100%"}}
+                animate={{x: 0}}
+                exit={{x: "100%"}}
+                transition={{type: "spring", stiffness: 300, damping: 30}}
+                style={{
+                    position: "fixed",
+                    top: 0,
+                    right: 0,
+                    width: "100vw",
+                    maxWidth: 480,
+                    height: "100vh",
+                    zIndex: 1301,
+                }}
+            >
+                <Paper
+                    elevation={24}
+                    sx={{
+                        width: "100%",
+                        height: "100vh",
+                        bgcolor: "background.paper",
+                        boxShadow: 12,
+                        borderRadius: 0,
+                        p: 0
+                    }}
+                >
+                    <Card sx={{minWidth: 400, maxWidth: 500, width: "90vw", p: 3, position: "relative"}}>
+                        <Typography variant="h6" fontWeight="bold" mb={2}>
+                            Edit Profile
+                        </Typography>
+                        <Divider sx={{mb: 2}}/>
+
+                        <Stack spacing={2}>
+                            <TextField
+                                label="Name"
+                                fullWidth
+                                value={name}
+                                onChange={e => setName(e.target.value)}
+                            />
+                            <TextField
+                                label="Contact (Phone)"
+                                fullWidth
+                                value={phone}
+                                onChange={e => setPhone(e.target.value)}
+                            />
+                        </Stack>
+                        <Stack direction="row" spacing={2} justifyContent="flex-end" mt={3}>
+                            <Button variant="outlined" color="secondary" onClick={onClose}>Cancel</Button>
+                            <Button variant="contained" color="primary" onClick={handleSave}>Save</Button>
+                        </Stack>
+                    </Card>
+                </Paper>
+            </motion.div>
+        </>
+    );
 }
 
 function RenderRightArea(){
@@ -201,15 +309,30 @@ function RenderRightArea(){
 }
 
 export default function SchoolProfile() {
+    const [showEdit, setShowEdit] = useState(false);
+    const [userData, setUserData] = useState(user);
+
+    const handleSave = (updatedUser) => {
+        handleUpdateSchoolProfile(updatedUser, setUserData, setShowEdit);
+    };
     return (
         <Box sx={{minHeight: "100vh", py: 5 }}>
 
             <Box sx={{ maxWidth: 1400, mx: "auto" }}>
                 <Grid container spacing={3} >
-                    <RenderLeftArea/>
-                    <RenderRightArea/>
+                    <RenderLeftArea onEditProfile={() => setShowEdit(true)} user={userData}/>
+                    <RenderRightArea user={userData}/>
                 </Grid>
             </Box>
+            <AnimatePresence>
+                {showEdit && (
+                    <EditProfileForm
+                        user={userData}
+                        onClose={() => setShowEdit(false)}
+                        onSave={handleSave}
+                    />
+                )}
+            </AnimatePresence>
         </Box>
     );
 }
