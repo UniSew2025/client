@@ -18,7 +18,7 @@ import {
 } from "@mui/material";
 import KeyboardArrowLeft from "@mui/icons-material/KeyboardArrowLeft";
 import KeyboardArrowRight from "@mui/icons-material/KeyboardArrowRight";
-import {getALlPackageByDesignerId} from "../../services/ProfileService.jsx";
+import {getALlPackageByDesignerId} from "../../../services/ProfileService.jsx";
 
 function GallerySection({ images = [] }) {
     const theme = useTheme();

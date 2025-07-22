@@ -1,5 +1,5 @@
 import {useLocation} from "react-router-dom";
-import ChatUI from "../ui/chat/ChatUI.jsx";
+import ChatUI from "../../ui/chat/ChatUI.jsx";
 
 export default function RequestDetail() {
 

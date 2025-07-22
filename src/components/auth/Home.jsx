@@ -337,7 +337,7 @@ function ExpertTrustSection() {
                             Feel confident working with our designer community. All our designers are vetted creative experts who've worked with hundreds of businesses to bring their designs to life.
                         </p>
                         <a
-                            href="/designer/list"
+                            href="/school/designer/list"
                             className="btn btn-outline-primary btn-lg px-4"
                             style={{
                                 borderRadius: 40,
