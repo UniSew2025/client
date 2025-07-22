@@ -1,5 +1,5 @@
 import './styles/App.css'
-import {createBrowserRouter, Navigate, RouterProvider, Outlet} from "react-router-dom";
+import {createBrowserRouter, Navigate, Outlet, RouterProvider} from "react-router-dom";
 import {SnackbarProvider} from 'notistack'
 import {Grow} from "@mui/material";
 import WebAppUILayout from "./layouts/ui/WebAppUILayout.jsx";
@@ -38,28 +38,74 @@ import OrderFillForm from "./components/school/order/OrderFillForm.jsx";
 
 const router = createBrowserRouter([
     {
-        path: "/home",
+        path: "/",
         element: (
-            <WebAppUILayout title={"Home"}>
-                <Home/>
-            </WebAppUILayout>
-        )
-    },
-    {
-        path: "/school/profile",
-        element: (
-            <WebAppUILayout title={"Profile"}>
-                <SchoolProfile/>
-            </WebAppUILayout>
-        )
-    },
-    {
-        path: "/request-list",
-        element: (
-            <WebAppUILayout title={"Request List"}>
-                <RequestList/>
-            </WebAppUILayout>
-        )
+            <WebAppUILayout/>
+        ),
+        children: [
+            {
+                index: true,
+                element: <Navigate to={'/home'}/>
+            },
+            {
+                path: 'home',
+                element: <Home/>
+            },
+            {
+                path: "school/profile",
+                element: <SchoolProfile/>
+            },
+            {
+                path: "request-list",
+                element: <RequestList/>
+            },
+            {
+                path: "designer/list",
+                element: <DesignerList/>
+            },
+            {
+                path: "designer/detail",
+                element: <DesignerDetail/>
+            },
+            {
+                path: "garment/list",
+                element: <GarmentList/>
+            },
+            {
+                path: "garment/detail",
+                element: <DesignerDetail/>
+            },
+            {
+                path: "school/d",
+                element: <SchoolLayout/>,
+                children: [
+                    {
+                        index: true,
+                        element: <Navigate to={"/school/d/design"}/>
+                    },
+                    {
+                        path: 'design',
+                        element: <RequestHistory/>
+                    },
+                    {
+                        path: 'detail',
+                        element: <RequestDetail/>
+                    },
+                    {
+                        path: 'order',
+                        element: <SchoolOrder/>
+                    },
+                    {
+                        path: 'order/form',
+                        element: <OrderFillForm/>
+                    },
+                    {
+                        path: 'feedback',
+                        element: <FeedbackHistory/>
+                    }
+                ]
+            },
+        ]
     },
     {
         path: "/designer",
@@ -105,72 +151,6 @@ const router = createBrowserRouter([
             {
                 path: 'profile',
                 element: <GarmentProfile/>
-            }
-        ]
-    },
-    {
-        path: "/school",
-        element: (
-            <WebAppUILayout title={"School"}>
-                <Outlet/>
-            </WebAppUILayout>
-        ),
-        children: [
-            {
-                index: true,
-                element: <Navigate to={"/home"}/>
-            },
-            //School dashboard
-            {
-                path: 'd',
-                element: (
-                    <SchoolLayout>
-                        <Outlet/>
-                    </SchoolLayout>
-                ),
-                children: [
-                    {
-                        index: true,
-                        element: <Navigate to={"/school/d/design"}/>
-                    },
-                    {
-                        path: 'design',
-                        element: <RequestHistory/>
-                    },
-                    {
-                        path: 'detail',
-                        element: <RequestDetail/>
-                    },
-                    {
-                        path: 'order',
-                        element: <SchoolOrder/>
-                    },
-                    {
-                        path: 'order/form',
-                        element: <OrderFillForm/>
-                    },
-                    {
-                        path: 'feedback',
-                        element: <FeedbackHistory/>
-                    }
-                ]
-            },
-            //School other screen
-            {
-                path: "designer/list",
-                element: <DesignerList/>
-            },
-            {
-                path: "designer/detail",
-                element: <DesignerDetail/>
-            },
-            {
-                path: "garment/list",
-                element: <GarmentList/>
-            },
-            {
-                path: "garment/detail",
-                element: <DesignerDetail/>
             }
         ]
     },
