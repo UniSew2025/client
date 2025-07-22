@@ -48,21 +48,21 @@ function RenderNav({navigation}) {
     )
 }
 
-function RenderPage({navigation}) {
+function RenderPage({navigation, children}) {
     return (
         <div className={'dbwui-main'}>
             <div className={'dbwui-nav'}>
                 <RenderNav navigation={navigation}/>
             </div>
             <div className={'dbwui-outlet'}>
-                <Outlet/>
+                {children}
             </div>
         </div>
     )
 }
 
-export default function DashboardWebUILayout({navigation}) {
+export default function DashboardWebUILayout({navigation, children}) {
     return (
-        <RenderPage navigation={navigation}/>
+        <RenderPage navigation={navigation} children={children}/>
     )
 }
