@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from "react";
+import React, {Fragment, useEffect, useRef, useState} from "react";
 import {
     Accordion,
     AccordionDetails,
@@ -9,7 +9,7 @@ import {
     CardActionArea,
     CardContent,
     CardMedia,
-    Chip,
+    Chip, Collapse,
     Dialog,
     DialogActions,
     DialogContent,
@@ -35,7 +35,14 @@ import {
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import {createDesignRequest, getSampleImages, viewListHistory} from "../../../services/DesignService.jsx";
-import {Add, AddCircleOutline, Info, RemoveCircleOutline} from '@mui/icons-material';
+import {
+    Add,
+    AddCircleOutline,
+    Info,
+    KeyboardArrowDown,
+    KeyboardArrowUp,
+    RemoveCircleOutline
+} from '@mui/icons-material';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
 import CircularProgress from '@mui/material/CircularProgress';
@@ -92,7 +99,7 @@ const ClothItem = ({
 
     useEffect(() => {
         const newCloth = {
-            images: images.map(url => ({ url })),
+            images: images.map(url => ({url})),
             templateId: designType === 'TEMPLATE' ? templateId : 0,
             type: clothType,
             category: clothData.category,
@@ -172,16 +179,15 @@ const ClothItem = ({
     };
 
 
-
     return (
         <Accordion expanded={expanded} onChange={onExpand}>
-            <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+            <AccordionSummary expandIcon={<ExpandMoreIcon/>}>
                 <Typography fontWeight="bold">{label}</Typography>
                 {typeof error === 'undefined'
                     ? null
                     : hasError
-                        ? <CancelIcon sx={{ color: "error.main", ml: 1 }} />
-                        : <CheckCircleIcon sx={{ color: "success.main", ml: 1 }} />}
+                        ? <CancelIcon sx={{color: "error.main", ml: 1}}/>
+                        : <CheckCircleIcon sx={{color: "success.main", ml: 1}}/>}
             </AccordionSummary>
             <AccordionDetails>
                 <TextField
@@ -247,7 +253,7 @@ const ClothItem = ({
                         </Button>
                         {uploading && (
                             <Box display="flex" alignItems="center" mt={1}>
-                                <CircularProgress size={24} style={{ marginRight: 8 }} />
+                                <CircularProgress size={24} style={{marginRight: 8}}/>
                                 <Typography color="textSecondary">Uploading...</Typography>
                             </Box>
                         )}
@@ -261,7 +267,7 @@ const ClothItem = ({
                                         src={img}
                                         alt={`img-${i}`}
                                         width={80}
-                                        style={{ cursor: 'pointer', borderRadius: 4, border: '1px solid #ccc' }}
+                                        style={{cursor: 'pointer', borderRadius: 4, border: '1px solid #ccc'}}
                                         onClick={() => setPreviewImage(img)}
                                     />
                                     <IconButton
@@ -275,10 +281,10 @@ const ClothItem = ({
                                             top: 0,
                                             right: 0,
                                             background: 'rgba(255,255,255,0.8)',
-                                            '&:hover': { background: 'rgba(255,0,0,0.7)' }
+                                            '&:hover': {background: 'rgba(255,0,0,0.7)'}
                                         }}
                                     >
-                                        <CloseIcon fontSize="small" />
+                                        <CloseIcon fontSize="small"/>
                                     </IconButton>
                                 </Box>
                             ))}
@@ -292,7 +298,7 @@ const ClothItem = ({
                             fullWidth
                             variant="outlined"
                             onClick={() => setTemplateDialogOpen(true)}
-                            sx={{ justifyContent: 'flex-start', textTransform: 'none', mt: 2 }}
+                            sx={{justifyContent: 'flex-start', textTransform: 'none', mt: 2}}
                         >
                             Choose Template
                         </Button>
@@ -301,14 +307,14 @@ const ClothItem = ({
                             <Box mt={2} display="flex" alignItems="center" gap={2}>
                                 <Box
                                     position="relative"
-                                    sx={{ cursor: 'pointer' }}
+                                    sx={{cursor: 'pointer'}}
                                     onClick={() => setPreviewImage(templateList.find(t => t.sampleId === sampleId)?.imageUrl)}
                                 >
                                     <img
                                         src={templateList.find(t => t.sampleId === sampleId)?.imageUrl}
                                         alt="Selected Template"
                                         width={100}
-                                        style={{ borderRadius: 8 }}
+                                        style={{borderRadius: 8}}
                                     />
                                     <IconButton
                                         size="small"
@@ -322,16 +328,17 @@ const ClothItem = ({
                                             right: -10,
                                             backgroundColor: 'white',
                                             border: '1px solid #ccc',
-                                            '&:hover': { backgroundColor: '#f0f0f0' }
+                                            '&:hover': {backgroundColor: '#f0f0f0'}
                                         }}
                                     >
-                                        <CloseIcon fontSize="small" />
+                                        <CloseIcon fontSize="small"/>
                                     </IconButton>
                                 </Box>
                             </Box>
                         )}
 
-                        <Dialog open={templateDialogOpen} onClose={() => setTemplateDialogOpen(false)} fullWidth maxWidth="md">
+                        <Dialog open={templateDialogOpen} onClose={() => setTemplateDialogOpen(false)} fullWidth
+                                maxWidth="md">
                             <DialogTitle>Select a Template</DialogTitle>
                             <DialogContent>
                                 <Box display="flex" flexWrap="wrap" gap={2}>
@@ -351,7 +358,7 @@ const ClothItem = ({
                                                 padding: 1,
                                             }}
                                         >
-                                            <img src={template.imageUrl} alt="" width={100} />
+                                            <img src={template.imageUrl} alt="" width={100}/>
                                         </Box>
                                     ))}
                                 </Box>
@@ -363,7 +370,7 @@ const ClothItem = ({
                                 <img
                                     src={templateList.find(t => t.sampleId === templateId)?.imageUrl}
                                     alt=""
-                                    style={{ width: '100%', maxHeight: '80vh', objectFit: 'contain' }}
+                                    style={{width: '100%', maxHeight: '80vh', objectFit: 'contain'}}
                                 />
                             </DialogContent>
                         </Dialog>
@@ -393,7 +400,7 @@ const ClothItem = ({
                             {sharedLogo?.logoImage && (
                                 <Box mt={1} position="relative" display="inline-block" width={80} height={80}>
                                     <img src={sharedLogo.logoImage} alt="logo" width={80} height={80}
-                                         style={{ borderRadius: 4, border: '1px solid #ccc', objectFit: 'cover' }} />
+                                         style={{borderRadius: 4, border: '1px solid #ccc', objectFit: 'cover'}}/>
                                     <IconButton
                                         size="small"
                                         onClick={() => {
@@ -410,10 +417,10 @@ const ClothItem = ({
                                             top: 0,
                                             right: 0,
                                             background: 'rgba(255,255,255,0.8)',
-                                            '&:hover': { background: 'rgba(255,0,0,0.7)' }
+                                            '&:hover': {background: 'rgba(255,0,0,0.7)'}
                                         }}
                                     >
-                                        <CloseIcon fontSize="small" />
+                                        <CloseIcon fontSize="small"/>
                                     </IconButton>
                                 </Box>
                             )}
@@ -454,10 +461,10 @@ const ClothItem = ({
                         type="color"
                         value={color}
                         onChange={(e) => setColor(e.target.value)}
-                        style={{ width: 40, height: 40, border: 'none', background: 'none', cursor: 'pointer' }}
+                        style={{width: 40, height: 40, border: 'none', background: 'none', cursor: 'pointer'}}
                     />
-                    <Typography variant="body2" sx={{ minWidth: 70 }}>
-                        Color code:  {color?.toUpperCase()}
+                    <Typography variant="body2" sx={{minWidth: 70}}>
+                        Color code: {color?.toUpperCase()}
                     </Typography>
                 </Box>
                 {error.color && (
@@ -477,9 +484,9 @@ const ClothItem = ({
             </AccordionDetails>
             <Dialog open={!!previewImage} onClose={() => setPreviewImage(null)} maxWidth="md">
                 <Box p={2} display="flex" flexDirection="column" alignItems="center">
-                    <img src={previewImage} alt="preview" style={{ maxWidth: '90vw', maxHeight: '80vh' }} />
-                    <IconButton onClick={() => setPreviewImage(null)} sx={{ alignSelf: 'flex-end' }}>
-                        <CloseIcon />
+                    <img src={previewImage} alt="preview" style={{maxWidth: '90vw', maxHeight: '80vh'}}/>
+                    <IconButton onClick={() => setPreviewImage(null)} sx={{alignSelf: 'flex-end'}}>
+                        <CloseIcon/>
                     </IconButton>
                 </Box>
             </Dialog>
@@ -522,7 +529,7 @@ const RegularForm = ({
     const [clothTouched, setClothTouched] = useState({});
 
     useEffect(() => {
-        const isValid = [0,1,2,3].every(i => Object.keys(validateClothError(clothes[i] || {})).length === 0);
+        const isValid = [0, 1, 2, 3].every(i => Object.keys(validateClothError(clothes[i] || {})).length === 0);
         if (onValidateChange) onValidateChange(isValid);
     }, [clothes, clothErrors]);
 
@@ -532,15 +539,15 @@ const RegularForm = ({
         setClothes(newClothes);
 
         const error = validateClothError(cloth);
-        setClothErrors(prev => ({ ...prev, [index]: error }));
-        setClothTouched(prev => ({ ...prev, [index]: true }));
+        setClothErrors(prev => ({...prev, [index]: error}));
+        setClothTouched(prev => ({...prev, [index]: true}));
 
         if (onClothesChange) onClothesChange(newClothes);
     };
 
     return (
         <Box>
-            <Box sx={{ width: '100%' }}>
+            <Box sx={{width: '100%'}}>
                 <Stepper activeStep={1} alternativeLabel>
                     {steps.map((label) => (
                         <Step key={label}>
@@ -553,7 +560,7 @@ const RegularForm = ({
                 <Typography fontWeight="bold">Boy</Typography>
                 <ClothItem
                     label="Shirt"
-                    clothData={{ type: 'SHIRT', category: 'REGULAR' }}
+                    clothData={{type: 'SHIRT', category: 'REGULAR'}}
                     gender="BOY"
                     index={0}
                     expanded={expandedIndex === 0}
@@ -565,7 +572,7 @@ const RegularForm = ({
                 />
                 <ClothItem
                     label="Pant"
-                    clothData={{ type: 'PANTS', category: 'REGULAR' }}
+                    clothData={{type: 'PANTS', category: 'REGULAR'}}
                     gender="BOY"
                     index={1}
                     expanded={expandedIndex === 1}
@@ -578,7 +585,7 @@ const RegularForm = ({
                 <Typography fontWeight="bold">Girl</Typography>
                 <ClothItem
                     label="Shirt"
-                    clothData={{ type: 'SHIRT', category: 'REGULAR' }}
+                    clothData={{type: 'SHIRT', category: 'REGULAR'}}
                     gender="GIRL"
                     index={2}
                     expanded={expandedIndex === 2}
@@ -590,7 +597,7 @@ const RegularForm = ({
                 />
                 <ClothItem
                     label="Pant / Skirt"
-                    clothData={{ type: 'PANTS', category: 'REGULAR' }}
+                    clothData={{type: 'PANTS', category: 'REGULAR'}}
                     gender="GIRL"
                     index={3}
                     expanded={expandedIndex === 3}
@@ -603,7 +610,6 @@ const RegularForm = ({
         </Box>
     );
 };
-
 
 
 const PhysicalForm = ({
@@ -623,13 +629,13 @@ const PhysicalForm = ({
         if (onClothesChange) onClothesChange(newClothes);
 
         const error = validateClothError(cloth);
-        setClothErrors(prev => ({ ...prev, [index]: error }));
-        setClothTouched(prev => ({ ...prev, [index]: true }));
+        setClothErrors(prev => ({...prev, [index]: error}));
+        setClothTouched(prev => ({...prev, [index]: true}));
     };
 
     return (
         <Box>
-            <Box sx={{ width: '100%' }}>
+            <Box sx={{width: '100%'}}>
                 <Stepper activeStep={steps.length === 3 ? 1 : 2} alternativeLabel>
                     {steps.map((label) => (
                         <Step key={label}><StepLabel>{label}</StepLabel></Step>
@@ -640,7 +646,7 @@ const PhysicalForm = ({
                 <Typography fontWeight="bold">Boy</Typography>
                 <ClothItem
                     label="Shirt"
-                    clothData={{ type: 'SHIRT', category: 'PHYSICAL' }}
+                    clothData={{type: 'SHIRT', category: 'PHYSICAL'}}
                     gender="BOY"
                     index={0}
                     expanded={expandedIndex === 0}
@@ -652,7 +658,7 @@ const PhysicalForm = ({
                 />
                 <ClothItem
                     label="Pant"
-                    clothData={{ type: 'PANTS', category: 'PHYSICAL' }}
+                    clothData={{type: 'PANTS', category: 'PHYSICAL'}}
                     gender="BOY"
                     index={1}
                     expanded={expandedIndex === 1}
@@ -665,7 +671,7 @@ const PhysicalForm = ({
                 <Typography fontWeight="bold">Girl</Typography>
                 <ClothItem
                     label="Shirt"
-                    clothData={{ type: 'SHIRT', category: 'PHYSICAL' }}
+                    clothData={{type: 'SHIRT', category: 'PHYSICAL'}}
                     gender="GIRL"
                     index={2}
                     expanded={expandedIndex === 2}
@@ -677,7 +683,7 @@ const PhysicalForm = ({
                 />
                 <ClothItem
                     label="Pant"
-                    clothData={{ type: 'PANTS', category: 'PHYSICAL' }}
+                    clothData={{type: 'PANTS', category: 'PHYSICAL'}}
                     gender="GIRL"
                     index={3}
                     expanded={expandedIndex === 3}
@@ -691,7 +697,7 @@ const PhysicalForm = ({
 };
 
 
-function RenderTooltip({title, children}){
+function RenderTooltip({title, children}) {
     return (
         <Tooltip
             title={title}
@@ -719,14 +725,15 @@ function RenderTooltip({title, children}){
 const RequestHistory = () => {
     const [open, setOpen] = useState(false);
     const [step, setStep] = useState(0);
-    const [designTypes, setDesignTypes] = useState({ regular: false, physical: false });
-    const [designRequest, setDesignRequest] = useState({ schoolId: 0, clothes: [] });
+    const [designTypes, setDesignTypes] = useState({regular: false, physical: false});
+    const [designRequest, setDesignRequest] = useState({schoolId: 0, clothes: []});
     const [historyList, setHistoryList] = useState([]);
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(5);
-    const [sharedLogo, setSharedLogo] = useState({ logoImage: '', logoPosition: '' });
+    const [sharedLogo, setSharedLogo] = useState({logoImage: '', logoPosition: ''});
     const [isRegularValid, setIsRegularValid] = useState(false);
     const [isPhysicalValid, setIsPhysicalValid] = useState(false);
+    const [rowExpand, setRowExpand] = useState(-1)
 
     const steps =
         designTypes.regular && designTypes.physical
@@ -751,26 +758,27 @@ const RequestHistory = () => {
         const schoolId = user.id || 0;
         setOpen(true);
         setStep(0);
-        setDesignTypes({ regular: false, physical: false });
-        setDesignRequest({ schoolId, clothes: [] });
+        setDesignTypes({regular: false, physical: false});
+        setDesignRequest({schoolId, clothes: []});
     };
 
     const handleClose = () => {
         setOpen(false);
-        setDesignRequest({ schoolId: 0, clothes: [] });
+        setDesignRequest({schoolId: 0, clothes: []});
     };
 
     const handleCheckboxChange = (name) => {
-        setDesignTypes(prev => ({ ...prev, [name]: !prev[name] }));
+        setDesignTypes(prev => ({...prev, [name]: !prev[name]}));
     };
 
     const handleClothesChange = (clothes) => {
-        setDesignRequest(prev => ({ ...prev, clothes }));
+        setDesignRequest(prev => ({...prev, clothes}));
     };
 
     const handleRegularValidate = (isValid) => {
         setIsRegularValid(isValid);
     };
+
     const handlePhysicalValidate = (isValid) => {
         setIsPhysicalValid(isValid);
     };
@@ -778,26 +786,26 @@ const RequestHistory = () => {
     const handleNext = async () => {
         if (step === 0) {
             if (!designTypes.regular && !designTypes.physical) {
-                enqueueSnackbar('Please choose at least one uniform type', { variant: "warning" });
+                enqueueSnackbar('Please choose at least one uniform type', {variant: "warning"});
                 return;
             }
             if (designTypes.regular) setStep(1);
             else setStep(2);
         } else if (step === 1 && designTypes.physical) {
             if (!isRegularValid) {
-                enqueueSnackbar("Please complete all required fields in Regular Uniform!", { variant: "error" });
+                enqueueSnackbar("Please complete all required fields in Regular Uniform!", {variant: "error"});
                 return;
             }
             setStep(2);
         } else {
             try {
                 const res = await createDesignRequest(designRequest);
-                enqueueSnackbar("Created successfully!", { variant: "success" });
+                enqueueSnackbar("Created successfully!", {variant: "success"});
                 setHistoryList(prev => [...prev, res?.data || {}]);
                 await getListRequest();
                 handleClose();
             } catch (err) {
-                enqueueSnackbar("Create failed", { variant: "error" });
+                enqueueSnackbar("Create failed", {variant: "error"});
                 console.log("error", err);
             }
         }
@@ -837,13 +845,20 @@ const RequestHistory = () => {
 
     const handleViewDetail = (item) => {
         console.log("item", item);
-        navigate('/school/d/detail', { state: { requestId: item.id, requestStatus: item.status, packageId: item.package, request: item} });
+        navigate('/school/d/detail', {
+            state: {
+                requestId: item.id,
+                packageId: item.package,
+                request: item
+            }
+        });
     };
 
     function RenderRadioSelection() {
         return (
             <div className={'d-flex justify-content-center align-content-center mb-lg-5 gap-3'}>
-                <RenderTooltip title={designTypes.regular ? "Click to unselect regular uniform" : "Click to select regular uniform"}>
+                <RenderTooltip
+                    title={designTypes.regular ? "Click to unselect regular uniform" : "Click to select regular uniform"}>
                     <Card>
                         <CardActionArea
                             onClick={() => handleCheckboxChange('regular')}
@@ -853,13 +868,13 @@ const RequestHistory = () => {
                                 width: '25vw',
                                 '&[data-active]': {
                                     backgroundColor: 'action.selected',
-                                    '&:hover': { backgroundColor: 'action.selectedHover' }
+                                    '&:hover': {backgroundColor: 'action.selectedHover'}
                                 }
                             }}
                         >
-                            <CardContent sx={{ height: '100%' }}>
-                                <CardMedia component="img" height="400" image="/regular.png" alt="Regular" />
-                                <Typography variant="h5" component="div" align={"center"} sx={{ marginTop: '3vh' }}>
+                            <CardContent sx={{height: '100%'}}>
+                                <CardMedia component="img" height="400" image="/regular.png" alt="Regular"/>
+                                <Typography variant="h5" component="div" align={"center"} sx={{marginTop: '3vh'}}>
                                     Regular Uniform {designTypes.regular ?
                                     <Typography fontWeight={"bold"} color={"success"}>Selected</Typography> :
                                     <Typography fontWeight={"bold"} color={"error"}>Unselected</Typography>}
@@ -868,7 +883,8 @@ const RequestHistory = () => {
                         </CardActionArea>
                     </Card>
                 </RenderTooltip>
-                <RenderTooltip title={designTypes.physical ? "Click to unselect physical education uniform" : "Click to select physical education uniform"}>
+                <RenderTooltip
+                    title={designTypes.physical ? "Click to unselect physical education uniform" : "Click to select physical education uniform"}>
                     <Card>
                         <CardActionArea
                             onClick={() => handleCheckboxChange('physical')}
@@ -878,13 +894,13 @@ const RequestHistory = () => {
                                 width: '25vw',
                                 '&[data-active]': {
                                     backgroundColor: 'action.selected',
-                                    '&:hover': { backgroundColor: 'action.selectedHover' }
+                                    '&:hover': {backgroundColor: 'action.selectedHover'}
                                 }
                             }}
                         >
-                            <CardContent sx={{ height: '100%' }}>
-                                <CardMedia component="img" height="400" image="/PE.jpg" alt="Physical Education" />
-                                <Typography variant="h5" component="div" align={"center"} sx={{ marginTop: '3vh' }}>
+                            <CardContent sx={{height: '100%'}}>
+                                <CardMedia component="img" height="400" image="/PE.jpg" alt="Physical Education"/>
+                                <Typography variant="h5" component="div" align={"center"} sx={{marginTop: '3vh'}}>
                                     Physical Education Uniform {designTypes.physical ?
                                     <Typography fontWeight={"bold"} color={"success"}>Selected</Typography> :
                                     <Typography fontWeight={"bold"} color={"error"}>Unselected</Typography>}
@@ -897,7 +913,7 @@ const RequestHistory = () => {
         )
     }
 
-    function RenderStatusDisplay({ status }) {
+    function RenderStatusDisplay({status}) {
         const color = status === 'created' ? 'secondary' :
             status === 'paid' ? 'primary' :
                 status === 'designing' ? 'info' : 'success'
@@ -908,12 +924,18 @@ const RequestHistory = () => {
                 variant={"filled"}
                 label={status}
                 size={"small"}
-                sx={{ textTransform: 'capitalize' }}
+                sx={{textTransform: 'capitalize'}}
             />
         )
     }
 
+    function HandleViewDesignList(item) {
+        localStorage.setItem("sDesign", JSON.stringify(item))
+        navigate("/school/designer/list")
+    }
+
     function HandleCreateOrder(request) {
+        localStorage.setItem("formStep", '0')
         localStorage.setItem("sRequest", request.id)
         navigate('/school/d/order/form')
     }
@@ -925,60 +947,103 @@ const RequestHistory = () => {
                 <Button
                     variant="contained"
                     onClick={handleOpen}
-                    startIcon={<Add />}
-                    sx={{ borderRadius: '20px', gap: '0.1vw' }}
+                    startIcon={<Add/>}
+                    sx={{borderRadius: '20px', gap: '0.1vw'}}
                 >
                     Create
                 </Button>
             </Box>
 
             <Paper elevation={2}>
-                <TableContainer sx={{ mt: 3 }}>
+                <TableContainer sx={{mt: 3}}>
                     <Table>
                         <TableHead>
-                            <TableRow>
-                                <TableCell align={"center"}><strong>ID</strong></TableCell>
-                                <TableCell align={"center"}><strong>Design Type</strong></TableCell>
-                                <TableCell align={"center"}><strong>Feedback</strong></TableCell>
-                                <TableCell align={"center"}><strong>Status</strong></TableCell>
-                                <TableCell align={"center"}><strong>View Detail</strong></TableCell>
-                                <TableCell align={"center"}><strong>Create Order</strong></TableCell>
+                            <TableRow sx={{'& > *': {borderBottom: 'unset'}}}>
+                                <TableCell align={"center"} sx={{width: '5%'}}/>
+                                <TableCell align={"center"} sx={{width: '5%'}}><strong>ID</strong></TableCell>
+                                <TableCell align={"center"} sx={{width: '20%'}}><strong>Design Type</strong></TableCell>
+                                <TableCell align={"center"} sx={{width: '30%'}}><strong>Feedback</strong></TableCell>
+                                <TableCell align={"center"} sx={{width: '20%'}}><strong>Status</strong></TableCell>
+                                <TableCell align={"center"} sx={{width: '20%'}}><strong>View Detail</strong></TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
                             {paginatedData.map((item, index) => (
-                                <TableRow key={`${item.id}-${index}`}>
-                                    <TableCell align={"center"}>{item.id}</TableCell>
-                                    <TableCell align={"center"}>{item.private ? "Private" : "Public"}</TableCell>
-                                    <TableCell align={"center"}>{item.feedback ? item.feedback : "N/A"}</TableCell>
-                                    <TableCell align={"center"}>
-                                        <RenderStatusDisplay status={item.status} />
-                                    </TableCell>
-                                    <TableCell align={"center"}>
-                                        <IconButton
-                                            size="small"
-                                            variant="outlined"
-                                            onClick={() => handleViewDetail(item)}
-                                        >
-                                            <Info fontSize={"medium"} color={"info"} />
-                                        </IconButton>
-                                    </TableCell>
-                                    <TableCell align={"center"}>
-                                        {item.status === 'completed' ?
-                                            <RenderTooltip title={"Create order with this design"}>
-                                                <IconButton onClick={() => HandleCreateOrder(item)}>
-                                                    <AddCircleOutline color={'success'} />
-                                                </IconButton>
-                                            </RenderTooltip>
-                                            :
-                                            <RenderTooltip title={"Current status is " + item.status + ". Required COMPLETED status to create order"}>
-                                                <IconButton>
-                                                    <RemoveCircleOutline color={'disabled'} />
-                                                </IconButton>
-                                            </RenderTooltip>
-                                        }
-                                    </TableCell>
-                                </TableRow>
+                                <Fragment key={index}>
+                                    <TableRow>
+                                        <TableCell align={"center"}>
+                                            {item.status === 'completed' || item.status === 'created' ?
+                                                (
+                                                    <IconButton
+                                                        size="small"
+                                                        onClick={() => setRowExpand(rowExpand === index ? -1 : index)}
+                                                    >
+                                                        {rowExpand === index ? <KeyboardArrowUp/> :
+                                                            <KeyboardArrowDown/>}
+                                                    </IconButton>
+                                                )
+                                                :
+                                                ""
+                                            }
+                                        </TableCell>
+                                        <TableCell align={"center"} sx={{width: '0.3vw'}}>{item.id}</TableCell>
+                                        <TableCell align={"center"}>{item.private ? "Private" : "Public"}</TableCell>
+                                        <TableCell align={"center"}>{item.feedback ? item.feedback : "N/A"}</TableCell>
+                                        <TableCell align={"center"}>
+                                            <RenderStatusDisplay status={item.status}/>
+                                        </TableCell>
+                                        <TableCell align={"center"}>
+                                            <IconButton
+                                                size="small"
+                                                variant="outlined"
+                                                onClick={() => handleViewDetail(item)}
+                                            >
+                                                <Info fontSize={"medium"} color={"info"}/>
+                                            </IconButton>
+                                        </TableCell>
+                                    </TableRow>
+                                    <TableRow>
+                                        <TableCell sx={{padding: 0, width: '100%', backgroundColor: '#EEF0F3'}}
+                                                   colSpan={12}>
+                                            {item.status === 'completed' || item.status === 'created' ?
+                                                (
+                                                    <Collapse in={rowExpand === index} timeout="auto" unmountOnExit>
+                                                        <Box sx={{
+                                                            marginY: '1vh',
+                                                            width: '100%',
+                                                            display: 'flex',
+                                                            justifyContent: 'flex-end'
+                                                        }}>
+                                                            {item.status === 'completed' ?
+                                                                (
+                                                                    <Button variant={'contained'}
+                                                                            sx={{marginRight: '3vw'}}
+                                                                            color={'success'}
+                                                                            onClick={() => HandleCreateOrder(item)}
+                                                                    >
+                                                                        Create Order
+                                                                    </Button>
+                                                                )
+                                                                :
+                                                                (
+                                                                    <Button variant={'contained'}
+                                                                            sx={{marginRight: '2vw'}}
+                                                                            color={'secondary'}
+                                                                            onClick={() => HandleViewDesignList(item)}
+                                                                    >
+                                                                        Select Designer
+                                                                    </Button>
+                                                                )
+                                                            }
+                                                        </Box>
+                                                    </Collapse>
+                                                )
+                                                :
+                                                ""
+                                            }
+                                        </TableCell>
+                                    </TableRow>
+                                </Fragment>
                             ))}
                         </TableBody>
                     </Table>
@@ -1000,15 +1065,15 @@ const RequestHistory = () => {
 
             <Dialog open={open} onClose={handleClose} fullWidth maxWidth="lg" scroll={'paper'}>
                 <DialogTitle variant="h4">Create Design Request</DialogTitle>
-                <Divider variant="middle" sx={{ borderTop: '1px solid black' }} />
+                <Divider variant="middle" sx={{borderTop: '1px solid black'}}/>
                 <DialogContent>
                     {step === 0 && (
                         <>
-                            <Typography variant="h5" sx={{ marginBottom: '1vh' }}>
+                            <Typography variant="h5" sx={{marginBottom: '1vh'}}>
                                 Choose uniform type you want to design
                                 <Typography color="error">Select at least 1 type *</Typography>
                             </Typography>
-                            <RenderRadioSelection />
+                            <RenderRadioSelection/>
                         </>
                     )}
                     {step === 1 && designTypes.regular && (

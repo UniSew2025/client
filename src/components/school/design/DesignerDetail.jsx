@@ -19,7 +19,7 @@ import {
 import KeyboardArrowLeft from "@mui/icons-material/KeyboardArrowLeft";
 import KeyboardArrowRight from "@mui/icons-material/KeyboardArrowRight";
 import {getALlPackageByDesignerId} from "../../../services/ProfileService.jsx";
-import PickPackagePopup from "../PickPackagePopup.jsx";
+import PickPackagePopup from "./PickPackagePopup.jsx";
 
 function GallerySection({ images = [] }) {
     const theme = useTheme();
