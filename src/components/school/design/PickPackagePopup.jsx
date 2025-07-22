@@ -14,7 +14,7 @@ import {
     Typography,
     List, FormControl, InputLabel, MenuItem, Select,
 } from "@mui/material";
-import {viewListHistory} from "../../services/DesignService.jsx";
+import {viewListHistory} from "../../../services/DesignService.jsx";
 
 
 export function ListRequest() {

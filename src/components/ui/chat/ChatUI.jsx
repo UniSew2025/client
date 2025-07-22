@@ -2,6 +2,7 @@ import {useEffect, useState} from 'react';
 import {
     Box,
     Button,
+    CircularProgress,
     Dialog,
     DialogContent,
     DialogTitle,
@@ -9,7 +10,6 @@ import {
     List,
     ListItem,
     Paper,
-    Stack,
     Tab,
     Table,
     TableBody,
@@ -19,17 +19,17 @@ import {
     TableRow,
     Tabs,
     TextField,
-    Typography,
-    CircularProgress,
-    Tooltip
+    Tooltip,
+    Typography
 } from '@mui/material';
-import {useLocation, useNavigate} from "react-router-dom";
+import {useLocation} from "react-router-dom";
 import {
     getAllComments,
     getAllDelivery,
     getClothByRequestId,
     sendComment,
-    submitDelivery, submitRevision
+    submitDelivery,
+    submitRevision
 } from "../../../services/DesignService.jsx";
 import {getPackageInfo} from "../../../services/ProfileService.jsx";
 import UploadZip from "../../designer/UploadZip.jsx";
@@ -377,15 +377,14 @@ const DeliveryTab = ({requestId, userRole, request}) => {
             setFileUrl("");
             setResetUploadKey(k => k + 1);
 
-            enqueueSnackbar(submit.message, { variant: "success" });
+            enqueueSnackbar(submit.message, {variant: "success"});
         } catch (err) {
-            enqueueSnackbar("Error submitting delivery", { variant: "error" });
+            enqueueSnackbar("Error submitting delivery", {variant: "error"});
             console.log("error", err);
         } finally {
             setIsSubmitting(false);
         }
     };
-
 
 
     const revisionDelivery = deliveries.filter((item) => item.isRevision)
@@ -403,7 +402,8 @@ const DeliveryTab = ({requestId, userRole, request}) => {
                     fullWidth
                     sx={{mb: 2}}
                 />
-                <UploadZip key={resetUploadKey} onUploadSuccess={url => setFileUrl(url)} accessToken={googleAccessToken} />
+                <UploadZip key={resetUploadKey} onUploadSuccess={url => setFileUrl(url)}
+                           accessToken={googleAccessToken}/>
                 {fileUrl && (
                     <Typography mt={1} color="green">
                         File uploaded! <a href={fileUrl} target="_blank" rel="noopener noreferrer">View File</a>
@@ -424,18 +424,17 @@ const DeliveryTab = ({requestId, userRole, request}) => {
                 </Box>
             </Paper>
         );
-    }
-    else if(userRole === "designer" && revisionDelivery.length === request.revisionTime){
-       return(
-           <>
-               <Typography variant="h2">Out of submit</Typography>
-               <Paper sx={{p: 3}}>
-                   <Typography variant="h6" mb={2}>Delivery History</Typography>
-                   {loading ? <CircularProgress/> :
-                       <DeliveryList deliveries={deliveries} userRole={userRole} request={request}/>}
-               </Paper>
-           </>
-       );
+    } else if (userRole === "designer" && revisionDelivery.length === request.revisionTime) {
+        return (
+            <>
+                <Typography variant="h2">Out of submit</Typography>
+                <Paper sx={{p: 3}}>
+                    <Typography variant="h6" mb={2}>Delivery History</Typography>
+                    {loading ? <CircularProgress/> :
+                        <DeliveryList deliveries={deliveries} userRole={userRole} request={request}/>}
+                </Paper>
+            </>
+        );
     }
 
     return (
@@ -556,59 +555,41 @@ function DeliveryList({deliveries, userRole, request}) {
 export default function ChatUI({packageId, requestId, request}) {
     const [tab, setTab] = useState(0);
     const userRole = JSON.parse(localStorage.getItem('user')).role;
-    const navigate = useNavigate();
-
-    function handleViewDesignList() {
-
-        navigate("/school/designer/list")
-    }
-
-    if (userRole === 'school') {
-        if (!packageId || packageId === 0) {
-            return (
-                <Box mt={4} textAlign="center">
-                    <Typography color="gray" mb={2}>
-                        This request has not been assigned yet.
-                    </Typography>
-                    <Stack direction="column" spacing={2} alignItems="center">
-                        <Button variant="contained" color="primary" onClick={handleViewDesignList}>
-                            Find the designer for this request
-                        </Button>
-                    </Stack>
-                </Box>
-            );
-        }
-    }
-
 
     return (
         <Paper elevation={2} sx={{width: "100%", maxWidth: "80vw", mx: "auto", mt: 3}}>
             <h1>Request : {requestId}</h1>
             <Tabs value={tab} onChange={(_, v) => setTab(v)} variant="fullWidth">
-                <Tab label="Activity"/>
-                <Tab label="Package & Payment"/>
+                {request.status !== "created" && <Tab label="Activity"/>}
+                {request.status !== "created" && <Tab label="Package & Payment"/>}
                 <Tab label="Requirements"/>
-                <Tab label="Delivery"/>
+                {request.status !== "created" && <Tab label="Delivery"/>}
             </Tabs>
             <Divider/>
-            <TabPanel value={tab} index={0}>
-                <ActivityTab
-                    requestId={requestId}
-                    userRole={userRole}
-                    onSend={(comment) => {
-                        console.log("New comment:", comment);
-                    }}
-                />
-            </TabPanel>
-            <TabPanel value={tab} index={1}>
-                <DetailsTab packageId={packageId} userRole={userRole}/>
-            </TabPanel>
-            <TabPanel value={tab} index={2}>
+            {request.status !== "created" &&
+                <TabPanel value={tab} index={0}>
+                    <ActivityTab
+                        requestId={requestId}
+                        userRole={userRole}
+                        onSend={(comment) => {
+                            console.log("New comment:", comment);
+                        }}
+                    />
+                </TabPanel>
+            }
+            {request.status !== "created" &&
+                <TabPanel value={tab} index={1}>
+                    <DetailsTab packageId={packageId} userRole={userRole}/>
+                </TabPanel>
+            }
+            <TabPanel value={tab} index={request.status !== "created" ? 2 : 0}>
                 <RequirementsTab/>
             </TabPanel>
-            <TabPanel value={tab} index={3}>
-                <DeliveryTab requestId={requestId} userRole={userRole} request={request}/>
-            </TabPanel>
+            {request.status !== "created" &&
+                <TabPanel value={tab} index={3}>
+                    <DeliveryTab requestId={requestId} userRole={userRole} request={request}/>
+                </TabPanel>
+            }
         </Paper>
     );
 }

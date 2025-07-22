@@ -364,7 +364,7 @@ function RenderFirstStep({selectedDesign, hasRegular, hasPE}) {
                 <Button
                     variant={'contained'}
                     color={'secondary'}
-                    onClick={() => navigate('/school/design')}
+                    onClick={() => navigate('/school/d/design')}
                     size={"small"}
                     sx={{height: '4vh', width: '10vw', fontSize: '0.7rem', marginTop: '5vh', marginBottom: '2vh'}}
                 >
