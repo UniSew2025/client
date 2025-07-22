@@ -309,6 +309,7 @@ function RenderRightArea(){
 }
 
 export default function SchoolProfile() {
+    document.title = "Profile"
     const [showEdit, setShowEdit] = useState(false);
     const [userData, setUserData] = useState(user);
 

@@ -1,4 +1,4 @@
-import DashboardWebUILayout from "../ui/DashboardWebUILayout.jsx";
+import SchoolDashboardUILayout from "./SchoolDashboardUILayout.jsx";
 
 const navigation = [
     {
@@ -35,15 +35,15 @@ const navigation = [
     }
 ]
 
-function RenderPage({children}){
+function RenderPage(){
     return (
-        <DashboardWebUILayout navigation={navigation} children={children}/>
+        <SchoolDashboardUILayout navigation={navigation}/>
     )
 }
 
-export default function SchoolLayout({children}){
+export default function SchoolLayout(){
     window.scrollTo(0, 0);
     return (
-        <RenderPage children={children}/>
+        <RenderPage/>
     )
 }

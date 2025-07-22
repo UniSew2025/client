@@ -88,8 +88,8 @@ function RenderPage({orders}) {
                                 <TableCell align={'center'} sx={{fontWeight: 'bold'}}>Order Date</TableCell>
                                 <TableCell align={'center'} sx={{fontWeight: 'bold'}}>Receive Date</TableCell>
                                 <TableCell align={'center'} sx={{fontWeight: 'bold'}}>Status</TableCell>
-                                <TableCell align={'center'} sx={{fontWeight: 'bold'}}>Detail</TableCell>
                                 <TableCell align={'center'} sx={{fontWeight: 'bold'}}>Action</TableCell>
+                                <TableCell align={'center'} sx={{fontWeight: 'bold'}}>Detail</TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
@@ -109,19 +109,19 @@ function RenderPage({orders}) {
                                             {order.status.substring(0, 1).toUpperCase() + order.status.substring(1).toLowerCase()}
                                         </TableCell>
                                         <TableCell align={'center'}>
-                                            <IconButton>
-                                                <RenderTooltip title={'View order detail'}>
-                                                    <Info color={'primary'}/>
+                                            <IconButton onClick={() => {
+                                                localStorage.setItem("sOrder", order.id)
+                                                window.location.href = "/garment/list"
+                                            }}>
+                                                <RenderTooltip title={'Find your garment factory'}>
+                                                    <Search color={'secondary'}/>
                                                 </RenderTooltip>
                                             </IconButton>
                                         </TableCell>
                                         <TableCell align={'center'}>
-                                            <IconButton onClick={() => {
-                                                localStorage.setItem("sOrder", order.id)
-                                                window.location.href = "/school/garment/list"
-                                            }}>
-                                                <RenderTooltip title={'Find your garment factory'}>
-                                                    <Search color={'secondary'}/>
+                                            <IconButton>
+                                                <RenderTooltip title={'View order detail'}>
+                                                    <Info color={'primary'}/>
                                                 </RenderTooltip>
                                             </IconButton>
                                         </TableCell>

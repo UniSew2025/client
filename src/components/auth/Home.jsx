@@ -1,17 +1,19 @@
 import '../../styles/auth/Home.css';
-import { Container, Row, Col, Button, Carousel, Card } from 'react-bootstrap';
-import heroBg from '../../assets/sewing.jpg'
+import {Button, Card, Carousel, Col, Container, Row} from 'react-bootstrap';
 import {enqueueSnackbar} from "notistack";
 
 function HeroSection() {
     return (
-        <section className="uni-hero d-flex align-items-center" style={{ backgroundImage: `url(${heroBg})` }}>
+        <section className="uni-hero d-flex align-items-center">
+            <video autoPlay loop muted className="background-video">
+                <source src={"/unisew.mp4"} type="video/mp4"/>
+            </video>
             <Container>
                 <Row>
                     <Col md={7} className="hero-content">
                         <h1 className="display-4 fw-bold text-white mb-4">Find the right service, right away</h1>
                         <form className="d-flex mb-3">
-                            <input className="form-control rounded-start-pill" placeholder="Search for any service" />
+                            <input className="form-control rounded-start-pill" placeholder="Search for any service"/>
                             <Button variant="primary" className="rounded-end-pill px-4 fw-bold">Search</Button>
                         </form>
                         <div className="text-white small">
@@ -49,7 +51,7 @@ function PopularServicesSection() {
         { img: '/designer.jpg', label: 'Chisa', desc: 'Uni Pro' },
     ];
     return (
-        <section className="popular-services py-5">
+        <section className="popular-services py-5" style={{backgroundColor:'rgb(96% 96% 98%)'}}>
             <Container>
                 <h2 className="section-title mb-4">Popular designer</h2>
                 <Carousel indicators={false} interval={3500}>
@@ -116,7 +118,7 @@ function FeaturedCategoriesSection() {
         { img: '/Valentino.png', title: 'Valentino' },
     ];
     return (
-        <section className="featured-categories py-5">
+        <section className="featured-categories py-5" style={{backgroundColor:'rgb(96% 96% 98%)'}}>
             <Container>
                 <h2 className="section-title mb-4">Explore UniSew Garment Factory</h2>
                 <Row>
@@ -385,5 +387,6 @@ function RenderPage() {
 }
 
 export default function Home() {
+    document.title = "Home"
     return <RenderPage />;
 }
