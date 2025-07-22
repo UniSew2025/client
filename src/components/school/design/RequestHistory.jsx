@@ -837,7 +837,7 @@ const RequestHistory = () => {
 
     const handleViewDetail = (item) => {
         console.log("item", item);
-        navigate('/school/detail', { state: { requestId: item.id, requestStatus: item.status, packageId: item.package, request: item} });
+        navigate('/school/d/detail', { state: { requestId: item.id, requestStatus: item.status, packageId: item.package, request: item} });
     };
 
     function RenderRadioSelection() {

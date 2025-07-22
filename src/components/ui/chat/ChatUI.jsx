@@ -388,10 +388,12 @@ const DeliveryTab = ({requestId, userRole, request}) => {
 
 
 
-    if (userRole === "designer" && deliveries.length !== request.revisionTime) {
+    const revisionDelivery = deliveries.filter((item) => item.isRevision)
+    if (userRole === "designer" && revisionDelivery.length !== request.revisionTime) {
         return (
             <Paper sx={{p: 3}}>
                 <Typography variant="h6" mb={2}>Submit Delivery</Typography>
+
                 <TextField
                     label="Note"
                     multiline
@@ -423,7 +425,7 @@ const DeliveryTab = ({requestId, userRole, request}) => {
             </Paper>
         );
     }
-    else if(userRole === "designer" && deliveries.length === request.revisionTime){
+    else if(userRole === "designer" && revisionDelivery.length === request.revisionTime){
        return(
            <>
                <Typography variant="h2">Out of submit</Typography>
@@ -453,6 +455,8 @@ function DeliveryList({deliveries, userRole, request}) {
     const user = JSON.parse(localStorage.getItem("user")) || {};
 
     const isDisabled = deliveries.length === request.revisionTime;
+
+    console.log("deliver", deliveries)
 
     function handleRequestRevision(delivery) {
         setSelectedDelivery(delivery);
@@ -556,7 +560,7 @@ export default function ChatUI({packageId, requestId, request}) {
 
     function handleViewDesignList() {
 
-        navigate("/designer/list")
+        navigate("/school/designer/list")
     }
 
     if (userRole === 'school') {
