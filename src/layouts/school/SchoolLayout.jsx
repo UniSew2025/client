@@ -8,7 +8,7 @@ const navigation = [
     {
         type: "sub",
         label: "Design History",
-        segment: "/school/design",
+        segment: "/school/d/design",
     },
     {
         type: "caption",
@@ -17,7 +17,12 @@ const navigation = [
     {
         type: "sub",
         label: "Order History",
-        segment: "/school/order"
+        segment: "/school/d/order"
+    },
+    {
+        type: "sub",
+        label: "Quotation",
+        segment: "/school/d/quotation"
     },
     {
         type: "caption",
@@ -26,19 +31,19 @@ const navigation = [
     {
         type: "sub",
         label: "Feedback history",
-        segment: "/school/feedback"
+        segment: "/school/d/feedback"
     }
 ]
 
-function RenderPage(){
+function RenderPage({children}){
     return (
-        <DashboardWebUILayout navigation={navigation}/>
+        <DashboardWebUILayout navigation={navigation} children={children}/>
     )
 }
 
-export default function SchoolLayout(){
+export default function SchoolLayout({children}){
     window.scrollTo(0, 0);
     return (
-        <RenderPage/>
+        <RenderPage children={children}/>
     )
 }

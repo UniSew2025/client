@@ -8,12 +8,14 @@ import {
     Card,
     CardActionArea,
     CardContent,
-    CardMedia, Chip,
+    CardMedia,
+    Chip,
     Dialog,
     DialogActions,
     DialogContent,
     DialogTitle,
-    Divider, Fade,
+    Divider,
+    Fade,
     MenuItem,
     Paper,
     Step,
@@ -26,21 +28,22 @@ import {
     TableHead,
     TablePagination,
     TableRow,
-    TextField, Tooltip, tooltipClasses,
+    TextField,
+    Tooltip,
+    tooltipClasses,
     Typography
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import {createDesignRequest, getSampleImages, viewListHistory} from "../../services/DesignService.jsx";
+import {createDesignRequest, getSampleImages, viewListHistory} from "../../../services/DesignService.jsx";
 import {Add, AddCircleOutline, Info, RemoveCircleOutline} from '@mui/icons-material';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
 import CircularProgress from '@mui/material/CircularProgress';
 import {useNavigate} from "react-router-dom";
-import '../../styles/school/RequestHistory.css'
+import '../../../styles/school/RequestHistory.css'
 import {enqueueSnackbar} from "notistack";
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CancelIcon from '@mui/icons-material/Cancel';
-
 
 
 const ClothItem = ({
@@ -910,12 +913,8 @@ const RequestHistory = () => {
     }
 
     function HandleCreateOrder(request) {
-        if (request.status === "completed") {
-            localStorage.setItem("sRequest", request.id)
-            navigate('/school/order')
-        } else {
-            console.error("!!! UniSew warning !!!: Do not use F12 to unlock the button")
-        }
+        localStorage.setItem("sRequest", request.id)
+        navigate('/school/d/order/form')
     }
 
     return (

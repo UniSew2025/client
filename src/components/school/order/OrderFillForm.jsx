@@ -1,45 +1,32 @@
-import '../../styles/school/SchoolOrder.css'
+import {useNavigate} from "react-router-dom";
+import {useEffect, useState} from "react";
 import {
     Box,
     Button,
     Checkbox,
-    Dialog,
-    DialogActions,
-    DialogContent,
-    DialogTitle,
     Divider,
     Fade,
     FormControlLabel,
     IconButton,
     Paper,
-    Slide,
     Step,
     StepLabel,
     Stepper,
     Tab,
-    Table,
-    TableBody,
-    TableCell,
-    TableContainer,
-    TableHead,
-    TablePagination,
-    TableRow,
     Tabs,
     TextField,
     Tooltip,
     tooltipClasses,
     Typography
 } from "@mui/material";
-import {ColorPicker} from 'antd'
-import {Add, Cancel, CheckCircle, Info, RestartAlt} from "@mui/icons-material";
-import {forwardRef, useEffect, useState} from "react";
-import {getCompleteDesignRequest} from "../../services/DesignService.jsx";
-import {useNavigate} from "react-router-dom";
 import ModalImage from "react-modal-image";
-import {DateField, DatePicker} from "@mui/x-date-pickers";
+import {ColorPicker} from "antd";
+import {Cancel, CheckCircle, RestartAlt} from "@mui/icons-material";
 import dayjs from "dayjs";
-import {createOrder, viewOrders} from "../../services/OrderService.jsx";
+import {DateField, DatePicker} from "@mui/x-date-pickers";
+import {getCompleteDesignRequest} from "../../../services/DesignService.jsx";
 import {enqueueSnackbar} from "notistack";
+import {createOrder} from "../../../services/OrderService.jsx";
 
 function SumSizeQty(size) {
     return size.S + size.M + size.L + size.XL + size.XXL + size.XXXL + size.XXXXL
@@ -78,9 +65,9 @@ function RenderStepper({step}) {
     ]
 
     return (
-        <Stepper activeStep={step} alternativeLabel sx={{width: '100%'}}>
-            {steps.map((label) => (
-                <Step key={label}>
+        <Stepper activeStep={step} alternativeLabel sx={{width: '100%', marginY: '5vh'}}>
+            {steps.map((label, index) => (
+                <Step key={index}>
                     <StepLabel>{label}</StepLabel>
                 </Step>
             ))}
@@ -346,7 +333,7 @@ function RenderSize({name, size, minH, maxH, minW, maxW, qty, SetQtyFunc, Update
     )
 }
 
-function RenderFirstStep({selectedRequest, hasRegular, hasPE}) {
+function RenderFirstStep({selectedDesign, hasRegular, hasPE}) {
     const vietnamLocale = 'vi-VN';
     const shortDate = {
         year: 'numeric',
@@ -391,7 +378,7 @@ function RenderFirstStep({selectedRequest, hasRegular, hasPE}) {
                 label={'ID'}
                 fullWidth
                 sx={{marginBottom: '3vh'}}
-                defaultValue={selectedRequest.id}
+                defaultValue={selectedDesign.id}
             />
 
             <TextField
@@ -401,7 +388,7 @@ function RenderFirstStep({selectedRequest, hasRegular, hasPE}) {
                 label={'Creation Date'}
                 fullWidth
                 sx={{marginBottom: '3vh'}}
-                defaultValue={new Intl.DateTimeFormat(vietnamLocale, shortDate).format(new Date(selectedRequest.creationDate))}
+                defaultValue={new Intl.DateTimeFormat(vietnamLocale, shortDate).format(new Date(selectedDesign.creationDate))}
             />
 
             <TextField
@@ -411,7 +398,7 @@ function RenderFirstStep({selectedRequest, hasRegular, hasPE}) {
                 label={'Status'}
                 fullWidth
                 sx={{marginBottom: '3vh'}}
-                defaultValue={selectedRequest.status.substring(0, 1).toUpperCase() + selectedRequest.status.substring(1).toLowerCase()}
+                defaultValue={selectedDesign.status.substring(0, 1).toUpperCase() + selectedDesign.status.substring(1).toLowerCase()}
             />
             <div className={'d-flex flex-column justify-content-center'}>
                 <Typography sx={{marginRight: '1vw'}} fontSize={18}>Selected Uniform Type:</Typography>
@@ -434,7 +421,6 @@ function RenderSecondStep({cloths, hasRegular, hasPE, SetLockFunc}) {
 
     const designId = localStorage.getItem("sRequest") ? localStorage.getItem("sRequest") : null
 
-
     const [tab, setTab] = useState({
         main: '1',
         sub: '1'
@@ -446,6 +432,10 @@ function RenderSecondStep({cloths, hasRegular, hasPE, SetLockFunc}) {
         peBoy: null,
         peGirl: null
     })
+
+    if (!localStorage.getItem("size_" + designId)) {
+        localStorage.setItem("size_" + designId, JSON.stringify(size))
+    }
 
     //Get list for size
     //Regular
@@ -889,38 +879,138 @@ function RenderFinalStep({hasRegular, hasPE}) {
     )
 }
 
-function RenderCreateOrderModal({open, CloseFunc, requests}) {
-    const navigate = useNavigate()
+function CheckExistedUniform(design, type) {
+    return !!(design && design.cloth.find(item => item.clothCategory === type))
+}
 
-    const [currentStep, setCurrentStep] = useState(0)
-
-    const [selectedRequest, setSelectedRequest] = useState(requests.find(request => request.id.toLocaleString() === localStorage.getItem('sRequest')))
-
-    const transition = forwardRef(function Transition(props, ref) {
-        return <Slide direction="up" ref={ref} {...props} />;
-    });
-
-    const hasRegular = !!(selectedRequest && selectedRequest.cloth.find(item => item.clothCategory === 'regular'))
-
-    const hasPE = !!(selectedRequest && selectedRequest.cloth.find(item => item.clothCategory === 'pe'))
-
-    const sizeHasNullChecker = (size) => {
-        for (const key in size) {
-            if (Object.prototype.hasOwnProperty.call(size, key)) {
-                const value = size[key]
-                if (value === null) {
-                    return true
-                }
+function CheckIfSizeHasNull(size) {
+    for (const key in size) {
+        if (Object.prototype.hasOwnProperty.call(size, key)) {
+            const value = size[key]
+            if (value === null) {
+                return true
             }
         }
-        return false
     }
+    return false
+}
 
-    const currentSize = localStorage.getItem('sRequest') && localStorage.getItem('size_' + localStorage.getItem('sRequest')) ?
+function GetFilledSize() {
+    return localStorage.getItem('sRequest') && localStorage.getItem('size_' + localStorage.getItem('sRequest')) ?
         JSON.parse(localStorage.getItem('size_' + localStorage.getItem('sRequest'))) :
         null
+}
 
-    const defaultLock = currentSize === null || sizeHasNullChecker(currentSize)
+function BuildOrderCloth(hasRegular, hasPE, requestCloth, size) {
+    const cloths = []
+
+    const mapSize = (selectedSize) => {
+        return Object.entries(selectedSize)
+            .filter(([name, qty]) => name !== '' && typeof qty === 'number' && qty > 0)
+            .map(([name, qty]) => ({name: name, quantity: qty}));
+    }
+
+    if (hasRegular) {
+        const reBoyUpper = requestCloth.find(cloth => cloth.clothCategory === 'regular' && cloth.gender === 'boy' && cloth.clothType === 'shirt')
+        const reBoyLower = requestCloth.find(cloth => cloth.clothCategory === 'regular' && cloth.gender === 'boy' && cloth.clothType === 'pants')
+        const reGirlUpper = requestCloth.find(cloth => cloth.clothCategory === 'regular' && cloth.gender === 'girl' && cloth.clothType === 'shirt')
+        const reGirlLower = requestCloth.find(cloth => cloth.clothCategory === 'regular' && cloth.gender === 'girl' && (cloth.clothType === 'pants' || cloth.clothType === 'skirt'))
+
+        const boySize = mapSize(size.reBoy)
+        const girlSize = mapSize(size.reGirl)
+
+        const boyUpper = {
+            id: reBoyUpper.id,
+            type: reBoyUpper.clothType,
+            gender: reBoyUpper.gender,
+            sizeList: boySize
+        }
+
+        const boyLower = {
+            id: reBoyLower.id,
+            type: reBoyLower.clothType,
+            gender: reBoyLower.gender,
+            sizeList: boySize
+        }
+
+        const girlUpper = {
+            id: reGirlUpper.id,
+            type: reGirlUpper.clothType,
+            gender: reGirlUpper.gender,
+            sizeList: girlSize
+        }
+
+        const girlLower = {
+            id: reGirlLower.id,
+            type: reGirlLower.clothType,
+            gender: reGirlLower.gender,
+            sizeList: girlSize
+        }
+
+        cloths.push(boyUpper)
+        cloths.push(boyLower)
+        cloths.push(girlUpper)
+        cloths.push(girlLower)
+    }
+
+    if (hasPE) {
+        const peBoyUpper = requestCloth.find(cloth => cloth.clothCategory === 'pe' && cloth.gender === 'boy' && cloth.clothType === 'shirt')
+        const peBoyLower = requestCloth.find(cloth => cloth.clothCategory === 'pe' && cloth.gender === 'boy' && cloth.clothType === 'pants')
+        const peGirUpper = requestCloth.find(cloth => cloth.clothCategory === 'pe' && cloth.gender === 'girl' && cloth.clothType === 'shirt')
+        const peGirLower = requestCloth.find(cloth => cloth.clothCategory === 'pe' && cloth.gender === 'girl' && cloth.clothType === 'pants')
+
+        const boySize = mapSize(size.peBoy)
+        const girlSize = mapSize(size.peGirl)
+
+        const boyUpper = {
+            id: peBoyUpper.id,
+            type: peBoyUpper.clothType,
+            gender: peBoyUpper.gender,
+            sizeList: boySize
+        }
+
+        const boyLower = {
+            id: peBoyLower.id,
+            type: peBoyLower.clothType,
+            gender: peBoyLower.gender,
+            sizeList: boySize
+        }
+
+        const girlUpper = {
+            id: peGirUpper.id,
+            type: peGirUpper.clothType,
+            gender: peGirUpper.gender,
+            sizeList: girlSize
+        }
+
+        const girlLower = {
+            id: peGirLower.id,
+            type: peGirLower.clothType,
+            gender: peGirLower.gender,
+            sizeList: girlSize
+        }
+
+        cloths.push(boyUpper)
+        cloths.push(boyLower)
+        cloths.push(girlUpper)
+        cloths.push(girlLower)
+    }
+
+    return cloths
+}
+
+function RenderPage({selectedDesign}) {
+    const navigate = useNavigate()
+
+    const [currentStep, setCurrentStep] = useState(parseInt(localStorage.getItem("formStep")))
+
+    const hasRegular = CheckExistedUniform(selectedDesign, 'regular')
+
+    const hasPE = CheckExistedUniform(selectedDesign, 'pe')
+
+    const filledSize = GetFilledSize()
+
+    const defaultLock = filledSize === null || CheckIfSizeHasNull(filledSize)
 
     const [lock, setLock] = useState(defaultLock)
 
@@ -928,116 +1018,29 @@ function RenderCreateOrderModal({open, CloseFunc, requests}) {
         setLock(lockStatus)
     }
 
-    async function CreateOrder() {
+    async function CreateOrder(findGarment) {
 
-        if (localStorage.getItem('orderData_' + selectedRequest.id) && localStorage.getItem('sRequest')) {
+        if (localStorage.getItem('orderData_' + selectedDesign.id) && localStorage.getItem('sRequest')) {
             const schoolId = localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')).id : null
             const deadline = localStorage.getItem('orderData_' + localStorage.getItem('sRequest')) ? JSON.parse(localStorage.getItem('orderData_' + localStorage.getItem('sRequest'))).deadline : null
             const note = localStorage.getItem('orderData_' + localStorage.getItem('sRequest')) ? JSON.parse(localStorage.getItem('orderData_' + localStorage.getItem('sRequest'))).note : null
-            const requestCloth = selectedRequest.cloth
-            const cloths = []
-            const size = JSON.parse(localStorage.getItem('size_' + selectedRequest.id))
-
-            const mapSize = (selectedSize) => {
-                return Object.entries(selectedSize)
-                    .filter(([name, qty]) => name !== '' && typeof qty === 'number' && qty > 0)
-                    .map(([name, qty]) => ({name: name, quantity: qty}));
-            }
-
-            if (hasRegular) {
-                const reBoyUpper = requestCloth.find(cloth => cloth.clothCategory === 'regular' && cloth.gender === 'boy' && cloth.clothType === 'shirt')
-                const reBoyLower = requestCloth.find(cloth => cloth.clothCategory === 'regular' && cloth.gender === 'boy' && cloth.clothType === 'pants')
-                const reGirlUpper = requestCloth.find(cloth => cloth.clothCategory === 'regular' && cloth.gender === 'girl' && cloth.clothType === 'shirt')
-                const reGirlLower = requestCloth.find(cloth => cloth.clothCategory === 'regular' && cloth.gender === 'girl' && (cloth.clothType === 'pants' || cloth.clothType === 'skirt'))
-
-                const boySize = mapSize(size.reBoy)
-                const girlSize = mapSize(size.reGirl)
-
-                const boyUpper = {
-                    id: reBoyUpper.id,
-                    type: reBoyUpper.clothType,
-                    gender: reBoyUpper.gender,
-                    sizeList: boySize
-                }
-
-                const boyLower = {
-                    id: reBoyLower.id,
-                    type: reBoyLower.clothType,
-                    gender: reBoyLower.gender,
-                    sizeList: boySize
-                }
-
-                const girlUpper = {
-                    id: reGirlUpper.id,
-                    type: reGirlUpper.clothType,
-                    gender: reGirlUpper.gender,
-                    sizeList: girlSize
-                }
-
-                const girlLower = {
-                    id: reGirlLower.id,
-                    type: reGirlLower.clothType,
-                    gender: reGirlLower.gender,
-                    sizeList: girlSize
-                }
-
-                cloths.push(boyUpper)
-                cloths.push(boyLower)
-                cloths.push(girlUpper)
-                cloths.push(girlLower)
-            }
-
-            if (hasPE) {
-                const peBoyUpper = requestCloth.find(cloth => cloth.clothCategory === 'pe' && cloth.gender === 'boy' && cloth.clothType === 'shirt')
-                const peBoyLower = requestCloth.find(cloth => cloth.clothCategory === 'pe' && cloth.gender === 'boy' && cloth.clothType === 'pants')
-                const peGirUpper = requestCloth.find(cloth => cloth.clothCategory === 'pe' && cloth.gender === 'girl' && cloth.clothType === 'shirt')
-                const peGirLower = requestCloth.find(cloth => cloth.clothCategory === 'pe' && cloth.gender === 'girl' && cloth.clothType === 'pants')
-
-                const boySize = mapSize(size.peBoy)
-                const girlSize = mapSize(size.peGirl)
-
-                const boyUpper = {
-                    id: peBoyUpper.id,
-                    type: peBoyUpper.clothType,
-                    gender: peBoyUpper.gender,
-                    sizeList: boySize
-                }
-
-                const boyLower = {
-                    id: peBoyLower.id,
-                    type: peBoyLower.clothType,
-                    gender: peBoyLower.gender,
-                    sizeList: boySize
-                }
-
-                const girlUpper = {
-                    id: peGirUpper.id,
-                    type: peGirUpper.clothType,
-                    gender: peGirUpper.gender,
-                    sizeList: girlSize
-                }
-
-                const girlLower = {
-                    id: peGirLower.id,
-                    type: peGirLower.clothType,
-                    gender: peGirLower.gender,
-                    sizeList: girlSize
-                }
-
-                cloths.push(boyUpper)
-                cloths.push(boyLower)
-                cloths.push(girlUpper)
-                cloths.push(girlLower)
-            }
+            const requestCloth = selectedDesign.cloth
+            const size = JSON.parse(localStorage.getItem('size_' + selectedDesign.id))
+            const cloths = BuildOrderCloth(hasRegular, hasPE, requestCloth, size)
 
             await createOrder(schoolId, cloths, deadline, note).then(res => {
                 if (res && res.status === 201) {
                     enqueueSnackbar(res.data.message, {variant: 'success'})
-                    localStorage.removeItem('orderData_' + selectedRequest.id)
-                    localStorage.removeItem('size_' + selectedRequest.id)
+                    localStorage.removeItem('orderData_' + selectedDesign.id)
+                    localStorage.removeItem('size_' + selectedDesign.id)
                     localStorage.removeItem('sRequest')
-                    setSelectedRequest(null)
-                    CloseFunc()
+                    localStorage.removeItem('formStep')
+                    if (findGarment) {
+                        localStorage.setItem("sOrder", res.data.data.orderId)
+                        window.location.href = "/school/garment/list"
+                    } else {
+                        window.location.href = "/school/d/order"
+                    }
                 }
             }).catch(e => {
                 enqueueSnackbar(e.response.data.message, {variant: 'error'})
@@ -1047,67 +1050,77 @@ function RenderCreateOrderModal({open, CloseFunc, requests}) {
     }
 
     return (
-        <Dialog
-            maxWidth={'lg'}
-            fullWidth
-            open={open}
-            onClose={CloseFunc}
-            scroll={'paper'}
-            slots={{
-                transition: transition,
-            }}
-            sx={{
-                maxHeight: '95vh'
-            }}
-            keepMounted
-        >
-            <DialogTitle sx={{padding: 0, height: '10vh', display: 'flex', alignItems: 'center'}}>
-                <Typography
-                    variant={'body2'}
-                    fontSize={30}
-                    fontWeight={'bold'}
-                    sx={{
-                        marginY: 0,
-                        padding: 0,
-                        width: '100%',
-                        ml: 2,
-                        flex: 1
-                    }}
-                    component="div"
-                >
-                    Create Order
-                </Typography>
-            </DialogTitle>
-            <Divider sx={{borderTop: '1px solid black'}}/>
-            <DialogContent>
-                <>
+        <div className={'d-flex flex-column align-items-center'}>
+            <Paper square elevation={0} sx={{width: '78vw', marginTop: '2vh'}}>
+                {/* Header */}
+                <Paper elevation={0} sx={{padding: 0, height: '10vh', display: 'flex', alignItems: 'center'}}>
+                    <Typography variant={'h4'}>Create Order</Typography>
+                </Paper>
+
+                {/* Content */}
+                <Paper elevation={0} sx={{width: '100%', marginX: 'auto'}}>
                     {
-                        !selectedRequest ?
-                            <div className={'d-flex flex-column align-items-center'}>
-                                <Typography variant={'body1'} fontSize={20} color={'error'} sx={{marginBottom: '2vh'}}>No
-                                    selected design request, click the button
-                                    to select one</Typography>
-                                <Button variant={"contained"} color={"info"} onClick={() => {
-                                    CloseFunc()
-                                    navigate('/school/design')
-                                }}>Select
-                                    your design request</Button>
-                            </div>
+                        !selectedDesign ?
+                            (
+                                <Paper elevation={6}>
+                                    <Paper elevation={0}
+                                           sx={{
+                                               display: 'flex',
+                                               flexDirection: 'column',
+                                               alignItems: 'center'
+                                           }}
+                                    >
+                                        <Typography variant={'body1'}
+                                                    fontSize={20}
+                                                    color={'error'}
+                                                    sx={{
+                                                        marginBottom: '2vh',
+                                                        marginTop: '10vh'
+                                                    }}
+                                        >
+                                            No selected design request, click the button to select one
+                                        </Typography>
+                                        <Button variant={"contained"}
+                                                color={"info"}
+                                                onClick={() => {
+                                                    navigate('/school/d/design')
+                                                }}
+                                        >
+                                            Select your design request
+                                        </Button>
+                                        <Divider variant={"middle"} sx={{width: '30%', opacity: 1, marginY: '2vh'}}
+                                                 textAlign={"center"}>Or</Divider>
+                                        <Button variant={"contained"}
+                                                color={"error"}
+                                                sx={{
+                                                    marginBottom: '10vh'
+                                                }}
+                                                onClick={() => {
+                                                    navigate('/school/d/order')
+                                                }}
+                                        >
+                                            Go back to your order history
+                                        </Button>
+                                    </Paper>
+                                </Paper>
+                            )
                             :
-                            <div>
+                            (
                                 <div className={'d-flex flex-column align-items-start'}>
-                                    <RenderStepper step={currentStep}/>
+                                    <Paper elevation={4} sx={{width: '100%'}}>
+                                        <RenderStepper step={currentStep}/>
+                                    </Paper>
                                     {
                                         currentStep === 0 &&
                                         <RenderFirstStep
-                                            selectedRequest={selectedRequest}
+                                            selectedDesign={selectedDesign}
                                             hasPE={hasPE}
                                             hasRegular={hasRegular}/>
                                     }
                                     {
                                         currentStep === 1 &&
                                         <RenderSecondStep
-                                            cloths={selectedRequest.cloth}
+                                            cloths={selectedDesign.cloth}
                                             hasPE={hasPE}
                                             hasRegular={hasRegular}
                                             SetLockFunc={HandleSetLock}
@@ -1115,147 +1128,77 @@ function RenderCreateOrderModal({open, CloseFunc, requests}) {
                                     }
                                     {
                                         currentStep === 2 &&
-                                        <RenderFinalStep selectedRequest={selectedRequest} hasPE={hasPE}
-                                                         hasRegular={hasRegular}/>
+                                        <RenderFinalStep
+                                            selectedDesign={selectedDesign}
+                                            hasPE={hasPE}
+                                            hasRegular={hasRegular}
+                                        />
                                     }
+                                    <Paper elevation={0} sx={{
+                                        width: '100%',
+                                        display: 'flex',
+                                        justifyContent: 'flex-end',
+                                        marginTop: '3vh',
+                                        gap: '1vw'
+                                    }}>
+                                        {
+                                            currentStep > 0 &&
+                                            <RenderTooltip title={'Back to step ' + (currentStep)}>
+                                                <Button variant={'outlined'}
+                                                        color={'error'}
+                                                        onClick={() => setCurrentStep(currentStep - 1)}
+                                                >
+                                                    Back
+                                                </Button>
+                                            </RenderTooltip>
+                                        }
+                                        {
+                                            currentStep < 2 &&
+                                            <RenderTooltip
+                                                title={'Move to step ' + (currentStep + 2)}>
+                                                <Button variant={'contained'} color={'primary'}
+                                                        onClick={() => setCurrentStep(currentStep + 1)}
+                                                        disabled={currentStep === 1 && lock}
+                                                >
+                                                    Next
+                                                </Button>
+                                            </RenderTooltip>
+                                        }
+                                        {
+                                            currentStep === 2 &&
+                                            <>
+                                                <RenderTooltip title={''}>
+                                                    <Button variant={'contained'}
+                                                            color={'success'}
+                                                            onClick={() => CreateOrder(false)}
+                                                    >
+                                                        Create Only
+                                                    </Button>
+                                                </RenderTooltip>
+                                                <RenderTooltip title={''}>
+                                                    <Button variant={'contained'}
+                                                            color={'secondary'}
+                                                            onClick={() => CreateOrder(true)}
+                                                    >
+                                                        Create and select your garment
+                                                    </Button>
+                                                </RenderTooltip>
+                                            </>
+                                        }
+                                    </Paper>
                                 </div>
-                            </div>
+                            )
                     }
-                </>
-            </DialogContent>
-            <DialogActions>
-                {currentStep === 0 && <Button variant={'outlined'} color={'error'} onClick={CloseFunc}>Close</Button>}
-                {
-                    currentStep > 0 &&
-                    <RenderTooltip title={'Back to step ' + (currentStep)}>
-                        <div>
-                            <Button variant={'outlined'} color={'error'}
-                                    onClick={() => setCurrentStep(currentStep - 1)}>Back</Button>
-                        </div>
-                    </RenderTooltip>
-                }
-                {
-                    currentStep < 2 &&
-                    <RenderTooltip
-                        title={!selectedRequest ? 'Select a design request first' : 'Move to step ' + (currentStep + 2)}>
-                        <div>
-                            <Button variant={'contained'} color={'primary'}
-                                    onClick={() => setCurrentStep(currentStep + 1)}
-                                    disabled={
-                                        !selectedRequest ||
-                                        (currentStep === 1 && lock)
-                                    }>
-                                Next
-                            </Button>
-                        </div>
-                    </RenderTooltip>
-                }
-                {
-                    currentStep === 2 &&
-                    <RenderTooltip title={''}>
-                        <div>
-                            <Button variant={'contained'} color={'success'}
-                                    onClick={CreateOrder}>Create</Button>
-                        </div>
-                    </RenderTooltip>
-                }
-            </DialogActions>
-        </Dialog>
-    )
-}
-
-function RenderPage({requests, getCompletedDesignRequests, getOrders, orders}) {
-    const [modal, setModal] = useState(false)
-    const [page, setPage] = useState(0);
-    const [rowsPerPage, setRowsPerPage] = useState(10);
-
-    const handleChangePage = (event, newPage) => {
-        setPage(newPage);
-    };
-
-    const handleChangeRowsPerPage = (event) => {
-        setRowsPerPage(event.target.value);
-        setPage(0);
-    };
-
-    function HandleClose() {
-        setModal(false)
-        getCompletedDesignRequests()
-        getOrders()
-    }
-
-    return (
-        <div className={'d-flex flex-column align-items-center'}>
-            <Paper square elevation={0} sx={{width: '78vw', marginTop: '2vh'}}>
-                <div className={'d-flex flex-row justify-content-between my-3'}>
-                    <Typography variant={"h4"}>Order History</Typography>
-                    <Button
-                        startIcon={<Add/>}
-                        variant={"contained"}
-                        sx={{
-                            borderRadius: '50px',
-                            height: '5vh'
-                        }}
-                        onClick={() => setModal(true)}
-                    >
-                        Create
-                    </Button>
-                </div>
+                </Paper>
             </Paper>
-
-            <Paper elevation={6} sx={{width: '78vw', marginTop: '2vh', overflow: 'hidden'}}>
-                <TableContainer sx={{ maxHeight: '50vh'}}>
-                    <Table stickyHeader>
-                        <TableHead>
-                            <TableRow>
-                                <TableCell align={'center'} sx={{fontWeight: 'bold'}}>No</TableCell>
-                                <TableCell align={'center'} sx={{fontWeight: 'bold'}}>Order Date</TableCell>
-                                <TableCell align={'center'} sx={{fontWeight: 'bold'}}>Receive Date</TableCell>
-                                <TableCell align={'center'} sx={{fontWeight: 'bold'}}>Status</TableCell>
-                                <TableCell align={'center'} sx={{fontWeight: 'bold'}}>Detail</TableCell>
-                            </TableRow>
-                        </TableHead>
-                        <TableBody>
-                            {
-                                orders.map((order, index) => (
-                                    <TableRow key={index}>
-                                        <TableCell align={'center'}>{index + 1}</TableCell>
-                                        <TableCell align={'center'}>{dayjs(order.orderDate).format('DD/MM/YYYY')}</TableCell>
-                                        <TableCell align={'center'}>{dayjs(order.deadline).format('DD/MM/YYYY')}</TableCell>
-                                        <TableCell align={'center'}>{order.status.substring(0,1).toUpperCase() + order.status.substring(1).toLowerCase()}</TableCell>
-                                        <TableCell align={'center'}><IconButton><Info color={'primary'}/></IconButton></TableCell>
-                                    </TableRow>
-                                ))
-                            }
-                        </TableBody>
-                    </Table>
-                </TableContainer>
-                <TablePagination
-                    rowsPerPageOptions={[10, 20, 30]}
-                    component="div"
-                    count={orders.length}
-                    rowsPerPage={rowsPerPage}
-                    page={page}
-                    onPageChange={handleChangePage}
-                    onRowsPerPageChange={handleChangeRowsPerPage}
-                />
-            </Paper>
-            {
-                modal &&
-                <RenderCreateOrderModal
-                    open={modal}
-                    CloseFunc={HandleClose}
-                    requests={requests}
-                />
-            }
         </div>
     )
 }
 
-export default function SchoolOrder() {
-    document.title = 'Order'
+export default function OrderFillForm() {
+    document.title = 'Create order'
+    window.scrollTo(0, 0)
     const [design, setDesign] = useState([])
-    const [orders, setOrders] = useState([])
 
     async function GetCompletedDesignRequests() {
         const response = await getCompleteDesignRequest()
@@ -1264,26 +1207,11 @@ export default function SchoolOrder() {
         }
     }
 
-    async function GetOrders(){
-        const response = await viewOrders()
-        if(response && response.status === 200){
-            setOrders(response.data.data)
-        }
-    }
-
     useEffect(() => {
         GetCompletedDesignRequests()
-        GetOrders()
-    }, []);
-
-    console.log("Orders: ", orders)
+    }, [])
 
     return (
-        <RenderPage
-            requests={design}
-            getCompletedDesignRequests={GetCompletedDesignRequests}
-            getOrders={GetOrders}
-            orders={orders}
-        />
+        <RenderPage selectedDesign={design.find(d => d.id.toLocaleString() === localStorage.getItem('sRequest'))}/>
     )
 }
