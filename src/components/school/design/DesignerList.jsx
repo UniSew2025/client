@@ -1,10 +1,10 @@
 import React, {useEffect, useState} from 'react';
-import { Box, Typography, Grid, Card, CardContent, CardMedia, Button, Avatar } from '@mui/material';
-import WebAppUILayout from "../../../layouts/ui/WebAppUILayout.jsx";
+import {Avatar, Box, Button, Card, CardContent, CardMedia, Grid, Typography} from '@mui/material';
 import {viewListDesigner} from "../../../services/ProfileService.jsx";
 import {useNavigate} from "react-router-dom";
 
 const DesignerList = () => {
+    document.title = "Designer list"
     const [designers, setDesigners] = useState([]);
     const navigate = useNavigate();
     const fetchDesigners = async () => {
@@ -19,7 +19,7 @@ const DesignerList = () => {
 
 
     const handleViewProfile = (designer) => {
-        navigate("/school/designer/detail", {
+        navigate("/designer/detail", {
             state: { designer }
         });
         localStorage.setItem("designer", JSON.stringify(designer));
@@ -29,7 +29,6 @@ const DesignerList = () => {
         fetchDesigners();
     }, []);
     return (
-        <WebAppUILayout title="Designers">
         <Box p={4}>
             <Typography variant="h4" gutterBottom fontWeight={700}>
                 DESIGNERS
@@ -79,7 +78,6 @@ const DesignerList = () => {
                 })}
             </Grid>
         </Box>
-        </WebAppUILayout>
     );
 };
 

@@ -9,7 +9,7 @@ import {
     Logout,
     Notifications
 } from '@mui/icons-material';
-import {useNavigate} from "react-router-dom";
+import {Outlet, useNavigate} from "react-router-dom";
 import {useEffect, useState} from "react";
 
 
@@ -270,8 +270,7 @@ function RenderFooter() {
     )
 }
 
-function RenderPage({children, title}) {
-    document.title = title;
+function RenderPage() {
     const [isAtTop, setIsAtTop] = useState(false);
 
     useEffect(() => {
@@ -299,7 +298,7 @@ function RenderPage({children, title}) {
         <div className={"home-main"}>
             <RenderHeader/>
             <div className={"home-body"}>
-                {children}
+                <Outlet/>
             </div>
             <RenderFooter/>
             <IconButton
@@ -333,11 +332,11 @@ function RenderPage({children, title}) {
     )
 }
 
-export default function WebAppUILayout({children, title}) {
+export default function WebAppUILayout() {
     if(localStorage.getItem('user') && JSON.parse(localStorage.getItem('user')).role !== 'school'){
         window.location.href = "/signin"
     }
     return (
-        <RenderPage children={children} title={title}/>
+        <RenderPage/>
     )
 }

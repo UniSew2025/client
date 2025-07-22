@@ -931,7 +931,7 @@ const RequestHistory = () => {
 
     function HandleViewDesignList(item) {
         localStorage.setItem("sDesign", JSON.stringify(item))
-        navigate("/school/designer/list")
+        navigate("/designer/list")
     }
 
     function HandleCreateOrder(request) {
@@ -970,16 +970,25 @@ const RequestHistory = () => {
                         <TableBody>
                             {paginatedData.map((item, index) => (
                                 <Fragment key={index}>
-                                    <TableRow>
+                                    <TableRow
+                                        onClick={() => setRowExpand(rowExpand === index ? -1 : index)}
+                                        sx={{
+                                            "&:hover": {
+                                                cursor: item.status === 'completed' || item.status === 'created' ? "pointer" : "default"
+                                            }
+                                        }}
+                                    >
                                         <TableCell align={"center"}>
                                             {item.status === 'completed' || item.status === 'created' ?
                                                 (
                                                     <IconButton
                                                         size="small"
-                                                        onClick={() => setRowExpand(rowExpand === index ? -1 : index)}
                                                     >
-                                                        {rowExpand === index ? <KeyboardArrowUp/> :
-                                                            <KeyboardArrowDown/>}
+                                                        {rowExpand === index ?
+                                                            <KeyboardArrowUp/>
+                                                            :
+                                                            <KeyboardArrowDown/>
+                                                        }
                                                     </IconButton>
                                                 )
                                                 :

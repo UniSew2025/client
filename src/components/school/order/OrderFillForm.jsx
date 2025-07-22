@@ -1037,7 +1037,7 @@ function RenderPage({selectedDesign}) {
                     localStorage.removeItem('formStep')
                     if (findGarment) {
                         localStorage.setItem("sOrder", res.data.data.orderId)
-                        window.location.href = "/school/garment/list"
+                        window.location.href = "/garment/list"
                     } else {
                         window.location.href = "/school/d/order"
                     }

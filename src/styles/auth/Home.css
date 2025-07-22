@@ -1,9 +1,25 @@
 .uni-hero {
-    min-height: 440px;
+    height: 100vh;
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
 }
+
+.background-video {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    margin-left: -26vw;
+    height: 110vh;
+    scale: 1.8;
+    z-index: -1;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+}
+
 .uni-hero .hero-content {
     padding-top: 80px;
 }
