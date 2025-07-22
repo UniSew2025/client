@@ -1,4 +1,5 @@
-export default function UniSewConsole(){
+export function UniSewConsole(){
+
     console.log(
         "%c   ██   ██  ██    ██  ██  ██████  ██████  ██    ██\n" +
         "   ██   ██  ████  ██  ██  ██      ██      ██    ██\n" +

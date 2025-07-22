@@ -10,7 +10,7 @@ import {
     Notifications
 } from '@mui/icons-material';
 import {useNavigate} from "react-router-dom";
-import {useState} from "react";
+import {useEffect, useState} from "react";
 
 
 function RenderFooterPolicyButton({link, title}) {
@@ -173,7 +173,7 @@ function RenderHeader() {
                     <Button
                         variant={"outlined"}
                         color={"primary"}
-                        onClick={() => navigate('/school/design')}
+                        onClick={() => navigate('/school/d/design')}
                     >
                         Create my design
                     </Button>
@@ -200,12 +200,12 @@ function RenderHeader() {
                                             icon: <AccountBox fontSize={"small"} color={"info"}/>
                                         },
                                         {
-                                            link: '/school/design',
+                                            link: '/school/d/design',
                                             title: 'My Designs',
                                             icon: <DesignServices fontSize={"small"} color={"primary"}/>
                                         },
                                         {
-                                            link: '/school/order',
+                                            link: '/school/d/order',
                                             title: 'My Orders',
                                             icon: <Inventory fontSize={"small"} color={"secondary"}/>
                                         },
@@ -272,6 +272,29 @@ function RenderFooter() {
 
 function RenderPage({children, title}) {
     document.title = title;
+    const [isAtTop, setIsAtTop] = useState(false);
+
+    useEffect(() => {
+        const checkScrollPosition = () => {
+            const currentScrollY = window.scrollY || window.pageYOffset;
+            const currentScrollX = window.scrollX || window.pageXOffset;
+
+            if (currentScrollY === 0 && currentScrollX === 0) {
+                setIsAtTop(true);
+            } else {
+                setIsAtTop(false);
+            }
+        };
+
+        checkScrollPosition();
+
+        window.addEventListener('scroll', checkScrollPosition);
+
+        return () => {
+            window.removeEventListener('scroll', checkScrollPosition);
+        };
+    }, []);
+
     return (
         <div className={"home-main"}>
             <RenderHeader/>
@@ -279,6 +302,33 @@ function RenderPage({children, title}) {
                 {children}
             </div>
             <RenderFooter/>
+            <IconButton
+                sx={{
+                    position: 'fixed',
+                    bottom: 20,
+                    right: 20,
+                    opacity: isAtTop ? 0 : 1,
+                    visibility: isAtTop ? 'hidden' : 'visible',
+                    pointerEvents: isAtTop ? 'none' : 'auto',
+
+                    transition: 'opacity 0.3s ease-in-out, visibility 0.3s ease-in-out',
+                    zIndex: 1000,
+
+                    '& .MuiSvgIcon-root': {
+                        fill: 'white',
+                        backgroundColor: 'gray',
+                        fontSize: '3.5rem',
+                        borderRadius: '50px',
+                        transition: 'background-color 0.3s ease',
+                        "&:hover": {
+                            backgroundColor: "rgb(0% 18% 42%)"
+                        }
+                    }
+                }}
+                onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+            >
+                <KeyboardArrowUp />
+            </IconButton>
         </div>
     )
 }

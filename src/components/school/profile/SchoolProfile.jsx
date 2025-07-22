@@ -25,14 +25,14 @@ import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import StarRateIcon from "@mui/icons-material/StarRate";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
-import '../../styles/school/SchoolProfile.css';
-import {dateFormatter} from "../../utils/DateFormatter.jsx";
+import '../../../styles/school/SchoolProfile.css';
+import {dateFormatter} from "../../../utils/DateFormatter.jsx";
 import {useNavigate} from "react-router-dom";
 import EditIcon from "@mui/icons-material/Edit";
 import {motion, AnimatePresence} from "framer-motion";
 import {useState} from "react";
 import {enqueueSnackbar} from "notistack";
-import {updateSchoolProfile} from "../../services/ProfileService.jsx";
+import {updateSchoolProfile} from "../../../services/ProfileService.jsx";
 
 
 const user = JSON.parse(localStorage.getItem('user'))

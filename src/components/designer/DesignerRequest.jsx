@@ -69,7 +69,8 @@ export default function DesignerRequest() {
             state: {
                 requestId: item.id,
                 requestStatus: item.status,
-                packageId: item.packageId
+                packageId: item.packageId,
+                request : item
             }
         });
     }
