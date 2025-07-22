@@ -19,6 +19,7 @@ import {
 import KeyboardArrowLeft from "@mui/icons-material/KeyboardArrowLeft";
 import KeyboardArrowRight from "@mui/icons-material/KeyboardArrowRight";
 import {getALlPackageByDesignerId} from "../../../services/ProfileService.jsx";
+import PickPackagePopup from "../PickPackagePopup.jsx";
 
 function GallerySection({ images = [] }) {
     const theme = useTheme();
@@ -145,14 +146,7 @@ function PackageTabs({ packages, onContinue }) {
                     : <Typography fontStyle="italic" color="text.secondary">No extra services</Typography>
                 }
             </Stack>
-            <Button
-                fullWidth
-                variant="contained"
-                sx={{ borderRadius: 2, fontWeight: "bold", py: 1.2 }}
-                onClick={() => onContinue(pkg)}
-            >
-                Continue
-            </Button>
+            <PickPackagePopup pkg={pkg} />
             <Button
                 fullWidth
                 variant="outlined"

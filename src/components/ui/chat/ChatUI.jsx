@@ -20,7 +20,8 @@ import {
     Tabs,
     TextField,
     Typography,
-    CircularProgress
+    CircularProgress,
+    Tooltip
 } from '@mui/material';
 import {useLocation, useNavigate} from "react-router-dom";
 import {
@@ -50,7 +51,7 @@ function TabPanel(props) {
 }
 
 
-const ActivityTab = ({ requestId, userRole, onSend }) => {
+const ActivityTab = ({requestId, userRole, onSend}) => {
     const [listComment, setListComment] = useState([]);
     const [commentInput, setCommentInput] = useState('');
     const [isSending, setIsSending] = useState(false);
@@ -114,7 +115,7 @@ const ActivityTab = ({ requestId, userRole, onSend }) => {
                             }
 
                             return (
-                                <ListItem key={i} sx={{ justifyContent: align }}>
+                                <ListItem key={i} sx={{justifyContent: align}}>
                                     <Box
                                         p={1.5}
                                         maxWidth="70%"
@@ -167,6 +168,9 @@ const ActivityTab = ({ requestId, userRole, onSend }) => {
     );
 };
 
+const formatVND = (number) => {
+    return new Intl.NumberFormat('vi-VN').format(number);
+};
 const DetailsTab = ({packageId, userRole}) => {
 
     const [packageInfo, setPackageInfo] = useState(null);
@@ -202,7 +206,7 @@ const DetailsTab = ({packageId, userRole}) => {
                 {packageInfo.headerContent}
             </Typography>
 
-            <Typography><b>Fee:</b> ${packageInfo.fee}</Typography>
+            <Typography><b>Fee:</b> {formatVND(packageInfo.fee)}VND</Typography>
             <Typography><b>Delivery:</b> {packageInfo.deliveryDuration} days</Typography>
             <Typography><b>Revisions:</b> {packageInfo.revisionTime}</Typography>
         </>
@@ -338,66 +342,58 @@ const RequirementsTab = () => {
     );
 };
 
-const DeliveryTab = ({ requestId, userRole }) => {
+const DeliveryTab = ({requestId, userRole, request}) => {
     const [note, setNote] = useState("");
     const [fileUrl, setFileUrl] = useState("");
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [deliveries, setDeliveries] = useState([]);
     const [loading, setLoading] = useState(true);
     const [googleAccessToken, setGoogleAccessToken] = useState("");
+    const [resetUploadKey, setResetUploadKey] = useState(0);
 
     useEffect(() => {
         if (!requestId) return;
         setLoading(true);
         getAllDelivery(requestId)
             .then((res) => {
-                console.log("res", res);
-                if (res?.data?.deliveries && Array.isArray(res.data.deliveries)) {
-                    setDeliveries(res.data.deliveries);
-                } else if (res?.data && Array.isArray(res.data)) {
-                    setDeliveries(res.data);
-                } else {
-                    setDeliveries([]);
-                }
-
-                if (res?.data?.google_access_token) {
-                    setGoogleAccessToken(res.data.google_access_token);
-                }
+                setDeliveries(res.data.deliveries);
+                setGoogleAccessToken(res?.data?.google_access_token || "");
             })
             .finally(() => setLoading(false));
-    }, []);
+    }, [requestId]);
 
-    console.log("de", deliveries)
+    console.log("de", request)
 
     const handleSubmit = async () => {
         setIsSubmitting(true);
         try {
             const submit = await submitDelivery(requestId, fileUrl, note);
+
+            const res = await getAllDelivery(requestId);
+
+            setDeliveries(res.data.deliveries);
+
             setNote("");
             setFileUrl("");
-            const res = await getAllDelivery(requestId);
-            let list = [];
+            setResetUploadKey(k => k + 1);
 
-            if (Array.isArray(res)) {
-                list = res;
-            } else if (res?.data && Array.isArray(res.data)) {
-                list = res.data;
-            } else if (res && typeof res === "object") {
-                list = [res];
-            }
-            setDeliveries(list);
-            enqueueSnackbar(submit.message, {variant: "success"});
-        } catch  {
-            alert("Error submitting delivery");
+            enqueueSnackbar(submit.message, { variant: "success" });
+        } catch (err) {
+            enqueueSnackbar("Error submitting delivery", { variant: "error" });
+            console.log("error", err);
         } finally {
             setIsSubmitting(false);
         }
     };
 
-    if (userRole === "designer") {
+
+
+    const revisionDelivery = deliveries.filter((item) => item.isRevision)
+    if (userRole === "designer" && revisionDelivery.length !== request.revisionTime) {
         return (
-            <Paper sx={{ p: 3 }}>
+            <Paper sx={{p: 3}}>
                 <Typography variant="h6" mb={2}>Submit Delivery</Typography>
+
                 <TextField
                     label="Note"
                     multiline
@@ -405,9 +401,9 @@ const DeliveryTab = ({ requestId, userRole }) => {
                     value={note}
                     onChange={e => setNote(e.target.value)}
                     fullWidth
-                    sx={{ mb: 2 }}
+                    sx={{mb: 2}}
                 />
-                <UploadZip onUploadSuccess={url => setFileUrl(url)} accessToken={googleAccessToken} />
+                <UploadZip key={resetUploadKey} onUploadSuccess={url => setFileUrl(url)} accessToken={googleAccessToken} />
                 {fileUrl && (
                     <Typography mt={1} color="green">
                         File uploaded! <a href={fileUrl} target="_blank" rel="noopener noreferrer">View File</a>
@@ -415,7 +411,7 @@ const DeliveryTab = ({ requestId, userRole }) => {
                 )}
                 <Button
                     variant="contained"
-                    sx={{ mt: 2 }}
+                    sx={{mt: 2}}
                     disabled={!fileUrl || !note || isSubmitting}
                     onClick={handleSubmit}
                 >
@@ -423,26 +419,44 @@ const DeliveryTab = ({ requestId, userRole }) => {
                 </Button>
                 <Box mt={4}>
                     <Typography variant="h6">Previous Deliveries</Typography>
-                    {loading ? <CircularProgress /> : <DeliveryList deliveries={deliveries} userRole={userRole} />}
+                    {loading ? <CircularProgress/> :
+                        <DeliveryList deliveries={deliveries} userRole={userRole} request={request}/>}
                 </Box>
             </Paper>
         );
     }
+    else if(userRole === "designer" && revisionDelivery.length === request.revisionTime){
+       return(
+           <>
+               <Typography variant="h2">Out of submit</Typography>
+               <Paper sx={{p: 3}}>
+                   <Typography variant="h6" mb={2}>Delivery History</Typography>
+                   {loading ? <CircularProgress/> :
+                       <DeliveryList deliveries={deliveries} userRole={userRole} request={request}/>}
+               </Paper>
+           </>
+       );
+    }
 
     return (
-        <Paper sx={{ p: 3 }}>
+        <Paper sx={{p: 3}}>
             <Typography variant="h6" mb={2}>Delivery History</Typography>
-            {loading ? <CircularProgress /> : <DeliveryList deliveries={deliveries} userRole={userRole} />}
+            {loading ? <CircularProgress/> :
+                <DeliveryList deliveries={deliveries} userRole={userRole} request={request}/>}
         </Paper>
     );
 };
 
-function DeliveryList({ deliveries, userRole }) {
+function DeliveryList({deliveries, userRole, request}) {
 
     const [openRevision, setOpenRevision] = useState(false);
     const [revisionNote, setRevisionNote] = useState("");
     const [selectedDelivery, setSelectedDelivery] = useState(null);
     const user = JSON.parse(localStorage.getItem("user")) || {};
+
+    const isDisabled = deliveries.length === request.revisionTime;
+
+    console.log("deliver", deliveries)
 
     function handleRequestRevision(delivery) {
         setSelectedDelivery(delivery);
@@ -467,7 +481,6 @@ function DeliveryList({ deliveries, userRole }) {
     }
 
 
-
     if (!deliveries || deliveries.length === 0) {
         return <Typography>No deliveries yet.</Typography>;
     }
@@ -480,14 +493,20 @@ function DeliveryList({ deliveries, userRole }) {
                             Delivery #{d.deliveryNumber}
                         </Typography>
                         {userRole === "school" && (
-                            <Button
-                                variant="outlined"
-                                color="error"
-                                size="small"
-                                onClick={() => handleRequestRevision(d)}
-                            >
-                                Request Revision
-                            </Button>
+                            <Tooltip title={isDisabled ? "Out of revision time" : ""}
+                                     disableHoverListener={!isDisabled}>
+                                <span>
+                                    <Button
+                                        variant="outlined"
+                                        color="error"
+                                        size="small"
+                                        disabled={isDisabled}
+                                        onClick={() => handleRequestRevision(d)}
+                                    >
+                                        Request Revision
+                                    </Button>
+                                </span>
+                            </Tooltip>
                         )}
                     </Box>
                     <Typography variant="body2" mb={1} color="text.secondary">
@@ -517,7 +536,7 @@ function DeliveryList({ deliveries, userRole }) {
                         minRows={3}
                         value={revisionNote}
                         onChange={e => setRevisionNote(e.target.value)}
-                        sx={{ mb: 2 }}
+                        sx={{mb: 2}}
                     />
                     <Box display="flex" justifyContent="flex-end" gap={1}>
                         <Button onClick={() => setOpenRevision(false)}>Cancel</Button>
@@ -534,15 +553,15 @@ function DeliveryList({ deliveries, userRole }) {
 }
 
 
-export default function ChatUI({ packageId, requestId }) {
+export default function ChatUI({packageId, requestId, request}) {
     const [tab, setTab] = useState(0);
     const userRole = JSON.parse(localStorage.getItem('user')).role;
     const navigate = useNavigate();
+
     function handleViewDesignList() {
 
-        navigate("/designer/list")
+        navigate("/school/designer/list")
     }
-
 
     if (userRole === 'school') {
         if (!packageId || packageId === 0) {
@@ -564,9 +583,10 @@ export default function ChatUI({ packageId, requestId }) {
 
     return (
         <Paper elevation={2} sx={{width: "100%", maxWidth: "80vw", mx: "auto", mt: 3}}>
+            <h1>Request : {requestId}</h1>
             <Tabs value={tab} onChange={(_, v) => setTab(v)} variant="fullWidth">
                 <Tab label="Activity"/>
-                <Tab label="Details"/>
+                <Tab label="Package & Payment"/>
                 <Tab label="Requirements"/>
                 <Tab label="Delivery"/>
             </Tabs>
@@ -587,7 +607,7 @@ export default function ChatUI({ packageId, requestId }) {
                 <RequirementsTab/>
             </TabPanel>
             <TabPanel value={tab} index={3}>
-                <DeliveryTab requestId={requestId} userRole={userRole}/>
+                <DeliveryTab requestId={requestId} userRole={userRole} request={request}/>
             </TabPanel>
         </Paper>
     );
