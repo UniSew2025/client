@@ -25,9 +25,13 @@ export const deleteAccount = async (id) => {
 }
 
 // Get all accounts
-export const getAllAccounts = async (params) => {
-    const response = await axiosClient.get("/acc", { params: params });
-    return response ? response : null;
+// export const getAllAccounts = async (params) => {
+//     const response = await axiosClient.get("/acc", { params: params });
+//     return response ? response : null;
+// }
+export const getAllAccounts = async () => {
+    const response = await axiosClient.get("/acc");
+    return response?.data || null;
 }
 
 // Get account by email

@@ -1,5 +1,6 @@
-import {Dashboard, ManageAccounts} from '@mui/icons-material';
+import {Dashboard, ManageAccounts, Paid} from '@mui/icons-material';
 import DashboardUILayout from "../ui/DashboardUILayout.jsx";
+import AdminTransaction from "../../components/admin/AdminTransaction.jsx";
 
 function RenderLayout() {
 
@@ -21,6 +22,15 @@ function RenderLayout() {
             segment: 'admin/account',
             title: 'Accounts',
             icon: <ManageAccounts/>
+        },
+        {
+            kind: 'header',
+            title: 'Transaction Management',
+        },
+        {
+            segment: 'admin/transaction',
+            title: 'Transaction history',
+            icon: <Paid/>
         },
     ]
 
