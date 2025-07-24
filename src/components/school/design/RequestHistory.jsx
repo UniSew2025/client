@@ -495,18 +495,18 @@ const ClothItem = ({
 };
 
 
-const validateClothError = (cloth) => {
+const validateClothError = (designItem) => {
     const errors = {};
-    if (!cloth?.designType) errors.designType = "Please select design type!";
-    if (!cloth?.type) errors.type = "Please select cloth type!";
-    if (cloth?.designType === "TEMPLATE" && (!cloth.templateId || cloth.templateId <= 0))
+    if (!designItem?.designType) errors.designType = "Please select design type!";
+    if (!designItem?.type) errors.type = "Please select designItem type!";
+    if (designItem?.designType === "TEMPLATE" && (!designItem.templateId || designItem.templateId <= 0))
         errors.templateId = "Please choose a template!";
-    if (cloth?.designType === "UPLOAD" && (!cloth.images || cloth.images.length === 0))
+    if (designItem?.designType === "UPLOAD" && (!designItem.images || designItem.images.length === 0))
         errors.images = "Please upload at least 1 image!";
-    const needLogo = cloth?.type !== 'PANTS' && cloth?.type !== 'SKIRT';
-    if (needLogo && (!cloth.logoImage || !cloth.logoPosition))
+    const needLogo = designItem?.type !== 'PANTS' && designItem?.type !== 'SKIRT';
+    if (needLogo && (!designItem.logoImage || !designItem.logoPosition))
         errors.logo = "Please upload logo image and choose position!";
-    if (!cloth?.color) errors.color = "Please choose a color!";
+    if (!designItem?.color) errors.color = "Please choose a color!";
     return errors;
 };
 
@@ -533,12 +533,12 @@ const RegularForm = ({
         if (onValidateChange) onValidateChange(isValid);
     }, [clothes, clothErrors]);
 
-    const handleClothChange = (index, cloth) => {
+    const handleClothChange = (index, designItem) => {
         const newClothes = [...clothes];
-        newClothes[index] = cloth;
+        newClothes[index] = designItem;
         setClothes(newClothes);
 
-        const error = validateClothError(cloth);
+        const error = validateClothError(designItem);
         setClothErrors(prev => ({...prev, [index]: error}));
         setClothTouched(prev => ({...prev, [index]: true}));
 
@@ -623,12 +623,12 @@ const PhysicalForm = ({
     const [clothErrors, setClothErrors] = useState({});
     const [clothTouched, setClothTouched] = useState({});
 
-    const handleClothChange = (index, cloth) => {
+    const handleClothChange = (index, designItem) => {
         const newClothes = [...clothes];
-        newClothes[index] = cloth;
+        newClothes[index] = designItem;
         if (onClothesChange) onClothesChange(newClothes);
 
-        const error = validateClothError(cloth);
+        const error = validateClothError(designItem);
         setClothErrors(prev => ({...prev, [index]: error}));
         setClothTouched(prev => ({...prev, [index]: true}));
     };
