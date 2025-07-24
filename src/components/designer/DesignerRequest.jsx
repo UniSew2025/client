@@ -22,7 +22,7 @@ export default function DesignerRequest() {
             try {
                 const user = JSON.parse(localStorage.getItem("user"));
                 console.log("user:", user);
-                const dId = user?.designer?.id || user?.profile?.designer?.id;
+                const dId = user?.profile?.partner?.id || user?.profile?.partner?.id ;
                 console.log("designerId:", dId);
 
                 setDesignerId(dId);
@@ -65,7 +65,7 @@ export default function DesignerRequest() {
     }, []);
 
     const handleViewDetail = (item) =>  {
-        navigate('/designer/detail', {
+        navigate('/designer/request/detail', {
             state: {
                 requestId: item.id,
                 requestStatus: item.status,
@@ -75,7 +75,7 @@ export default function DesignerRequest() {
         });
     }
 
-    console.log(user.profile.designer.id);
+    console.log(user.profile.partner.id);
     console.log("designerId:", designerId);
     console.log("packages:", packages);
     console.log("packageIds:", packageIds);
@@ -105,7 +105,7 @@ export default function DesignerRequest() {
                             <TableRow key={req.id}>
                                 <TableCell>{req.id}</TableCell>
                                 <TableCell>{req.packageId}</TableCell>
-                                <TableCell>{req.school.name}</TableCell>
+                                <TableCell>{req.school?.name|| ""}</TableCell>
                                 <TableCell>{req.status}</TableCell>
                                 <TableCell>{req.creationDate}</TableCell>
                                 <TableCell><Button onClick={() => handleViewDetail(req)}>View</Button></TableCell>

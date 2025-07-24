@@ -131,7 +131,7 @@ const router = createBrowserRouter([
                 path: 'packages',
                 element: <DesignerPackage/>
             }, {
-                path: 'detail',
+                path: 'request/detail',
                 element: <RequestDetail/>
             }
         ]

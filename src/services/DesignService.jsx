@@ -15,12 +15,17 @@ export const getClothByRequestId = async (requestId) => {
     return res?.data?.data || [];
 };
 
-export const chooseDesignPackage = async ({ designRequestId, packageId }) => {
+export const chooseDesignPackage = async ({ designRequestId, packageId, getPackagePrice,packageName,packageHeaderContent, revisionTime, packageDeliveryDate}) => {
     const res = await axiosClient.post("/design/package", {
         designRequestId,
-        packageId
+        packageId,
+        getPackagePrice,
+        packageName,
+        packageHeaderContent,
+        revisionTime,
+        packageDeliveryDate
     });
-    return res?.data?.data || [];
+    return res?.data || [];
 }
 
 export const getSampleImages = async () => {
@@ -33,9 +38,9 @@ export const getAllComments = async (requestId) => {
     return response?.data || null;
 }
 
-export const getDesignById = async (id) => {
-    const res = await axiosClient.post(`/design/cloth-list`, { id });
-    return res?.data?.data || [];
+export const getRequestById = async (id) => {
+    const res = await axiosClient.post(`/design/request/${id}`);
+    return res?.data || null;
 };
 
 export const getCompleteDesignRequest = async () => {
@@ -63,11 +68,13 @@ export const getAllDelivery = async (id) => {
     return response?.data || null;
 }
 
-export const submitDelivery = async (requestId, fileUrl, note) => {
+export const submitDelivery = async (requestId, fileUrl, note, revisionId, revision ) => {
     const response = await axiosClient.post(`/design/deliveries`, {
         requestId,
         fileUrl,
-        note
+        note,
+        revisionId,
+        revision
     });
     return response.data || [];
 }
@@ -79,6 +86,11 @@ export const submitRevision = async (deliveryId, note, senderId,senderRole) => {
         senderRole
     });
     return response.data || [];
+}
+
+export const getRevisionUnUseList = async (requestId) =>{
+    const response = await axiosClient.get(`/design/list-revision/${requestId}`);
+    return response?.data || [];
 }
 
 
