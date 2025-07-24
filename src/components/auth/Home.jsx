@@ -44,16 +44,16 @@ function TrustedBySection() {
 
 function PopularServicesSection() {
     const services = [
-        { img: '/designer.jpg', label: 'Adam', desc: 'Uni Pro' },
-        { img: '/designer.jpg', label: 'Eva', desc: 'Uni Pro' },
-        { img: '/designer.jpg', label: 'Saber', desc: 'Uni Pro' },
-        { img: '/designer.jpg', label: 'Cartethyia', desc: 'Uni Pro' },
-        { img: '/designer.jpg', label: 'Chisa', desc: 'Uni Pro' },
+        { img: '/partner.jpg', label: 'Adam', desc: 'Uni Pro' },
+        { img: '/partner.jpg', label: 'Eva', desc: 'Uni Pro' },
+        { img: '/partner.jpg', label: 'Saber', desc: 'Uni Pro' },
+        { img: '/partner.jpg', label: 'Cartethyia', desc: 'Uni Pro' },
+        { img: '/partner.jpg', label: 'Chisa', desc: 'Uni Pro' },
     ];
     return (
         <section className="popular-services py-5" style={{backgroundColor:'rgb(96% 96% 98%)'}}>
             <Container>
-                <h2 className="section-title mb-4">Popular designer</h2>
+                <h2 className="section-title mb-4">Popular partner</h2>
                 <Carousel indicators={false} interval={3500}>
                     {services.map((sv, idx) => (
                         <Carousel.Item key={idx}>
@@ -78,7 +78,7 @@ function HowItWorksSection() {
     return (
         <section className="how-it-works py-5 bg-light">
             <Container>
-                <h2 className="section-title mb-4 text-center">A whole world of uniform designer at your fingertips</h2>
+                <h2 className="section-title mb-4 text-center">A whole world of uniform partner at your fingertips</h2>
                 <Row className="text-center">
                     <Col md={3}>
                         <img src="/icon-checked.svg" alt="" className="mb-2" height={48} />
@@ -167,7 +167,7 @@ function TestimonialsSection() {
         {
             avatar: 'https://ueed.edu.vn/wp-content/uploads/2022/11/tieu-hoc-linh-dong.png',
             name: 'Tiểu học Linh Đông',
-            text: 'The designer I hired was professional and quick. 10/10 experience.',
+            text: 'The partner I hired was professional and quick. 10/10 experience.',
             job: 'School'
         },
         {
@@ -286,7 +286,7 @@ function DesignHeroSection() {
                             Your business deserves great design
                         </h1>
                         <p className="lead mb-4" style={{ color: '#555', maxWidth: 600 }}>
-                            Logos, websites, packaging design and more. Our trusted designer community has helped thousands of businesses launch, grow, expand and rebrand with custom, professional design.
+                            Logos, websites, packaging design and more. Our trusted partner community has helped thousands of businesses launch, grow, expand and rebrand with custom, professional design.
                         </p>
                         <a
                             href="/school"
@@ -336,10 +336,10 @@ function ExpertTrustSection() {
                             Work with creative experts you can trust
                         </h2>
                         <p className="mb-4" style={{ color: '#555', maxWidth: 640 }}>
-                            Feel confident working with our designer community. All our designers are vetted creative experts who've worked with hundreds of businesses to bring their designs to life.
+                            Feel confident working with our partner community. All our designers are vetted creative experts who've worked with hundreds of businesses to bring their designs to life.
                         </p>
                         <a
-                            href="/school/designer/list"
+                            href="/school/partner/list"
                             className="btn btn-outline-primary btn-lg px-4"
                             style={{
                                 borderRadius: 40,
@@ -348,7 +348,7 @@ function ExpertTrustSection() {
                                 borderColor: '#002f6c'
                             }}
                         >
-                            Browse designer portfolios
+                            Browse partner portfolios
                         </a>
                     </div>
                 </div>

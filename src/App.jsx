@@ -35,6 +35,7 @@ import {AdapterDayjs} from "@mui/x-date-pickers/AdapterDayjs";
 import {viVN} from "@mui/x-date-pickers/locales"
 import GarmentList from "./components/school/order/GarmentList.jsx";
 import OrderFillForm from "./components/school/order/OrderFillForm.jsx";
+import AdminTransaction from "./components/admin/AdminTransaction.jsx";
 
 const router = createBrowserRouter([
     {
@@ -181,6 +182,10 @@ const router = createBrowserRouter([
             {
                 path: 'account',
                 element: <AdminAccount/>
+            },
+            {
+                path: 'transaction',
+                element: <AdminTransaction/>
             }
         ]
     },
