@@ -93,6 +93,11 @@ export const getRevisionUnUseList = async (requestId) =>{
     return response?.data || [];
 }
 
+export const makeDeliveryFinalAndRequestComplete = async (deliveryId, requestId) => {
+    const response = await axiosClient.post(`design/makeFinal/${deliveryId}/${requestId}`)
+    return response?.data || null;
+}
+
 
 
 

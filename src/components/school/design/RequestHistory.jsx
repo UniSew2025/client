@@ -749,6 +749,7 @@ const RequestHistory = () => {
     const navigate = useNavigate();
 
     const paginatedData = historyList
+        .slice()
         .reverse()
         .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
 

@@ -21,18 +21,18 @@ import {
     TextField,
     Tooltip,
     Typography,
-    Radio,RadioGroup,
+    Radio, RadioGroup,
     FormControlLabel,
     FormControl,
     InputLabel,
     Select,
-    MenuItem
+    MenuItem, DialogActions
 } from '@mui/material';
 import {useLocation} from "react-router-dom";
 import {
     getAllComments,
     getAllDelivery,
-    getClothByRequestId, getRequestById, getRevisionUnUseList,
+    getClothByRequestId, getRequestById, getRevisionUnUseList, makeDeliveryFinalAndRequestComplete,
     sendComment,
     submitDelivery,
     submitRevision
@@ -42,6 +42,8 @@ import UploadZip from "../../designer/UploadZip.jsx";
 import {enqueueSnackbar} from "notistack";
 import InfoOutlined from "@mui/icons-material/InfoOutlined";
 import RefreshIcon from '@mui/icons-material/Refresh';
+import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
+import FileUploadIcon from '@mui/icons-material/FileUpload';
 
 function TabPanel(props) {
     const {children, value, index, ...other} = props;
@@ -180,7 +182,6 @@ const formatVND = (number) => {
     return new Intl.NumberFormat('vi-VN').format(number);
 };
 const DetailsTab = ({packageInfo, request}) => {
-
 
 
     if (!packageInfo) {
@@ -333,7 +334,7 @@ const RequirementsTab = () => {
     );
 };
 
-const DeliveryTab = ({ requestId, userRole, request, refreshKey}) => {
+const DeliveryTab = ({requestId, userRole, request, refreshKey}) => {
     const [note, setNote] = useState("");
     const [fileUrl, setFileUrl] = useState("");
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -422,9 +423,10 @@ const DeliveryTab = ({ requestId, userRole, request, refreshKey}) => {
                 setRevisionList(data.data || []);
             });
 
-            enqueueSnackbar(submit.message, { variant: "success" });
+            enqueueSnackbar(submit.message, {variant: "success"});
         } catch (err) {
-            enqueueSnackbar("Error submitting delivery", { variant: "error" });
+            const errorMsg = err?.response?.data?.message || "Error submitting delivery";
+            enqueueSnackbar(errorMsg, {variant: "error"});
             console.log("error", err);
         } finally {
             setIsSubmitting(false);
@@ -434,16 +436,15 @@ const DeliveryTab = ({ requestId, userRole, request, refreshKey}) => {
     const handleGoToDelivery = (deliveryId) => {
         const target = deliveryRefs.current[deliveryId];
         if (target) {
-            target.scrollIntoView({ behavior: "smooth", block: "center" });
+            target.scrollIntoView({behavior: "smooth", block: "center"});
             setHighlightedId(deliveryId);
-            // Xóa highlight sau 1-2s
             setTimeout(() => setHighlightedId(null), 2000);
         }
     };
 
     if (userRole === "designer" && revisionDelivery.length !== request.revisionTime) {
         return (
-            <Paper sx={{ p: 3 }}>
+            <Paper sx={{p: 3}}>
                 <Typography variant="h3" mb={2}>Submit Delivery</Typography>
 
                 <RadioGroup
@@ -453,15 +454,16 @@ const DeliveryTab = ({ requestId, userRole, request, refreshKey}) => {
                         setSubmitType(e.target.value);
                         setSelectedRevisionId("");
                     }}
-                    sx={{ mb: 2 }}
+                    sx={{mb: 2}}
                 >
-                    <FormControlLabel value="normal" control={<Radio />} label="Normal" />
-                    <FormControlLabel value="revision" control={<Radio />} label="Revision submit" disabled={isRevisionDisabled} />
+                    <FormControlLabel value="normal" control={<Radio/>} label="Normal"/>
+                    <FormControlLabel value="revision" control={<Radio/>} label="Revision submit"
+                                      disabled={isRevisionDisabled}/>
                 </RadioGroup>
 
                 {submitType === "revision" && (
-                    <Box display="flex" alignItems="center" gap={2} sx={{ mb: 2 }}>
-                        <FormControl sx={{ minWidth: 180 }}>
+                    <Box display="flex" alignItems="center" gap={2} sx={{mb: 2}}>
+                        <FormControl sx={{minWidth: 180}}>
                             <InputLabel>Revision request id</InputLabel>
                             <Select
                                 value={selectedRevisionId ?? ""}
@@ -479,7 +481,7 @@ const DeliveryTab = ({ requestId, userRole, request, refreshKey}) => {
                         <Box>
 
                         </Box>
-                        <Divider orientation="vertical" flexItem sx={{ mx: 1 }} />
+                        <Divider orientation="vertical" flexItem sx={{mx: 1}}/>
                         <Typography>
                             Delivery ID: {selectedRevision?.deliveryId}
                         </Typography>
@@ -494,8 +496,9 @@ const DeliveryTab = ({ requestId, userRole, request, refreshKey}) => {
                     </Box>
                 )}
 
-                <Typography variant="body2" color="text.secondary" fontWeight="bold" sx={{ display: "flex", alignItems: "center" }}>
-                    <InfoOutlined sx={{ mr: 0.5, fontSize: 18, color: "primary.main" }}/>
+                <Typography variant="body2" color="text.secondary" fontWeight="bold"
+                            sx={{display: "flex", alignItems: "center"}}>
+                    <InfoOutlined sx={{mr: 0.5, fontSize: 18, color: "primary.main"}}/>
                     Note from School:
                 </Typography>
                 <Box
@@ -511,7 +514,7 @@ const DeliveryTab = ({ requestId, userRole, request, refreshKey}) => {
                     {selectedRevision?.note ? selectedRevision.note : "No note"}
                 </Box>
 
-                <Divider sx={{borderTop: "1px solid #000000", marginY:"3vh"}} />
+                <Divider sx={{borderTop: "1px solid #000000", marginY: "3vh"}}/>
                 <TextField
                     label="Your note to School "
                     multiline
@@ -519,7 +522,7 @@ const DeliveryTab = ({ requestId, userRole, request, refreshKey}) => {
                     value={note}
                     onChange={e => setNote(e.target.value)}
                     fullWidth
-                    sx={{ mb: 2, mt: 1 }}
+                    sx={{mb: 2, mt: 1}}
                 />
 
                 <UploadZip
@@ -536,7 +539,7 @@ const DeliveryTab = ({ requestId, userRole, request, refreshKey}) => {
 
                 <Button
                     variant="contained"
-                    sx={{ mt: 2 }}
+                    sx={{mt: 2}}
                     disabled={
                         !fileUrl ||
                         !note ||
@@ -550,7 +553,7 @@ const DeliveryTab = ({ requestId, userRole, request, refreshKey}) => {
 
                 <Box mt={4}>
                     <Typography variant="h6">Previous Deliveries</Typography>
-                    {loading ? <CircularProgress /> :
+                    {loading ? <CircularProgress/> :
                         <DeliveryList
                             deliveries={deliveries}
                             userRole={userRole}
@@ -565,9 +568,9 @@ const DeliveryTab = ({ requestId, userRole, request, refreshKey}) => {
         return (
             <>
                 <Typography variant="h2">Out of submit</Typography>
-                <Paper sx={{ p: 3 }}>
+                <Paper sx={{p: 3}}>
                     <Typography variant="h6" mb={2}>Delivery History</Typography>
-                    {loading ? <CircularProgress /> :
+                    {loading ? <CircularProgress/> :
                         <DeliveryList
                             deliveries={deliveries}
                             userRole={userRole}
@@ -581,12 +584,11 @@ const DeliveryTab = ({ requestId, userRole, request, refreshKey}) => {
     }
 
     return (
-        <Paper sx={{ p: 3 }}>
+        <Paper sx={{p: 3}}>
             <Box display="flex" alignItems="center" gap={2} mb={2}>
                 <Typography variant="h6" mb={0}>Delivery History</Typography>
-
             </Box>
-            {loading ? <CircularProgress /> :
+            {loading ? <CircularProgress/> :
                 <DeliveryList
                     deliveries={deliveries}
                     userRole={userRole}
@@ -598,12 +600,100 @@ const DeliveryTab = ({ requestId, userRole, request, refreshKey}) => {
     );
 };
 
-function DeliveryList({deliveries, userRole, request, deliveryRefs, highlightedId}) {
+const SpecificationPopUp = ({open, onClose, request}) => {
+    const [specs, setSpecs] = useState(
+        (request?.clothes || []).map(c => ({
+            ...c,
+            specification: "",
+            file: null,
+            filePreview: null,
+        }))
+    );
+
+    const handleChange = (index, key, value) => {
+        setSpecs(prev => {
+            const updated = [...prev];
+            updated[index][key] = value;
+            return updated;
+        });
+    };
+
+    const handleFileChange = (index, e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const filePreview = URL.createObjectURL(file);
+            handleChange(index, "file", file);
+            handleChange(index, "filePreview", filePreview);
+        }
+    };
+
+    const handleSubmit = () => {
+        console.log("Specs to submit:", specs);
+        onClose();
+    };
+
+    return (
+        <Dialog open={open} onClose={onClose} maxWidth={"md"} fullWidth>
+            <DialogTitle>Upload image for each item</DialogTitle>
+            <DialogContent dividers>
+                <Box display="flex" flexDirection="column" gap={3}>
+                    {specs.map((item, i) => (
+                        <Box
+                            key={item.id || i}
+                            p={2}
+                            border="1px solid #eee"
+                            borderRadius={2}
+                            bgcolor="#fafafa"
+                        >
+                            <Typography variant="h6">{item.type} - {item.category}</Typography>
+                            <TextField
+                                label="Specification / Notes"
+                                value={item.specification}
+                                onChange={e => handleChange(i, "specification", e.target.value)}
+                                fullWidth
+                                sx={{my: 2}}
+                            />
+                            <Box display="flex" alignItems="center" gap={2}>
+                                <Button
+                                    variant="outlined"
+                                    component="label"
+                                    startIcon={<FileUploadIcon/>}
+                                >
+                                    Upload Image
+                                    <input
+                                        type="file"
+                                        accept="image/*"
+                                        hidden
+                                        onChange={e => handleFileChange(i, e)}
+                                    />
+                                </Button>
+                                {item.filePreview && (
+                                    <img
+                                        src={item.filePreview}
+                                        alt="Preview"
+                                        style={{height: 60, borderRadius: 8, border: '1px solid #ccc'}}
+                                    />
+                                )}
+                            </Box>
+                        </Box>
+                    ))}
+                </Box>
+            </DialogContent>
+            <DialogActions>
+                <Button onClick={onClose}>Cancel</Button>
+                <Button variant="contained" onClick={handleSubmit}>Submit</Button>
+            </DialogActions>
+        </Dialog>
+    );
+};
+
+const DeliveryList = ({deliveries, userRole, request, deliveryRefs, highlightedId}) => {
     console.log('resquest:', request);
     console.log('deliveries:', deliveries);
     const [openRevision, setOpenRevision] = useState(false);
     const [revisionNote, setRevisionNote] = useState("");
     const [selectedDelivery, setSelectedDelivery] = useState(null);
+    const [openSpec, setOpenSpec] = useState(false);
     const user = JSON.parse(localStorage.getItem("user")) || {};
 
 
@@ -612,6 +702,7 @@ function DeliveryList({deliveries, userRole, request, deliveryRefs, highlightedI
     const setDeliveryRef = (id) => (el) => {
         if (el) deliveryRefs[id] = el;
     };
+    const anyFinal = deliveries.some(delivery => delivery.isFinal);
 
     function handleRequestRevision(delivery) {
         setSelectedDelivery(delivery);
@@ -635,6 +726,19 @@ function DeliveryList({deliveries, userRole, request, deliveryRefs, highlightedI
         }
     }
 
+    async function handleMakeFinal(deliveryId, requestId) {
+        try {
+            const response = await makeDeliveryFinalAndRequestComplete(deliveryId, requestId);
+            enqueueSnackbar(response.data?.message ?? "Success", {variant: "success"});
+        } catch (err) {
+            console.log(err);
+        }
+    }
+
+    function handleSpecification() {
+        setOpenSpec(true);
+    }
+
     console.log("deliveries", deliveries);
 
     if (!deliveries || deliveries.length === 0) {
@@ -656,31 +760,63 @@ function DeliveryList({deliveries, userRole, request, deliveryRefs, highlightedI
                         transition: "background 0.5s, border 0.5s"
                     }}
                 >
-
-                <Box display="flex" alignItems="center" justifyContent="space-between">
+                    <Box display="flex" alignItems="center" justifyContent="space-between">
                         <Typography fontWeight="bold">
                             Delivery #{d.deliveryNumber}
                         </Typography>
-                        {userRole === "school" && (
-                            <Tooltip title={isDisabled ? "Out of revision time" : ""}
-                                     disableHoverListener={!isDisabled}>
-                                <span>
+                        {d.isFinal ? (
+                            user.role === "designer" && (
+                                <Box>
+                                    <CheckCircleOutlineIcon color="success" fontSize="large"
+                                                            titleAccess="Final Delivery"/>
                                     <Button
                                         variant="outlined"
-                                        color="error"
-                                        size="small"
-                                        disabled={isDisabled}
-                                        onClick={() => handleRequestRevision(d)}
+                                        onClick={handleSpecification}
                                     >
-                                        Request Revision
+                                        Upload Image
                                     </Button>
-                                </span>
-                            </Tooltip>
+                                    <SpecificationPopUp
+                                        open={openSpec}
+                                        onClose={() => setOpenSpec(false)}
+                                        request={request}
+                                    />
+                                </Box>
+                            )
+                        ) : (
+                            !anyFinal && userRole === "school" && request.status !== "complete" && (
+                                <Box display="flex" gap={1}>
+                                    <Tooltip title={isDisabled ? "Out of revision time" : ""}
+                                             disableHoverListener={!isDisabled}>
+                                        <span>
+                                          <Button
+                                              variant="outlined"
+                                              color="error"
+                                              size="small"
+                                              disabled={isDisabled}
+                                              onClick={() => handleRequestRevision(d)}
+                                          >
+                                            Request Revision
+                                          </Button>
+                                        </span>
+                                    </Tooltip>
+                                    <Button
+                                        onClick={() => handleMakeFinal(d.id, request.id)}
+                                        variant="outlined"
+                                        color="primary"
+                                        size="small"
+                                    >
+                                        Make Final
+                                    </Button>
+                                </Box>
+                            )
                         )}
                     </Box>
-                    <Typography variant="body2" mb={1} color="text.secondary">
-                        {d.submitDate ? new Date(d.submitDate).toLocaleString() : ""}
-                    </Typography>
+
+                    <Box display="flex" alignItems="center" justifyContent="space-between" marginTop={1}>
+                        <Typography variant="body2" mb={1} color="text.secondary">
+                            {d.submitDate ? new Date(d.submitDate).toLocaleString() : ""}
+                        </Typography>
+                    </Box>
                     <Typography mb={1}>{d.note}</Typography>
                     <Typography>
                         {d.fileUrl ? (
@@ -691,9 +827,13 @@ function DeliveryList({deliveries, userRole, request, deliveryRefs, highlightedI
                             "No file"
                         )}
                     </Typography>
-                    {d.isFinal && <Typography color="success.main">Final Delivery</Typography>}
+                    {d.isFinal && (
+                        <Typography color="success.main" fontWeight="bold"
+                                    sx={{mt: 1, display: "flex", alignItems: "center"}}>
+                            <CheckCircleOutlineIcon color="success" sx={{mr: 1}}/> Final Delivery
+                        </Typography>
+                    )}
                 </Box>
-
             ))}
             <Dialog open={openRevision} onClose={() => setOpenRevision(false)} maxWidth="sm" fullWidth>
                 <DialogTitle>Request Revision</DialogTitle>
@@ -716,8 +856,6 @@ function DeliveryList({deliveries, userRole, request, deliveryRefs, highlightedI
                 </DialogContent>
             </Dialog>
         </Box>
-
-
     );
 }
 
@@ -765,7 +903,7 @@ export default function ChatUI({packageId, requestId, request}) {
             <Button
                 variant="outlined"
                 onClick={handleRefreshAll}
-                startIcon={<RefreshIcon />}
+                startIcon={<RefreshIcon/>}
                 disabled={loadingRequest}
             >
                 Refresh
@@ -792,7 +930,8 @@ export default function ChatUI({packageId, requestId, request}) {
             </TabPanel>
             {requestDetail.status !== "created" &&
                 <TabPanel value={tab} index={3}>
-                    <DeliveryTab requestId={requestId} userRole={userRole} request={requestDetail} packageInfo={packageInfo} refreshKey={refreshKey} />
+                    <DeliveryTab requestId={requestId} userRole={userRole} request={requestDetail}
+                                 packageInfo={packageInfo} refreshKey={refreshKey}/>
                 </TabPanel>
             }
         </Paper>
