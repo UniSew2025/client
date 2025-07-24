@@ -1,5 +1,5 @@
 import './styles/App.css'
-import {createBrowserRouter, Navigate, Outlet, RouterProvider} from "react-router-dom";
+import {createBrowserRouter, Navigate, RouterProvider} from "react-router-dom";
 import {SnackbarProvider} from 'notistack'
 import {Grow} from "@mui/material";
 import WebAppUILayout from "./layouts/ui/WebAppUILayout.jsx";
@@ -60,16 +60,16 @@ const router = createBrowserRouter([
                 element: <RequestList/>
             },
             {
-                path: "designer/list",
+                path: "list/designer",
                 element: <DesignerList/>
+            },
+            {
+                path: "list/garment",
+                element: <GarmentList/>
             },
             {
                 path: "designer/detail",
                 element: <DesignerDetail/>
-            },
-            {
-                path: "garment/list",
-                element: <GarmentList/>
             },
             {
                 path: "garment/detail",

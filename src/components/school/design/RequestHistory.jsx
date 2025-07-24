@@ -931,7 +931,7 @@ const RequestHistory = () => {
 
     function HandleViewDesignList(item) {
         localStorage.setItem("sDesign", JSON.stringify(item))
-        navigate("/designer/list")
+        navigate("/list/designer")
     }
 
     function HandleCreateOrder(request) {
@@ -953,7 +953,13 @@ const RequestHistory = () => {
                     Create
                 </Button>
             </Box>
-
+            <Typography variant={'subtitle2'} color={'error'}>
+                * Click on
+                <span style={{fontStyle: 'italic', fontWeight: 'bold', color: 'purple'}}> CREATED </span>
+                design to find designer or
+                <span style={{fontStyle: 'italic', fontWeight: 'bold', color: 'green'}}> COMPLETED </span>
+                design to create order
+            </Typography>
             <Paper elevation={2}>
                 <TableContainer sx={{mt: 3}}>
                     <Table>

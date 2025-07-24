@@ -1,9 +1,9 @@
 import axiosClient from "../config/APIConfig.jsx";
 
-export const createOrder = async (schoolId, cloths, deadline, note) => {
+export const createOrder = async (schoolId, items, deadline, note) => {
     const response = await axiosClient.post('/order', {
         schoolId: schoolId,
-        clothList: cloths,
+        itemList: items,
         deadline: deadline,
         note: note
     })
