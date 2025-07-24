@@ -20,12 +20,11 @@ import {
 import {RestartAlt} from '@mui/icons-material';
 import {Input, Select} from 'antd';
 import {useEffect, useState} from "react";
-import {LocalizationProvider, TimePicker} from "@mui/x-date-pickers";
-import {AdapterDayjs} from "@mui/x-date-pickers/AdapterDayjs";
-import dayjs from "dayjs";
 import {getAllGarmentProfile} from "../../../services/ProfileService.jsx";
+import {useNavigate} from "react-router-dom";
 
 function RenderCard({garment}) {
+    const navigate = useNavigate()
     return (
         <Card sx={{height: '100%', width: '100%', background: 'whitesmoke'}} raised>
             <CardMedia
@@ -48,7 +47,11 @@ function RenderCard({garment}) {
                 </Typography>
             </CardContent>
             <CardActions>
-                <Button size="small">View Detail</Button>
+                <Button size="small" onClick={() => navigate("/garment/detail", {
+                    state: {
+                        garmentId: garment.id
+                    }
+                })}>View Detail</Button>
             </CardActions>
         </Card>
     )
@@ -79,15 +82,23 @@ function RenderTooltip({title, children}) {
     )
 }
 
-function RenderStatusFilter() {
+function RenderStatusFilter({UpdateStatus}) {
     const [checked, setChecked] = useState([false, false]);
 
+    if(!checked[0] && !checked[1]) setChecked([true, false]);
+
     const checkAvailable = (e) => {
-        setChecked([e.target.checked, checked[1]]);
+        let newData = [e.target.checked, checked[1]]
+        if(!newData[0] && !newData[1]) newData = [true, false]
+        setChecked(newData);
+        UpdateStatus(newData[0] && newData[1] ? "both" : (!newData[0] && newData[1] ? "busy" : "available"));
     }
 
     const checkBusy = (e) => {
-        setChecked([checked[0], e.target.checked]);
+        let newData = [checked[0], e.target.checked]
+        if(!newData[0] && !newData[1]) newData = [true, false]
+        setChecked(newData);
+        UpdateStatus(newData[0] && newData[1] ? "both" : (!newData[0] && newData[1] ? "busy" : "available"));
     }
 
     return (
@@ -119,19 +130,24 @@ function RenderStatusFilter() {
     )
 }
 
-function RenderRatingFilter() {
+function RenderRatingFilter({UpdateRating}) {
 
-    const [rating, setRating] = useState(0)
+    const [rating, setRating] = useState(5)
 
     const [hoverValue, setHoverValue] = useState(-1)
 
     const label = {
-        0: 'Select all',
+        0: '0 star',
         1: '≤ 1 star',
         2: '≤ 2 stars',
         3: '≤ 3 stars',
         4: '≤ 4 stars',
         5: '≤ 5 stars'
+    }
+
+    const handleSetRating = (e, rating) => {
+        setRating(rating)
+        UpdateRating(rating)
     }
 
     return (
@@ -146,81 +162,18 @@ function RenderRatingFilter() {
                 >
                     Rating
                 </Typography>
-                <Button onClick={() => {
-                    setRating(0)
-                }}>Clear</Button>
             </Box>
             <Box sx={{display: 'flex', gap: '0.5vw', alignItems: 'center'}}>
                 <Rating
                     value={rating}
-                    onChange={(event, newValue) => {
-                        setRating(newValue);
-                    }}
-                    onChangeActive={(e, newValue) => {
-                        setHoverValue(newValue)
-                    }}
+                    onChange={(event, newValue) => handleSetRating(event, newValue)}
+                    onChangeActive={(e, newValue) => setHoverValue(newValue)}
                 />
                 <Typography
                     fontSize={'1rem'}>{hoverValue !== -1 ? label[hoverValue] : (rating === null ? label[0] : label[rating])}</Typography>
             </Box>
             <Divider variant={'fullWidth'} sx={{width: '100%', borderTop: '1px solid black', marginTop: '2vh'}}/>
         </Box>
-    )
-}
-
-function RenderWorkingTimeFilter() {
-    const minTime = dayjs().set('hour', 0).set('minute', 0).set('second', 0)
-    const maxTime = dayjs().set('hour', 23).set('minute', 55).set('second', 0)
-
-    const [time, setTime] = useState([null, null])
-
-    return (
-        <LocalizationProvider dateAdapter={AdapterDayjs}>
-            <Box sx={{display: 'flex', flexDirection: 'column', marginX: '1vw', marginY: '2vh'}}>
-                <Box sx={{display: 'flex', gap: '0.5vw', alignItems: 'center', justifyContent: 'space-between'}}>
-                    <Typography
-                        variant={'body1'}
-                        sx={{
-                            fontWeight: 'bold',
-                            fontSize: '1.3rem'
-                        }}
-                    >
-                        Working time
-                    </Typography>
-                    <Button onClick={() => {
-                        setTime([null, null])
-                    }}>Clear</Button>
-                </Box>
-                <Box sx={{display: 'flex', gap: '0.5vw', marginTop: '2vh', alignItems: 'center'}}>
-                    <TimePicker
-                        label={"From"}
-                        ampm={false}
-                        value={time[0]}
-                        onChange={(newValue) => {
-                            setTime([newValue, time[1]])
-                        }}
-                        minTime={minTime}
-                        maxTime={maxTime}
-                        format={"HH:mm"}
-                        sx={{width: '8vw',}}
-                    />
-                    <TimePicker
-                        label={"To"}
-                        ampm={false}
-                        value={time[1] !== null ? time[1] : (time[0] === null ? null : time[0].add(5, 'minute'))}
-                        onChange={(newValue) => {
-                            setTime([time[0], newValue])
-                        }}
-                        disabled={time[0] === null}
-                        minTime={time[0] === null ? null : time[0].add(5, 'minute')}
-                        maxTime={maxTime}
-                        format={"HH:mm"}
-                        sx={{width: '8vw',}}
-                    />
-                </Box>
-                <Divider variant={'fullWidth'} sx={{width: '100%', borderTop: '1px solid black', marginTop: '2vh'}}/>
-            </Box>
-        </LocalizationProvider>
     )
 }
 
@@ -252,12 +205,7 @@ function RenderContentArea({garments}) {
     )
 }
 
-function RenderSearchArea(
-    {
-        ClearSearch,
-        UpdateNameAndSort
-    }
-) {
+function RenderSearchArea({ClearSearch, UpdateNameAndSort}) {
     const [input, setInput] = useState({
         text: "",
         type: "name1"
@@ -265,16 +213,19 @@ function RenderSearchArea(
 
     const handleSearch = (e, type) => {
         let newInput = null
-        if(type === 'name'){
+        if (type === 'name') {
             newInput = {...input, text: e.target.value}
-        }else {
-            newInput = {...input, type: e.target.value}
+        } else {
+            newInput = {...input, type: e}
         }
         setInput(newInput)
         UpdateNameAndSort(newInput.text, newInput.type)
     }
 
-
+    const handleClearSearch = () => {
+        setInput({...input, text: "", type: "name1"})
+        ClearSearch()
+    }
 
     return (
         <Paper
@@ -289,12 +240,13 @@ function RenderSearchArea(
             <Box sx={{display: 'flex', gap: '1vw'}}>
                 <Input
                     placeholder={"Enter garment factory name to search..."}
+                    value={input.text}
                     onChange={(e) => handleSearch(e, 'name')}
                     style={{width: '60vw'}}
                 />
                 <Select
                     prefix="Sort by:  "
-                    defaultValue="name1"
+                    value={input.type}
                     style={{width: '12vw', height: '6vh'}}
                     onChange={(e) => handleSearch(e, 'sort')}
                     options={[
@@ -307,6 +259,7 @@ function RenderSearchArea(
                 <RenderTooltip title={'Clear search information'}>
                     <IconButton
                         color={'error'}
+                        onClick={handleClearSearch}
                         sx={{
                             backgroundColor: 'red',
                             borderRadius: '10px',
@@ -323,14 +276,7 @@ function RenderSearchArea(
     )
 }
 
-function RenderFilterArea(
-    {
-        UpdateStatus,
-        UpdateRating,
-        UpdateStartTime,
-        UpdateEndTime
-    }
-) {
+function RenderFilterArea({UpdateStatus, UpdateRating}) {
     return (
         <Paper
             elevation={0}
@@ -340,9 +286,8 @@ function RenderFilterArea(
             }}
             component={"div"}
         >
-            <RenderStatusFilter/>
-            <RenderRatingFilter/>
-            <RenderWorkingTimeFilter/>
+            <RenderStatusFilter UpdateStatus={UpdateStatus}/>
+            <RenderRatingFilter UpdateRating={UpdateRating}/>
         </Paper>
     )
 }
@@ -353,8 +298,6 @@ function RenderPage(
         ClearSearch,
         UpdateStatus,
         UpdateRating,
-        UpdateStartTime,
-        UpdateEndTime,
         UpdateNameAndSort
     }) {
     return (
@@ -378,8 +321,6 @@ function RenderPage(
                 <RenderFilterArea
                     UpdateStatus={UpdateStatus}
                     UpdateRating={UpdateRating}
-                    UpdateStartTime={UpdateStartTime}
-                    UpdateEndTime={UpdateEndTime}
                 />
             </Paper>
 
@@ -398,6 +339,7 @@ function RenderPage(
                     ClearSearch={ClearSearch}
                     UpdateNameAndSort={UpdateNameAndSort}
                 />
+                <Typography variant={'h4'} sx={{width: '90%', marginX: 'auto', marginTop: '1vh'}}>Garment Found: {garments.length}</Typography>
                 <RenderContentArea garments={garments}/>
             </Paper>
         </Paper>
@@ -410,8 +352,7 @@ export default function GarmentList() {
     const [garments, setGarments] = useState([])
     const [filterData, setFilterData] = useState({
         status: "available",
-        rating: 0,
-        time: {start: null, end: null},
+        rating: 5,
         name: '',
         sort: "name1"
     })
@@ -443,34 +384,52 @@ export default function GarmentList() {
         setFilterData({...filterData, rating: value})
     }
 
-    function UpdateStartTime(value) {
-        setFilterData({...filterData, time: {...filterData.time, start: value}})
-    }
-
-    function UpdateEndTime(value) {
-        setFilterData({...filterData, time: {...filterData.time, end: value}})
-    }
-
     function UpdateNameAndSort(name, sort) {
         setFilterData({...filterData, name: name, sort: sort})
     }
-    console.log("Filter data", filterData)
-    console.log("Garments: ", garments)
-    console.log("Filter: ", garments.filter(garment =>
+
+    let filterGarments = garments.filter(garment =>
         garment.profile.name.toLowerCase().includes(filterData.name.toLowerCase())
-    ))
+    )
+
+    switch (filterData.sort) {
+        case "name1": {
+            filterGarments = filterGarments.sort((g1, g2) => g1.profile.name.localeCompare(g2.profile.name))
+            break
+        }
+        case "name2": {
+            filterGarments = filterGarments.sort((g1, g2) => g2.profile.name.localeCompare(g1.profile.name))
+            break
+        }
+        case "rating1": {
+            filterGarments = filterGarments.sort((g1, g2) => g1.rating - g2.rating)
+            break
+        }
+        default: {
+            filterGarments = filterGarments.sort((g1, g2) => g2.rating - g1.rating)
+            break
+        }
+    }
+
+    switch (filterData.status) {
+        case "available":{
+            filterGarments = filterGarments.filter(garment => !garment.busy)
+            break
+        }
+        case "busy":{
+            filterGarments = filterGarments.filter(garment => garment.busy)
+            break
+        }
+    }
+
+    filterGarments = filterGarments.filter(garment => garment.rating <= filterData.rating)
+
     return (
         <RenderPage
-            garments={
-                garments.filter(garment =>
-                    garment.profile.name.toLowerCase().includes(filterData.name.toLowerCase())
-                )
-            }
+            garments={filterGarments}
             ClearSearch={ClearSearch}
             UpdateStatus={UpdateStatus}
             UpdateRating={UpdateRating}
-            UpdateStartTime={UpdateStartTime}
-            UpdateEndTime={UpdateEndTime}
             UpdateNameAndSort={UpdateNameAndSort}
         />
     )

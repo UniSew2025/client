@@ -35,6 +35,7 @@ import {AdapterDayjs} from "@mui/x-date-pickers/AdapterDayjs";
 import {viVN} from "@mui/x-date-pickers/locales"
 import GarmentList from "./components/school/order/GarmentList.jsx";
 import OrderFillForm from "./components/school/order/OrderFillForm.jsx";
+import GarmentDetail from "./components/school/order/GarmentDetail.jsx";
 
 const router = createBrowserRouter([
     {
@@ -73,7 +74,7 @@ const router = createBrowserRouter([
             },
             {
                 path: "garment/detail",
-                element: <DesignerDetail/>
+                element: <GarmentDetail/>
             },
             {
                 path: "school/d",
