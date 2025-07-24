@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react';
+import {createRef, useEffect, useRef, useState} from 'react';
 import {
     Box,
     Button,
@@ -20,13 +20,19 @@ import {
     Tabs,
     TextField,
     Tooltip,
-    Typography
+    Typography,
+    Radio,RadioGroup,
+    FormControlLabel,
+    FormControl,
+    InputLabel,
+    Select,
+    MenuItem
 } from '@mui/material';
 import {useLocation} from "react-router-dom";
 import {
     getAllComments,
     getAllDelivery,
-    getClothByRequestId,
+    getClothByRequestId, getRequestById, getRevisionUnUseList,
     sendComment,
     submitDelivery,
     submitRevision
@@ -34,6 +40,8 @@ import {
 import {getPackageInfo} from "../../../services/ProfileService.jsx";
 import UploadZip from "../../designer/UploadZip.jsx";
 import {enqueueSnackbar} from "notistack";
+import InfoOutlined from "@mui/icons-material/InfoOutlined";
+import RefreshIcon from '@mui/icons-material/Refresh';
 
 function TabPanel(props) {
     const {children, value, index, ...other} = props;
@@ -171,26 +179,9 @@ const ActivityTab = ({requestId, userRole, onSend}) => {
 const formatVND = (number) => {
     return new Intl.NumberFormat('vi-VN').format(number);
 };
-const DetailsTab = ({packageId, userRole}) => {
-
-    const [packageInfo, setPackageInfo] = useState(null);
+const DetailsTab = ({packageInfo, request}) => {
 
 
-    useEffect(() => {
-        if (!packageId) return;
-        const fetchPackage = async () => {
-            try {
-                const res = await getPackageInfo(packageId);
-                if (res && res.data) {
-                    return res.data
-                }
-            } catch (error) {
-                console.error("Failed to load package info:", error);
-                return null;
-            }
-        };
-        fetchPackage().then(res => setPackageInfo(res));
-    }, [packageId]);
 
     if (!packageInfo) {
         return <Typography>Loading package info...</Typography>;
@@ -199,16 +190,16 @@ const DetailsTab = ({packageId, userRole}) => {
     return (
         <>
             <Typography variant="h6" fontWeight="bold" gutterBottom>
-                {packageInfo.pkgName}
+                {request.packageName}
             </Typography>
 
             <Typography color="text.secondary" mb={2}>
-                {packageInfo.headerContent}
+                {request.headerContent}
             </Typography>
 
-            <Typography><b>Fee:</b> {formatVND(packageInfo.fee)}VND</Typography>
-            <Typography><b>Delivery:</b> {packageInfo.deliveryDuration} days</Typography>
-            <Typography><b>Revisions:</b> {packageInfo.revisionTime}</Typography>
+            <Typography><b>Fee:</b> {formatVND(request.packagePrice)}VND</Typography>
+            <Typography><b>Delivery:</b> {request.deliveryDate} days</Typography>
+            <Typography><b>Revisions:</b> {request.revisionTime}</Typography>
         </>
     );
 };
@@ -236,7 +227,7 @@ const RequirementsTab = () => {
         };
         if (requestId) fetchDesign();
     }, [requestId]);
-    console.log(designDetails);
+
 
     const handleViewImages = (images) => {
         setSelectedImages(images);
@@ -342,7 +333,7 @@ const RequirementsTab = () => {
     );
 };
 
-const DeliveryTab = ({requestId, userRole, request}) => {
+const DeliveryTab = ({ requestId, userRole, request, refreshKey}) => {
     const [note, setNote] = useState("");
     const [fileUrl, setFileUrl] = useState("");
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -350,6 +341,18 @@ const DeliveryTab = ({requestId, userRole, request}) => {
     const [loading, setLoading] = useState(true);
     const [googleAccessToken, setGoogleAccessToken] = useState("");
     const [resetUploadKey, setResetUploadKey] = useState(0);
+    const [submitType, setSubmitType] = useState("normal");
+    const [selectedRevisionId, setSelectedRevisionId] = useState(null);
+    const [revisionList, setRevisionList] = useState([]);
+    const [highlightedId, setHighlightedId] = useState(null);
+
+
+    const deliveryRefs = useRef({});
+    const selectedRevision = revisionList.find(rev => rev.id === Number(selectedRevisionId));
+    const revisionDelivery = deliveries.filter((item) => item.isRevision);
+    const revisionCount = revisionDelivery.length;
+    const isRevisionDisabled = revisionCount >= request.revisionTime;
+
 
     useEffect(() => {
         if (!requestId) return;
@@ -360,67 +363,201 @@ const DeliveryTab = ({requestId, userRole, request}) => {
                 setGoogleAccessToken(res?.data?.google_access_token || "");
             })
             .finally(() => setLoading(false));
+
+        getRevisionUnUseList(requestId).then((data) => {
+            setRevisionList(data.data || []);
+        });
+
+    }, [requestId, refreshKey]);
+
+    useEffect(() => {
+        if (deliveries && deliveries.length > 0) {
+            deliveries.forEach((d) => {
+                if (!deliveryRefs.current[d.id]) {
+                    deliveryRefs.current[d.id] = createRef();
+                }
+            });
+        }
+    }, [deliveries]);
+
+    useEffect(() => {
+        if (!requestId) return;
+        fetchAllData();
     }, [requestId]);
 
-    console.log("de", request)
+
+    const fetchAllData = async () => {
+        setLoading(true);
+        try {
+            const res = await getAllDelivery(requestId);
+            setDeliveries(res.data.deliveries);
+            setGoogleAccessToken(res?.data?.google_access_token || "");
+
+            getRevisionUnUseList(requestId).then((data) => {
+                setRevisionList(data.data || []);
+            });
+        } finally {
+            setLoading(false);
+        }
+    };
+
 
     const handleSubmit = async () => {
         setIsSubmitting(true);
         try {
-            const submit = await submitDelivery(requestId, fileUrl, note);
+            const revision = submitType === "revision";
+            const revisionId = revision ? selectedRevisionId : null;
+
+
+            const submit = await submitDelivery(requestId, fileUrl, note, revisionId, revision);
 
             const res = await getAllDelivery(requestId);
-
             setDeliveries(res.data.deliveries);
 
             setNote("");
             setFileUrl("");
             setResetUploadKey(k => k + 1);
 
-            enqueueSnackbar(submit.message, {variant: "success"});
+            getRevisionUnUseList(requestId).then((data) => {
+                setRevisionList(data.data || []);
+            });
+
+            enqueueSnackbar(submit.message, { variant: "success" });
         } catch (err) {
-            enqueueSnackbar("Error submitting delivery", {variant: "error"});
+            enqueueSnackbar("Error submitting delivery", { variant: "error" });
             console.log("error", err);
         } finally {
             setIsSubmitting(false);
         }
     };
 
+    const handleGoToDelivery = (deliveryId) => {
+        const target = deliveryRefs.current[deliveryId];
+        if (target) {
+            target.scrollIntoView({ behavior: "smooth", block: "center" });
+            setHighlightedId(deliveryId);
+            // Xóa highlight sau 1-2s
+            setTimeout(() => setHighlightedId(null), 2000);
+        }
+    };
 
-    const revisionDelivery = deliveries.filter((item) => item.isRevision)
     if (userRole === "designer" && revisionDelivery.length !== request.revisionTime) {
         return (
-            <Paper sx={{p: 3}}>
-                <Typography variant="h6" mb={2}>Submit Delivery</Typography>
+            <Paper sx={{ p: 3 }}>
+                <Typography variant="h3" mb={2}>Submit Delivery</Typography>
 
+                <RadioGroup
+                    row
+                    value={submitType}
+                    onChange={e => {
+                        setSubmitType(e.target.value);
+                        setSelectedRevisionId("");
+                    }}
+                    sx={{ mb: 2 }}
+                >
+                    <FormControlLabel value="normal" control={<Radio />} label="Normal" />
+                    <FormControlLabel value="revision" control={<Radio />} label="Revision submit" disabled={isRevisionDisabled} />
+                </RadioGroup>
+
+                {submitType === "revision" && (
+                    <Box display="flex" alignItems="center" gap={2} sx={{ mb: 2 }}>
+                        <FormControl sx={{ minWidth: 180 }}>
+                            <InputLabel>Revision request id</InputLabel>
+                            <Select
+                                value={selectedRevisionId ?? ""}
+                                label="Revision request id"
+                                onChange={e => setSelectedRevisionId(Number(e.target.value))}
+                                variant="filled"
+                            >
+                                {revisionList.map((rev) => (
+                                    <MenuItem key={rev.id} value={rev.id}>
+                                        {rev.id}
+                                    </MenuItem>
+                                ))}
+                            </Select>
+                        </FormControl>
+                        <Box>
+
+                        </Box>
+                        <Divider orientation="vertical" flexItem sx={{ mx: 1 }} />
+                        <Typography>
+                            Delivery ID: {selectedRevision?.deliveryId}
+                        </Typography>
+                        {selectedRevision?.deliveryId && (
+                            <Button
+                                variant="outlined"
+                                onClick={() => handleGoToDelivery(selectedRevision?.deliveryId)}
+                            >
+                                Go to Delivery
+                            </Button>
+                        )}
+                    </Box>
+                )}
+
+                <Typography variant="body2" color="text.secondary" fontWeight="bold" sx={{ display: "flex", alignItems: "center" }}>
+                    <InfoOutlined sx={{ mr: 0.5, fontSize: 18, color: "primary.main" }}/>
+                    Note from School:
+                </Typography>
+                <Box
+                    sx={{
+                        background: "#f5f5f5",
+                        borderRadius: 1,
+                        px: 2,
+                        py: 1,
+                        mb: 1,
+                        border: "1px solid #eee"
+                    }}
+                >
+                    {selectedRevision?.note ? selectedRevision.note : "No note"}
+                </Box>
+
+                <Divider sx={{borderTop: "1px solid #000000", marginY:"3vh"}} />
                 <TextField
-                    label="Note"
+                    label="Your note to School "
                     multiline
                     minRows={3}
                     value={note}
                     onChange={e => setNote(e.target.value)}
                     fullWidth
-                    sx={{mb: 2}}
+                    sx={{ mb: 2, mt: 1 }}
                 />
-                <UploadZip key={resetUploadKey} onUploadSuccess={url => setFileUrl(url)}
-                           accessToken={googleAccessToken}/>
+
+                <UploadZip
+                    key={resetUploadKey}
+                    onUploadSuccess={url => setFileUrl(url)}
+                    accessToken={googleAccessToken}
+                />
+
                 {fileUrl && (
                     <Typography mt={1} color="green">
                         File uploaded! <a href={fileUrl} target="_blank" rel="noopener noreferrer">View File</a>
                     </Typography>
                 )}
+
                 <Button
                     variant="contained"
-                    sx={{mt: 2}}
-                    disabled={!fileUrl || !note || isSubmitting}
+                    sx={{ mt: 2 }}
+                    disabled={
+                        !fileUrl ||
+                        !note ||
+                        isSubmitting ||
+                        (submitType === "revision" && !selectedRevisionId)
+                    }
                     onClick={handleSubmit}
                 >
                     {isSubmitting ? "Submitting..." : "Submit Delivery"}
                 </Button>
+
                 <Box mt={4}>
                     <Typography variant="h6">Previous Deliveries</Typography>
-                    {loading ? <CircularProgress/> :
-                        <DeliveryList deliveries={deliveries} userRole={userRole} request={request}/>}
+                    {loading ? <CircularProgress /> :
+                        <DeliveryList
+                            deliveries={deliveries}
+                            userRole={userRole}
+                            request={request}
+                            deliveryRefs={deliveryRefs.current}
+                            highlightedId={highlightedId}
+                        />}
                 </Box>
             </Paper>
         );
@@ -428,34 +565,53 @@ const DeliveryTab = ({requestId, userRole, request}) => {
         return (
             <>
                 <Typography variant="h2">Out of submit</Typography>
-                <Paper sx={{p: 3}}>
+                <Paper sx={{ p: 3 }}>
                     <Typography variant="h6" mb={2}>Delivery History</Typography>
-                    {loading ? <CircularProgress/> :
-                        <DeliveryList deliveries={deliveries} userRole={userRole} request={request}/>}
+                    {loading ? <CircularProgress /> :
+                        <DeliveryList
+                            deliveries={deliveries}
+                            userRole={userRole}
+                            request={request}
+                            deliveryRefs={deliveryRefs.current}
+                            highlightedId={highlightedId}
+                        />}
                 </Paper>
             </>
         );
     }
 
     return (
-        <Paper sx={{p: 3}}>
-            <Typography variant="h6" mb={2}>Delivery History</Typography>
-            {loading ? <CircularProgress/> :
-                <DeliveryList deliveries={deliveries} userRole={userRole} request={request}/>}
+        <Paper sx={{ p: 3 }}>
+            <Box display="flex" alignItems="center" gap={2} mb={2}>
+                <Typography variant="h6" mb={0}>Delivery History</Typography>
+
+            </Box>
+            {loading ? <CircularProgress /> :
+                <DeliveryList
+                    deliveries={deliveries}
+                    userRole={userRole}
+                    request={request}
+                    deliveryRefs={deliveryRefs.current}
+                    highlightedId={highlightedId}
+                />}
         </Paper>
     );
 };
 
-function DeliveryList({deliveries, userRole, request}) {
-
+function DeliveryList({deliveries, userRole, request, deliveryRefs, highlightedId}) {
+    console.log('resquest:', request);
+    console.log('deliveries:', deliveries);
     const [openRevision, setOpenRevision] = useState(false);
     const [revisionNote, setRevisionNote] = useState("");
     const [selectedDelivery, setSelectedDelivery] = useState(null);
     const user = JSON.parse(localStorage.getItem("user")) || {};
 
-    const isDisabled = deliveries.length === request.revisionTime;
 
-    console.log("deliver", deliveries)
+    const isDisabled = request.revisionCount >= request.revisionTime;
+
+    const setDeliveryRef = (id) => (el) => {
+        if (el) deliveryRefs[id] = el;
+    };
 
     function handleRequestRevision(delivery) {
         setSelectedDelivery(delivery);
@@ -470,15 +626,16 @@ function DeliveryList({deliveries, userRole, request}) {
         }
         try {
             const submit = await submitRevision(selectedDelivery.id, revisionNote, user.id, userRole)
-            console.log("submit", submit)
             setOpenRevision(false);
             enqueueSnackbar(submit?.message ?? "Success", {variant: "success"});
+
         } catch (err) {
             console.log("error", err, err?.response)
             enqueueSnackbar("Failed to submit revision request!", {variant: "error"});
         }
     }
 
+    console.log("deliveries", deliveries);
 
     if (!deliveries || deliveries.length === 0) {
         return <Typography>No deliveries yet.</Typography>;
@@ -486,8 +643,21 @@ function DeliveryList({deliveries, userRole, request}) {
     return (
         <Box>
             {deliveries.map((d, i) => (
-                <Box key={d.id || i} mb={2} p={2} border="1px solid #eee" borderRadius={2}>
-                    <Box display="flex" alignItems="center" justifyContent="space-between">
+                <Box
+                    key={d.id || i}
+                    ref={setDeliveryRef(d.id)}
+                    sx={{
+                        mb: 2,
+                        p: 2,
+                        border: "2px solid",
+                        borderColor: d.id === highlightedId ? "primary.main" : "#eee",
+                        borderRadius: 2,
+                        backgroundColor: d.id === highlightedId ? "rgba(33,150,243,0.08)" : "#fff",
+                        transition: "background 0.5s, border 0.5s"
+                    }}
+                >
+
+                <Box display="flex" alignItems="center" justifyContent="space-between">
                         <Typography fontWeight="bold">
                             Delivery #{d.deliveryNumber}
                         </Typography>
@@ -554,42 +724,78 @@ function DeliveryList({deliveries, userRole, request}) {
 
 export default function ChatUI({packageId, requestId, request}) {
     const [tab, setTab] = useState(0);
+    const [packageInfo, setPackageInfo] = useState(null);
+    const [requestDetail, setRequestDetail] = useState(request || null);
+    const [loadingRequest, setLoadingRequest] = useState(!request);
+    const [refreshKey, setRefreshKey] = useState(0);
+
+    useEffect(() => {
+        if (!packageId) return;
+        getPackageInfo(packageId).then(res => setPackageInfo(res?.data || null));
+    }, [packageId]);
+
+    const fetchRequestDetail = async () => {
+        setLoadingRequest(true);
+        try {
+            const res = await getRequestById(requestId);
+            setRequestDetail(res.data);
+        } catch (err) {
+            console.error("Failed to load request detail:", err);
+        } finally {
+            setLoadingRequest(false);
+        }
+    };
+
+    useEffect(() => {
+        if (requestId) fetchRequestDetail();
+    }, [requestId]);
+
+    const handleRefreshAll = async () => {
+        await fetchRequestDetail();
+        setRefreshKey(prev => prev + 1)
+    };
+
     const userRole = JSON.parse(localStorage.getItem('user')).role;
+
+    if (!requestDetail) return <CircularProgress sx={{m: 4}}/>;
 
     return (
         <Paper elevation={2} sx={{width: "100%", maxWidth: "80vw", mx: "auto", mt: 3}}>
             <h1>Request : {requestId}</h1>
+            <Button
+                variant="outlined"
+                onClick={handleRefreshAll}
+                startIcon={<RefreshIcon />}
+                disabled={loadingRequest}
+            >
+                Refresh
+            </Button>
             <Tabs value={tab} onChange={(_, v) => setTab(v)} variant="fullWidth">
-                {request.status !== "created" && <Tab label="Activity"/>}
-                {request.status !== "created" && <Tab label="Package & Payment"/>}
+                {requestDetail.status !== "created" && <Tab label="Activity"/>}
+                {requestDetail.status !== "created" && <Tab label="Package & Payment"/>}
                 <Tab label="Requirements"/>
-                {request.status !== "created" && <Tab label="Delivery"/>}
+                {requestDetail.status !== "created" && <Tab label="Delivery"/>}
             </Tabs>
             <Divider/>
-            {request.status !== "created" &&
+            {requestDetail.status !== "created" &&
                 <TabPanel value={tab} index={0}>
-                    <ActivityTab
-                        requestId={requestId}
-                        userRole={userRole}
-                        onSend={(comment) => {
-                            console.log("New comment:", comment);
-                        }}
-                    />
+                    <ActivityTab requestId={requestId} userRole={userRole}/>
                 </TabPanel>
             }
-            {request.status !== "created" &&
+            {requestDetail.status !== "created" &&
                 <TabPanel value={tab} index={1}>
-                    <DetailsTab packageId={packageId} userRole={userRole}/>
+                    <DetailsTab packageInfo={packageInfo} request={requestDetail}/>
                 </TabPanel>
             }
-            <TabPanel value={tab} index={request.status !== "created" ? 2 : 0}>
+            <TabPanel value={tab} index={requestDetail.status !== "created" ? 2 : 0}>
                 <RequirementsTab/>
             </TabPanel>
-            {request.status !== "created" &&
+            {requestDetail.status !== "created" &&
                 <TabPanel value={tab} index={3}>
-                    <DeliveryTab requestId={requestId} userRole={userRole} request={request}/>
+                    <DeliveryTab requestId={requestId} userRole={userRole} request={requestDetail} packageInfo={packageInfo} refreshKey={refreshKey} />
                 </TabPanel>
             }
         </Paper>
     );
 }
+
