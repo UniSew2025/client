@@ -22,80 +22,59 @@ import {
     TextField,
     Typography
 } from '@mui/material';
-import {Add, Delete, Edit, Search, Visibility} from '@mui/icons-material';
-import {createAccount, deleteAccount, getAllAccounts, updateAccount} from '../../services/AccountService.jsx';
+import {Add, Block, Done, Search, Visibility} from '@mui/icons-material';
+import {createAccount, getAllAccounts, updateAccount} from '../../services/AccountService.jsx';
+import {enqueueSnackbar} from "notistack";
 
 function AdminAccount() {
     const [accounts, setAccounts] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const [searchTerm, setSearchTerm] = useState('');
-    
-    // Dialog states
+
     const [openDialog, setOpenDialog] = useState(false);
-    const [dialogMode, setDialogMode] = useState('create'); 
     const [selectedAccount, setSelectedAccount] = useState(null);
-    
-    // Form states
+
     const [formData, setFormData] = useState({
-        id: '',
         email: '',
         role: '',
-        registerDate: '',
-        status: 'ACTIVE'
+        status: 'ACTIVE',
+        packageIds: []
     });
 
     useEffect(() => {
-        fetchAccounts();
+        FetchAccounts();
     }, []);
 
-    const fetchAccounts = async () => {
-        try {
-            setLoading(true);
-            const response = await getAllAccounts();
-            if (response && response.data) {
-                const accountsData = response.data.data
-                setAccounts(accountsData);
-            } else {
-                setAccounts([]);
-            }
-            setError(null);
-            if (accounts.length === 0) {
-                setError('No accounts found');
-            }
-        } catch (err) {
-            setError('Failed to fetch accounts');
-            console.error('Error fetching accounts:', err);
-            setAccounts([]);
-        } finally {
-            setLoading(false);
+    async function FetchAccounts() {
+        const res = await getAllAccounts();
+        const accountsData = res.data;
+        console.log(accountsData);
+        setAccounts(accountsData)
+        if (accountsData.length === 0) {
+            enqueueSnackbar(res?.message || "Get account fail!", {variant: "success"})
         }
-    };
+    }
 
-    const handleOpenDialog = (mode, account = null) => {
-        setDialogMode(mode);
+    const handleOpenDialog = (account = null) => {
         setSelectedAccount(account);
-        
+
         if (account) {
             setFormData({
                 id: account.id || '',
                 email: account.email || '',
                 role: account.role || '',
-                registerDate: account.registerDate || '',
-                status: account.status || 'ACCOUNT_ACTIVE'
+                status: account.status || ''
             });
         } else {
             setFormData({
                 id: '',
                 email: '',
                 role: '',
-                registerDate: '',
-                status: 'ACCOUNT_ACTIVE'
+                status: ''
             });
         }
-        
+
         setOpenDialog(true);
     };
 
@@ -106,13 +85,12 @@ function AdminAccount() {
             id: '',
             email: '',
             role: '',
-            registerDate: '',
-            status: 'ACCOUNT_ACTIVE'
+            status: ''
         });
     };
 
     const handleInputChange = (e) => {
-        const { name, value } = e.target;
+        const {name, value} = e.target;
         setFormData(prev => ({
             ...prev,
             [name]: value
@@ -120,39 +98,11 @@ function AdminAccount() {
     };
 
     const handleSubmit = async () => {
-        try {
-            setLoading(true);
-            
-            if (dialogMode === 'create') {
-                await createAccount(formData);
-            } else if (dialogMode === 'edit') {
-                await updateAccount(selectedAccount.id, formData);
-            }
-            
-            await fetchAccounts();
-            handleCloseDialog();
-        } catch (err) {
-            setError(`Failed to ${dialogMode} account`);
-            console.error(`Error ${dialogMode} account:`, err);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const handleDelete = async (accountId) => {
-        if (window.confirm('Are you sure you want to delete this account?')) {
-            try {
-                setLoading(true);
-                await deleteAccount(accountId);
-                await fetchAccounts();
-            } catch (err) {
-                setError('Failed to delete account');
-                console.error('Error deleting account:', err);
-            } finally {
-                setLoading(false);
-            }
-        }
-    };
+        const res = await createAccount(formData);
+        await FetchAccounts();
+        handleCloseDialog();
+        enqueueSnackbar(res?.message || "Create account fail!", {variant: "error"});
+    }
 
     const getRoleColor = (role) => {
         switch (role?.toLowerCase()) {
@@ -161,19 +111,18 @@ function AdminAccount() {
             case 'school':
                 return 'primary';
             case 'designer':
-                return 'secondary';
-            case 'garment':
-                return 'success';
+                return 'primary';
+            case 'garment_factory':
+                return 'primary';
             default:
                 return 'default';
         }
     };
 
     const getStatusColor = (status) => {
-        return status === 'ACCOUNT_ACTIVE' ? 'success' : 'error';
+        return status === 'active' ? 'success' : 'error';
     };
 
-    // Filter accounts based on search term
     const filteredAccounts = Array.isArray(accounts) ? accounts.filter(account => {
         const searchLower = searchTerm.toLowerCase();
         return (
@@ -184,22 +133,39 @@ function AdminAccount() {
         );
     }) : [];
 
-    const paginatedAccounts = filteredAccounts.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
-
-    // Reset page when search term changes
+    const paginatedAccounts = filteredAccounts.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).sort((a, b) => a.id - b.id);
     const handleSearchChange = (e) => {
         setSearchTerm(e.target.value);
-        setPage(0); // Reset to first page when searching
+        setPage(0);
     };
 
-    if (loading && accounts.length === 0) {
+    if (accounts.length === 0) {
         return (
             <Box display="flex" justifyContent="center" alignItems="center" minHeight="400px">
-                <CircularProgress />
+                <CircularProgress/>
             </Box>
         );
     }
 
+    async function HandleBanOrUnban(account) {
+        try {
+            const updatedStatus = account.status === 'active' ? 'inactive' : 'active';
+            const partnerId = account.partner?.id || '';
+            const res = await updateAccount(account.id, {
+                ...account,
+                status: updatedStatus,
+                packageIds: [account?.partner?.packages[0]?.id],
+                garmentId: partnerId,
+            });
+            await FetchAccounts();
+            enqueueSnackbar(res.message, {variant: "success"});
+        } catch (error) {
+            const errorMessage = error.response?.data?.message || "Failed to update account status" + error;
+            enqueueSnackbar(errorMessage, {variant: "error"});
+        }
+    }
+
+    // -----------------------------------------------------------------------------
     return (
         <Box p={4}>
             <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
@@ -208,7 +174,7 @@ function AdminAccount() {
                 </Typography>
                 <Button
                     variant="contained"
-                    startIcon={<Add />}
+                    startIcon={<Add/>}
                     onClick={() => handleOpenDialog('create')}
                 >
                     Create Account
@@ -225,19 +191,13 @@ function AdminAccount() {
                     InputProps={{
                         startAdornment: (
                             <InputAdornment position="start">
-                                <Search />
+                                <Search/>
                             </InputAdornment>
                         ),
                     }}
-                    sx={{ maxWidth: 600 }}
+                    sx={{maxWidth: 600}}
                 />
             </Box>
-
-            {error && (
-                <Alert severity="error" sx={{ mb: 2 }}>
-                    {error}
-                </Alert>
-            )}
 
             {/* Search Results Info */}
             {searchTerm && (
@@ -261,9 +221,9 @@ function AdminAccount() {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {paginatedAccounts.map((account) => (
+                        {paginatedAccounts.map((account, index) => (
                             <TableRow key={account.id} hover>
-                                <TableCell>{account.id}</TableCell>
+                                <TableCell>{index + 1}</TableCell>
                                 <TableCell>{account.email}</TableCell>
                                 <TableCell>
                                     <Chip
@@ -281,27 +241,15 @@ function AdminAccount() {
                                     />
                                 </TableCell>
                                 <TableCell align="center">
+                                    {/*ban || unban button*/}
                                     <IconButton
                                         size="small"
-                                        onClick={() => handleOpenDialog('view', account)}
-                                        title="View Details"
+                                        onClick={() => {
+                                            HandleBanOrUnban(account)
+                                        }}
+                                        title={account.status === 'active' ? "Ban Account" : "Unban Account"}
                                     >
-                                        <Visibility />
-                                    </IconButton>
-                                    <IconButton
-                                        size="small"
-                                        onClick={() => handleOpenDialog('edit', account)}
-                                        title="Edit Account"
-                                    >
-                                        <Edit />
-                                    </IconButton>
-                                    <IconButton
-                                        size="small"
-                                        color="error"
-                                        onClick={() => handleDelete(account.id)}
-                                        title="Delete Account"
-                                    >
-                                        <Delete />
+                                        {account.status === 'active' ? <Block/> : <Done/>}
                                     </IconButton>
                                 </TableCell>
                             </TableRow>
@@ -323,25 +271,14 @@ function AdminAccount() {
                 />
             </TableContainer>
 
-            {/* Create/Edit/View Dialog */}
             <Dialog open={openDialog} onClose={handleCloseDialog} maxWidth="sm" fullWidth>
                 <DialogTitle>
-                    {dialogMode === 'create' && 'Create New Account'}
-                    {dialogMode === 'edit' && 'Edit Account'}
-                    {dialogMode === 'view' && 'Account Details'}
+                    <Typography variant="body1" gutterBottom sx={{textAlign: 'center'}} fontSize={'xx-large'}>
+                        Create New Account
+                    </Typography>
                 </DialogTitle>
                 <DialogContent>
-                    <Box sx={{ pt: 2 }}>
-                        {dialogMode === 'view' && (
-                            <TextField
-                                fullWidth
-                                label="ID"
-                                name="id"
-                                value={formData.id}
-                                margin="normal"
-                                disabled
-                            />
-                        )}
+                    <Box sx={{pt: 2}}>
                         <TextField
                             fullWidth
                             label="Email"
@@ -350,7 +287,6 @@ function AdminAccount() {
                             value={formData.email}
                             onChange={handleInputChange}
                             margin="normal"
-                            disabled={dialogMode === 'view'}
                             required
                         />
                         <TextField
@@ -358,62 +294,27 @@ function AdminAccount() {
                             label="Role"
                             name="role"
                             select
-                            SelectProps={{ native: true }}
+                            SelectProps={{native: true}}
                             value={formData.role}
                             onChange={handleInputChange}
                             margin="normal"
-                            disabled={dialogMode === 'view'}
                             required
                         >
-                            <option value="">Select Role</option>
-                            <option value="ADMIN">Admin</option>
+                            <option value=""></option>
                             <option value="SCHOOL">School</option>
                             <option value="DESIGNER">Designer</option>
-                            <option value="GARMENT">Garment Factory</option>
-                        </TextField>
-                        <TextField
-                            fullWidth
-                            label="Register Date"
-                            name="registerDate"
-                            type="date"
-                            value={formData.registerDate}
-                            onChange={handleInputChange}
-                            margin="normal"
-                            disabled={dialogMode === 'view'}
-                            InputLabelProps={{
-                                shrink: true,
-                            }}
-                        />
-                        <TextField
-                            fullWidth
-                            label="Status"
-                            name="status"
-                            select
-                            SelectProps={{ native: true }}
-                            value={formData.status}
-                            onChange={handleInputChange}
-                            margin="normal"
-                            disabled={dialogMode === 'view'}
-                            required
-                        >
-                            <option value="ACCOUNT_ACTIVE">Active</option>
-                            <option value="ACCOUNT_INACTIVE">Inactive</option>
+                            <option value="GARMENT_FACTORY">Garment Factory</option>
                         </TextField>
                     </Box>
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handleCloseDialog}>
-                        {dialogMode === 'view' ? 'Close' : 'Cancel'}
+                        Cancel
                     </Button>
-                    {dialogMode !== 'view' && (
-                        <Button
-                            variant="contained"
-                            onClick={handleSubmit}
-                            disabled={loading}
-                        >
-                            {loading ? <CircularProgress size={20} /> : dialogMode === 'create' ? 'Create' : 'Update'}
-                        </Button>
-                    )}
+                    <Button
+                        variant="contained"
+                        onClick={handleSubmit}>OK
+                    </Button>
                 </DialogActions>
             </Dialog>
         </Box>

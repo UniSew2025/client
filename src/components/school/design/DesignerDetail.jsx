@@ -176,7 +176,6 @@ export default function DesignerDetail() {
         GetDesignerDetail()
     }, []);
 
-    console.log("In ra data ne:", data);
 
     return (
         <Box sx={{ background: "#fff", minHeight: "100vh", pb: 8 }}>

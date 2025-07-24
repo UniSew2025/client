@@ -1,5 +1,5 @@
 import './styles/App.css'
-import {createBrowserRouter, Navigate, Outlet, RouterProvider} from "react-router-dom";
+import {createBrowserRouter, Navigate, RouterProvider} from "react-router-dom";
 import {SnackbarProvider} from 'notistack'
 import {Grow} from "@mui/material";
 import WebAppUILayout from "./layouts/ui/WebAppUILayout.jsx";
@@ -35,6 +35,8 @@ import {AdapterDayjs} from "@mui/x-date-pickers/AdapterDayjs";
 import {viVN} from "@mui/x-date-pickers/locales"
 import GarmentList from "./components/school/order/GarmentList.jsx";
 import OrderFillForm from "./components/school/order/OrderFillForm.jsx";
+import AdminTransaction from "./components/admin/AdminTransaction.jsx";
+import GarmentDetail from "./components/school/order/GarmentDetail.jsx";
 
 const router = createBrowserRouter([
     {
@@ -60,20 +62,20 @@ const router = createBrowserRouter([
                 element: <RequestList/>
             },
             {
-                path: "designer/list",
+                path: "list/designer",
                 element: <DesignerList/>
+            },
+            {
+                path: "list/garment",
+                element: <GarmentList/>
             },
             {
                 path: "designer/detail",
                 element: <DesignerDetail/>
             },
             {
-                path: "garment/list",
-                element: <GarmentList/>
-            },
-            {
                 path: "garment/detail",
-                element: <DesignerDetail/>
+                element: <GarmentDetail/>
             },
             {
                 path: "school/d",
@@ -181,6 +183,10 @@ const router = createBrowserRouter([
             {
                 path: 'account',
                 element: <AdminAccount/>
+            },
+            {
+                path: 'transaction',
+                element: <AdminTransaction/>
             }
         ]
     },
