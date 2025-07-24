@@ -25,3 +25,8 @@ export const updateSchoolProfile = async (request) => {
     const response = await axiosClient.put("/profile/school", request);
     return response?.data || null;
 };
+
+export const getAllGarmentProfile = async () => {
+    const response = await axiosClient.get("/profile/garment/list");
+    return response || null;
+}
