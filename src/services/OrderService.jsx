@@ -16,3 +16,13 @@ export const viewOrders = async () => {
 
     return response || null
 }
+
+export const createQuotation = async (orderId, garmentId, note) => {
+    const response = await axiosClient.post('/order/quotation', {
+        orderId: orderId,
+        garmentId: garmentId,
+        note: note
+    })
+
+    return response || null
+}

@@ -1,9 +1,11 @@
 import {Box, Button, Divider, Paper, Rating, Typography} from "@mui/material";
 import {Send} from '@mui/icons-material';
 import {Avatar, Carousel, Image} from 'antd';
-import {useLocation} from "react-router-dom";
+import {useLocation, useNavigate} from "react-router-dom";
 import {useEffect, useState} from "react";
 import {getAllGarmentProfile} from "../../../services/ProfileService.jsx";
+import {createQuotation} from "../../../services/OrderService.jsx";
+import {enqueueSnackbar} from "notistack";
 
 function RenderGarmentInformation({garment}) {
     return (
@@ -87,6 +89,20 @@ function RenderInfoArea({garment}) {
 }
 
 function RenderPage({garment}) {
+    const navigate = useNavigate()
+
+    const handleCreateOrder = async (orderId, garmentId) => {
+        const response = await createQuotation(orderId, garmentId, "");
+        if(response && response.status === 201) {
+            enqueueSnackbar(response.data.message, {variant: 'success'});
+            localStorage.removeItem("sOrder")
+            setTimeout(() => {
+                navigate("/school/d/order")
+            }, 3000)
+        }else {
+            enqueueSnackbar(response.data.message, {variant: 'error'});
+        }
+    }
 
     return (
         <div className={'d-flex'}>
@@ -138,6 +154,7 @@ function RenderPage({garment}) {
                             width: '100%',
                         }}
                         endIcon={<Send/>}
+                        onClick={() => handleCreateOrder(parseInt(JSON.parse(localStorage.getItem('sOrder'))), garment.id)}
                     >
                         Contact us now
                     </Button>
@@ -178,6 +195,10 @@ export default function GarmentDetail() {
         )
     } else {
         selectedGarment = garments.find(garment => garment.id.toString() === garmentId.toString())
+        if(!localStorage.getItem("sOrder")){
+            window.location.href = "/school/d/order"
+        }
+
         if (garments.length === 0 || !selectedGarment) {
             window.location.href = "/list/garment"
         }

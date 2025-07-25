@@ -37,6 +37,9 @@ import GarmentList from "./components/school/order/GarmentList.jsx";
 import OrderFillForm from "./components/school/order/OrderFillForm.jsx";
 import AdminTransaction from "./components/admin/AdminTransaction.jsx";
 import GarmentDetail from "./components/school/order/GarmentDetail.jsx";
+import SchoolQuotation from "./components/school/order/SchoolQuotation.jsx";
+import OrderDetail from "./components/school/order/OrderDetail.jsx";
+import QuotationDetail from "./components/school/order/QuotationDetail.jsx";
 
 const router = createBrowserRouter([
     {
@@ -98,12 +101,24 @@ const router = createBrowserRouter([
                         element: <SchoolOrder/>
                     },
                     {
+                        path: 'order/detail',
+                        element: <OrderDetail/>
+                    },
+                    {
                         path: 'order/form',
                         element: <OrderFillForm/>
                     },
                     {
                         path: 'feedback',
                         element: <FeedbackHistory/>
+                    },
+                    {
+                        path: 'quotation',
+                        element: <SchoolQuotation/>
+                    },
+                    {
+                        path: 'quotation/detail',
+                        element: <QuotationDetail/>
                     }
                 ]
             },

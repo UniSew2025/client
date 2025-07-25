@@ -16,6 +16,7 @@ import {Add, Info, Search} from "@mui/icons-material";
 import {useEffect, useState} from "react";
 import dayjs from "dayjs";
 import {viewOrders} from "../../../services/OrderService.jsx";
+import {useNavigate} from "react-router-dom";
 
 function RenderTooltip({title, children}) {
     return (
@@ -59,6 +60,8 @@ function RenderPage({orders}) {
         localStorage.setItem("formStep", '0')
         window.location.href = "/school/d/order/form"
     }
+
+    const navigate = useNavigate()
 
     return (
         <div className={'d-flex flex-column align-items-center'}>
@@ -109,17 +112,25 @@ function RenderPage({orders}) {
                                             {order.status.substring(0, 1).toUpperCase() + order.status.substring(1).toLowerCase()}
                                         </TableCell>
                                         <TableCell align={'center'}>
-                                            <IconButton onClick={() => {
-                                                localStorage.setItem("sOrder", order.id)
-                                                window.location.href = "/list/garment"
-                                            }}>
+                                            <IconButton
+                                                onClick={() => {
+                                                    localStorage.setItem("sOrder", order.id)
+                                                    window.location.href = "/list/garment"
+                                                }}
+                                                disabled={order.status !== "created"}
+                                            >
                                                 <RenderTooltip title={'Find your garment factory'}>
-                                                    <Search color={'secondary'}/>
+                                                    <Search
+                                                        color={order.status === 'created' ? 'secondary' : 'disabled'}/>
                                                 </RenderTooltip>
                                             </IconButton>
                                         </TableCell>
                                         <TableCell align={'center'}>
-                                            <IconButton>
+                                            <IconButton
+                                                onClick={
+                                                    () => navigate("/school/d/order/detail",{state: {order: order}})
+                                                }
+                                            >
                                                 <RenderTooltip title={'View order detail'}>
                                                     <Info color={'primary'}/>
                                                 </RenderTooltip>
@@ -147,7 +158,7 @@ function RenderPage({orders}) {
 
 export default function SchoolOrder() {
     document.title = 'Order'
-    window.scrollTo(0,0)
+    window.scrollTo(0, 0)
     const [orders, setOrders] = useState([])
 
 
@@ -161,8 +172,6 @@ export default function SchoolOrder() {
     useEffect(() => {
         GetOrders()
     }, []);
-
-    console.log("Orders: ", orders)
 
     return (
         <RenderPage
