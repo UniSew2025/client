@@ -37,6 +37,7 @@ import GarmentList from "./components/school/order/GarmentList.jsx";
 import OrderFillForm from "./components/school/order/OrderFillForm.jsx";
 import AdminTransaction from "./components/admin/AdminTransaction.jsx";
 import GarmentDetail from "./components/school/order/GarmentDetail.jsx";
+import PaymentResult from "./components/school/design/PaymentResult.jsx";
 
 const router = createBrowserRouter([
     {
@@ -76,6 +77,9 @@ const router = createBrowserRouter([
             {
                 path: "garment/detail",
                 element: <GarmentDetail/>
+            },{
+                path: "payment/result",
+                element: <PaymentResult/>
             },
             {
                 path: "school/d",
