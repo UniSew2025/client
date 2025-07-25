@@ -3,18 +3,25 @@ import CallIcon from '@mui/icons-material/Call';
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import EditIcon from '@mui/icons-material/Edit';
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
-import RemoveRedEyeIcon from "@mui/icons-material/RemoveRedEye";
-import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import StarRateIcon from "@mui/icons-material/StarRate";
 import '../../styles/school/SchoolProfile.css'
 import {dateFormatter} from "../../utils/DateFormatter.jsx";
 import {useNavigate} from "react-router-dom";
 import {useState} from "react";
 import {motion, AnimatePresence} from "framer-motion";
-import { updateDesignerProfile } from "../../services/ProfileService.jsx";
-import { enqueueSnackbar } from "notistack";
+import {updateDesignerProfile, updateGarmentProfile} from "../../services/ProfileService.jsx";
+import {enqueueSnackbar} from "notistack";
 
 const user = JSON.parse(localStorage.getItem('user'))
+
+function formatTimeToAMPM(timeStr) {
+    if (!timeStr) return "";
+    const [h, m, s] = timeStr.split(":").map(Number);
+    let hour = h % 12 || 12;
+    let period = h < 12 ? "am" : "pm";
+    let minStr = String(m).padStart(2, "0");
+    return `${hour}:${minStr} ${period}`;
+}
 
 function formatPhoneDash(phone) {
     if (!phone) return "";
@@ -25,35 +32,39 @@ function formatPhoneDash(phone) {
 }
 
 //api
-async function handleUpdateGarmentProfile(updatedUser, setUserData, setShowEdit) {
+async function HandleUpdateGarmentProfile(updatedUser, setUserData, setShowEdit) {
+    try {
         const req = {
             accountId: updatedUser.accountId || updatedUser.id || updatedUser.profile.accountId,
             name: updatedUser.profile.name,
             phone: updatedUser.profile.phone,
-            street: updatedUser.profile.partner.street,
-            ward: updatedUser.profile.partner.ward,
-            district: updatedUser.profile.partner.district,
-            province: updatedUser.profile.partner.province,
+            address: updatedUser.profile.address,
+            outsidePreview: updatedUser.profile.partner.outsidePreview,
+            insidePreview: updatedUser.profile.partner.insidePreview,
+            startDate: updatedUser.profile.partner.startTime,
+            endDate: updatedUser.profile.partner.endTime,
         };
 
-        const res = await updateDesignerProfile(req)
-        if (res && res.status === 200) {
-            enqueueSnackbar(res?.message || "Profile updated!", { variant: "success" });
-            setUserData(updatedUser);
-            setShowEdit(false);
-            localStorage.setItem('user', JSON.stringify(updatedUser));
-        } else {
-            enqueueSnackbar(res?.message || "Update failed!", { variant: "error" });
-        }
+        console.log("alo:", req);
+        const res = await updateGarmentProfile(req);
+        enqueueSnackbar(res?.message || "", {variant: "success"});
+        setUserData(updatedUser);
+        setShowEdit(false);
+        localStorage.setItem('user', JSON.stringify(updatedUser));
+    }catch (error) {
+        console.log("error: ",error);
+        enqueueSnackbar(error?.message || "Failed to update profile", {variant: "error"});
+    }
 }
 
-function EditProfileForm({ user, onClose, onSave }) {
+function EditProfileForm({user, onClose, onSave}) {
     const [name, setName] = useState(user.profile.name || "");
     const [phone, setPhone] = useState(user.profile.phone || "");
-    const [street, setStreet] = useState(user.profile.street || user.profile.partner?.street || "");
-    const [ward, setWard] = useState(user.profile.ward || user.profile.partner?.ward || "");
-    const [district, setDistrict] = useState(user.profile.district || user.profile.partner?.district || "");
-    const [province, setProvince] = useState(user.profile.province || user.profile.partner?.province || "");
+    const [address, setAddress] = useState(user.profile.address || "");
+    const [outsidePreview, setOutsidePreview] = useState(user.profile.partner.outsidePreview || "");
+    const [insidePreview, setInsidePreview] = useState(user.profile.partner.insidePreview || "");
+    const [startTime, setStartTime] = useState(user.profile.partner.startTime || "08:00:00");
+    const [endTime, setEndTime] = useState(user.profile.partner.endTime || "17:00:00");
 
     const handleSave = () => {
         const updatedUser = {
@@ -62,13 +73,14 @@ function EditProfileForm({ user, onClose, onSave }) {
                 ...user.profile,
                 name,
                 phone,
+                address,
                 partner: {
                     ...user.profile.partner,
-                    street,
-                    ward,
-                    district,
-                    province,
-                }
+                    outsidePreview,
+                    insidePreview,
+                    startTime,
+                    endTime,
+                },
             },
         };
         onSave(updatedUser);
@@ -86,12 +98,11 @@ function EditProfileForm({ user, onClose, onSave }) {
                 }}
                 onClick={onClose}
             />
-            {/* Slide-in Form */}
             <motion.div
-                initial={{ x: "100%" }}
-                animate={{ x: 0 }}
-                exit={{ x: "100%" }}
-                transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                initial={{x: "100%"}}
+                animate={{x: 0}}
+                exit={{x: "100%"}}
+                transition={{type: "spring", stiffness: 300, damping: 30}}
                 style={{
                     position: "fixed",
                     top: 0,
@@ -113,20 +124,11 @@ function EditProfileForm({ user, onClose, onSave }) {
                         p: 0
                     }}
                 >
-                    <Card sx={{
-                        minWidth: 400,
-                        maxWidth: 500,
-                        width: "90vw",
-                        p: 3,
-                        position: "relative",
-                        borderRadius: 3,
-                        mt: 3,
-                        mx: "auto"
-                    }}>
+                    <Card sx={{minWidth: 400, maxWidth: 500, width: "90vw", p: 3, position: "relative"}}>
                         <Typography variant="h6" fontWeight="bold" mb={2}>
                             Edit Profile
                         </Typography>
-                        <Divider sx={{ mb: 2 }} />
+                        <Divider sx={{mb: 2}}/>
 
                         <Stack spacing={2}>
                             <TextField
@@ -134,72 +136,59 @@ function EditProfileForm({ user, onClose, onSave }) {
                                 fullWidth
                                 value={name}
                                 onChange={e => setName(e.target.value)}
-                                variant="outlined"
-                                sx={{ borderRadius: 2 }}
                             />
                             <TextField
                                 label="Contact (Phone)"
                                 fullWidth
                                 value={phone}
                                 onChange={e => setPhone(e.target.value)}
-                                variant="outlined"
-                                sx={{ borderRadius: 2 }}
+                            />
+                            <TextField
+                                label="Address"
+                                fullWidth
+                                value={address}
+                                onChange={e => setAddress(e.target.value)}
+                            />
+                            <Stack direction="row" spacing={2}>
+                                <TextField
+                                    label="Working Time (From)"
+                                    type="time"
+                                    fullWidth
+                                    value={startTime.slice(0, 5)}
+                                    onChange={e => setStartTime(e.target.value + ":00")}
+                                    InputLabelProps={{shrink: true}}
+                                    inputProps={{step: 300}}
+                                />
+                                <TextField
+                                    label="Working Time (To)"
+                                    type="time"
+                                    fullWidth
+                                    value={endTime.slice(0, 5)}
+                                    onChange={e => setEndTime(e.target.value + ":00")}
+                                    InputLabelProps={{shrink: true}}
+                                    inputProps={{step: 300}}
+                                />
+                            </Stack>
+                            <TextField
+                                label="About (OutsidePreview)"
+                                fullWidth
+                                multiline
+                                minRows={3}
+                                value={outsidePreview}
+                                onChange={e => setOutsidePreview(e.target.value)}
+                            />
+                            <TextField
+                                label="Inside Preview"
+                                fullWidth
+                                multiline
+                                minRows={2}
+                                value={insidePreview}
+                                onChange={e => setInsidePreview(e.target.value)}
                             />
                         </Stack>
-
-                        <Typography variant="subtitle1" fontWeight="bold" sx={{ mt: 4, mb: 1 }}>
-                            Address
-                        </Typography>
-                        <Grid container spacing={2}>
-                            <Grid item xs={12}>
-                                <TextField
-                                    label="Street"
-                                    fullWidth
-                                    value={street}
-                                    onChange={e => setStreet(e.target.value)}
-                                    variant="outlined"
-                                    sx={{ borderRadius: 2 }}
-                                />
-                            </Grid>
-                            <Grid item xs={6}>
-                                <TextField
-                                    label="Ward"
-                                    fullWidth
-                                    value={ward}
-                                    onChange={e => setWard(e.target.value)}
-                                    variant="outlined"
-                                    sx={{ borderRadius: 2 }}
-                                />
-                            </Grid>
-                            <Grid item xs={6}>
-                                <TextField
-                                    label="District"
-                                    fullWidth
-                                    value={district}
-                                    onChange={e => setDistrict(e.target.value)}
-                                    variant="outlined"
-                                    sx={{ borderRadius: 2 }}
-                                />
-                            </Grid>
-                            <Grid item xs={12}>
-                                <TextField
-                                    label="Province"
-                                    fullWidth
-                                    value={province}
-                                    onChange={e => setProvince(e.target.value)}
-                                    variant="outlined"
-                                    sx={{ borderRadius: 2 }}
-                                />
-                            </Grid>
-                        </Grid>
-
-                        <Stack direction="row" spacing={2} justifyContent="flex-end" mt={4}>
-                            <Button variant="outlined" color="secondary" onClick={onClose}>
-                                Cancel
-                            </Button>
-                            <Button variant="contained" color="primary" onClick={handleSave}>
-                                Save
-                            </Button>
+                        <Stack direction="row" spacing={2} justifyContent="flex-end" mt={3}>
+                            <Button variant="outlined" color="secondary" onClick={onClose}>Cancel</Button>
+                            <Button variant="contained" color="primary" onClick={handleSave}>Save</Button>
                         </Stack>
                     </Card>
                 </Paper>
@@ -209,7 +198,7 @@ function EditProfileForm({ user, onClose, onSave }) {
 }
 
 function RenderLeftArea({onEditProfile, user}) {
-    const navigate = useNavigate()
+    // const navigate = useNavigate()
     return (
         <>
             <Paper elevation={6} sx={{maxWidth: "500px", maxHeight: "440px"}}>
@@ -226,28 +215,37 @@ function RenderLeftArea({onEditProfile, user}) {
                                 <Typography variant="body2">Contact: {formatPhoneDash(user.profile.phone)}</Typography>
                             </Stack>
                             <Stack direction="row" spacing={1} alignItems="center">
+                                <CallIcon fontSize="small" color="action"/>
+                                <Typography variant="body2">Address: {user.profile.address || "N/A"}</Typography>
+                            </Stack>
+                            <Stack direction="row" spacing={1} alignItems="center">
                                 <CalendarMonthIcon fontSize="small" color="action"/>
                                 <Typography variant="body2">Joined date: {dateFormatter(user.registerDate)}</Typography>
                             </Stack>
+                            <Stack direction="row" spacing={1} alignItems="center">
+                                <AccessTimeIcon fontSize="small" color="action"/>
+                                <Typography variant="body2">Working
+                                    time: {formatTimeToAMPM(user.profile.partner.startTime)} - {formatTimeToAMPM(user.profile.partner.endTime)}</Typography>
+                            </Stack>
                         </Stack>
-                        <Button
-                            variant="outlined"
-                            fullWidth
-                            startIcon={<RemoveRedEyeIcon/>}
-                            sx={{mb: 1, borderRadius: 2, textTransform: "none", fontWeight: "bold"}}
-                            onClick={() => navigate("/designer/requests")}
-                        >
-                            View my designs
-                        </Button>
-                        <Button
-                            variant="outlined"
-                            fullWidth
-                            endIcon={<ArrowForwardIcon/>}
-                            sx={{mb: 1, borderRadius: 2, textTransform: "none", fontWeight: "bold"}}
-                            onClick={() => navigate("/designer/packages")}
-                        >
-                            Explore your packages
-                        </Button>
+                        {/*<Button*/}
+                        {/*    variant="outlined"*/}
+                        {/*    fullWidth*/}
+                        {/*    startIcon={<RemoveRedEyeIcon/>}*/}
+                        {/*    sx={{mb: 1, borderRadius: 2, textTransform: "none", fontWeight: "bold"}}*/}
+                        {/*    onClick={() => navigate("/designer/requests")}*/}
+                        {/*>*/}
+                        {/*    View my order*/}
+                        {/*</Button>*/}
+                        {/*<Button*/}
+                        {/*    variant="outlined"*/}
+                        {/*    fullWidth*/}
+                        {/*    endIcon={<ArrowForwardIcon/>}*/}
+                        {/*    sx={{mb: 1, borderRadius: 2, textTransform: "none", fontWeight: "bold"}}*/}
+                        {/*    onClick={() => navigate("/designer/packages")}*/}
+                        {/*>*/}
+                        {/*    Explore your packages*/}
+                        {/*</Button>*/}
                         <Button
                             variant="outlined"
                             fullWidth
@@ -285,13 +283,17 @@ function RenderRightArea({user}) {
                             <Typography variant="h6" fontWeight="bold" mb={1.5}>
                                 About
                             </Typography>
-
+                            <Typography variant="body2" color="text.secondary">
+                                {user.profile.partner.outsidePreview || "You haven't added an outside preview yet."}
+                            </Typography>
                         </CardContent>
                         <CardContent>
                             <Typography variant="h6" fontWeight="bold" mb={1.5}>
                                 Short review
                             </Typography>
-
+                            <Typography variant="body2" color="text.secondary">
+                                {user.profile.partner.insidePreview || "You haven't added a short review yet."}
+                            </Typography>
                         </CardContent>
                     </Card>
                 </Paper>
@@ -325,15 +327,14 @@ export default function DesignerProfile() {
     const [userData, setUserData] = useState(user); // dùng cho UI
 
     const handleSave = (updatedUser) => {
-        handleUpdateGarmentProfile(updatedUser, setUserData, setShowEdit);
+        HandleUpdateGarmentProfile(updatedUser, setUserData, setShowEdit);
     };
     return (
         <Box sx={{minHeight: "100vh", py: 5}}>
-
             <Box sx={{maxWidth: 1400, mx: "auto"}}>
                 <Grid container spacing={3}>
-                    <RenderLeftArea onEditProfile={() => setShowEdit(true)} user={userData} />
-                    <RenderRightArea user={userData} />
+                    <RenderLeftArea onEditProfile={() => setShowEdit(true)} user={userData}/>
+                    <RenderRightArea user={userData}/>
                 </Grid>
             </Box>
             <AnimatePresence>
