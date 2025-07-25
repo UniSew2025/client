@@ -88,7 +88,7 @@ function RenderSummarySizeQuantityArea({qty}) {
     )
 }
 
-function RenderFillSizeArea({upperCloth, lowerCloth, UpdateSizeFunc, initQty}) {
+function RenderFillSizeArea({upperDesignItem, lowerDesignItem, UpdateSizeFunc, initQty}) {
 
     const [qty, setQty] = useState(initQty ? initQty : {
         S: 0,
@@ -118,7 +118,7 @@ function RenderFillSizeArea({upperCloth, lowerCloth, UpdateSizeFunc, initQty}) {
                 }}
             >
                 {
-                    upperCloth && lowerCloth ?
+                    upperDesignItem && lowerDesignItem ?
                         (
                             <div className={'d-flex flex-column justify-content-start align-items-center w-100'}>
                                 <div className={'d-flex justify-content-between align-items-start w-100'}>
@@ -142,10 +142,10 @@ function RenderFillSizeArea({upperCloth, lowerCloth, UpdateSizeFunc, initQty}) {
                                          variant={'fullWidth'}/>
                                 <div className={'d-flex justify-content-start align-items-start w-100 gap-2 mb-3'}>
                                     <Paper variant={'outlined'} sx={{paddingLeft: '2vw', width: '50%'}}>
-                                        <RenderUniFormInformation cloth={upperCloth}/>
+                                        <RenderUniFormInformation designItem={upperDesignItem}/>
                                     </Paper>
                                     <Paper variant={'outlined'} sx={{paddingLeft: '2vw', width: '50%'}}>
-                                        <RenderUniFormInformation cloth={lowerCloth}/>
+                                        <RenderUniFormInformation designItem={lowerDesignItem}/>
                                     </Paper>
                                 </div>
                             </div>
@@ -158,13 +158,13 @@ function RenderFillSizeArea({upperCloth, lowerCloth, UpdateSizeFunc, initQty}) {
                                     fontStyle={"italic"}
                                     sx={{marginTop: '2vh', marginBottom: '2vh'}}
                         >
-                            Invalid cloth
+                            Invalid designItem
                         </Typography>
                 }
             </Paper>
             <div className={'w-100 mt-3 py-2'}>
                 {
-                    upperCloth && lowerCloth ?
+                    upperDesignItem && lowerDesignItem ?
                         (
                             <>
                                 <div className={'d-flex flex-row justify-content-start align-items-start w-100 gap-2'}>
@@ -172,36 +172,36 @@ function RenderFillSizeArea({upperCloth, lowerCloth, UpdateSizeFunc, initQty}) {
                                         <RenderSize name={'S'} size={'S'} minH={100} maxH={109} minW={18} maxW={27}
                                                     qty={qty}
                                                     SetQtyFunc={HandleSetQty} UpdateSizeFunc={UpdateSizeFunc}
-                                                    cloth={upperCloth}/>
+                                                    designItem={upperDesignItem}/>
                                         <RenderSize name={'M'} size={'M'} minH={110} maxH={119} minW={28} maxW={37}
                                                     qty={qty}
                                                     SetQtyFunc={HandleSetQty} UpdateSizeFunc={UpdateSizeFunc}
-                                                    cloth={upperCloth}/>
+                                                    designItem={upperDesignItem}/>
                                         <RenderSize name={'L'} size={'L'} minH={120} maxH={129} minW={38} maxW={47}
                                                     qty={qty}
                                                     SetQtyFunc={HandleSetQty} UpdateSizeFunc={UpdateSizeFunc}
-                                                    cloth={upperCloth}/>
+                                                    designItem={upperDesignItem}/>
                                     </div>
                                     <div className={'d-flex flex-column justify-content-center align-items-start w-50'}>
                                         <RenderSize name={'XL'} size={'XL'} minH={130} maxH={139} minW={48} maxW={57}
                                                     qty={qty}
                                                     SetQtyFunc={HandleSetQty} UpdateSizeFunc={UpdateSizeFunc}
-                                                    cloth={upperCloth}/>
+                                                    designItem={upperDesignItem}/>
                                         <RenderSize name={'XXL'} size={'XXL'} minH={140} maxH={149} minW={58} maxW={67}
                                                     qty={qty}
                                                     SetQtyFunc={HandleSetQty} UpdateSizeFunc={UpdateSizeFunc}
-                                                    cloth={upperCloth}/>
+                                                    designItem={upperDesignItem}/>
                                         <RenderSize name={'XXXL'} size={'3XL'} minH={150} maxH={159} minW={68} maxW={77}
                                                     qty={qty}
                                                     SetQtyFunc={HandleSetQty} UpdateSizeFunc={UpdateSizeFunc}
-                                                    cloth={upperCloth}/>
+                                                    designItem={upperDesignItem}/>
                                     </div>
                                 </div>
                                 <div className={'d-flex justify-content-start align-items-start w-100'}>
                                     <RenderSize name={'XXXXL'} size={'4XL'} minH={160} maxH={180} minW={78} maxW={100}
                                                 qty={qty}
                                                 SetQtyFunc={HandleSetQty} UpdateSizeFunc={UpdateSizeFunc}
-                                                cloth={upperCloth}/>
+                                                designItem={upperDesignItem}/>
                                 </div>
                             </>
                         )
@@ -213,7 +213,7 @@ function RenderFillSizeArea({upperCloth, lowerCloth, UpdateSizeFunc, initQty}) {
                                     fontStyle={"italic"}
                                     sx={{marginTop: '2vh', marginBottom: '2vh'}}
                         >
-                            Invalid cloth
+                            Invalid designItem
                         </Typography>
                 }
             </div>
@@ -221,26 +221,26 @@ function RenderFillSizeArea({upperCloth, lowerCloth, UpdateSizeFunc, initQty}) {
     )
 }
 
-function RenderUniFormInformation({cloth}) {
+function RenderUniFormInformation({designItem}) {
     return (
         <div className={'d-flex flex-column justify-content-center align-items-start my-5'}>
             {/*Name*/}
             <Typography variant={'h5'} fontWeight={'bold'} sx={{marginBottom: '4vh'}}>
-                {cloth.clothType.substring(0, 1).toUpperCase() + cloth.clothType.substring(1).toLowerCase()}
+                {designItem.clothType.substring(0, 1).toUpperCase() + designItem.clothType.substring(1).toLowerCase()}
             </Typography>
 
             {/*Image*/}
             <Typography variant={'body1'} fontWeight={'bold'} sx={{marginBottom: '2vh'}}>
                 1. Image:
             </Typography>
-            <ModalImage className='uniform-img' small={cloth.finalImages[0].url} large={cloth.finalImages[0].url}
+            <ModalImage className='uniform-img' small={designItem.finalImages[0].url} large={designItem.finalImages[0].url}
                         alt={""} hideDownload={false} hideZoom={true}/>
 
             {/*Logo image*/}
             <Typography variant={'body1'} fontWeight={'bold'} sx={{marginTop: '1vh', marginBottom: '0.2vh'}}>
                 2. Logo:
             </Typography>
-            <ModalImage className='uniform-img-logo' small={cloth.logoImage} large={cloth.logoImage}
+            <ModalImage className='uniform-img-logo' small={designItem.logoImage} large={designItem.logoImage}
                         alt={""} hideDownload={false} hideZoom={true}/>
 
             {/*Color*/}
@@ -248,20 +248,20 @@ function RenderUniFormInformation({cloth}) {
                 3. Color:
             </Typography>
             <div className={'d-flex align-items-center gap-2'}>
-                <ColorPicker defaultValue={cloth.color} size={'small'} disabled/>
-                <span>{cloth.color}</span>
+                <ColorPicker defaultValue={designItem.color} size={'small'} disabled/>
+                <span>{designItem.color}</span>
             </div>
 
             {/*Note*/}
             <Typography variant={'body1'} sx={{marginTop: '2vh', fontWeight: 'bold', marginBottom: '0.2vh'}}>
                 4. Note:
             </Typography>
-            <Typography variant={'body2'}>{cloth.note}</Typography>
+            <Typography variant={'body2'}>{designItem.note}</Typography>
         </div>
     )
 }
 
-function RenderSize({name, size, minH, maxH, minW, maxW, qty, SetQtyFunc, UpdateSizeFunc, cloth}) {
+function RenderSize({name, size, minH, maxH, minW, maxW, qty, SetQtyFunc, UpdateSizeFunc, designItem}) {
 
     const handleChangeQty = (e, resetValue) => {
         const value = resetValue === 0 ? resetValue : (e.target.value < 0 ? 0 : e.target.value)
@@ -276,9 +276,9 @@ function RenderSize({name, size, minH, maxH, minW, maxW, qty, SetQtyFunc, Update
             newQty.XXXL === 0 &&
             newQty.XXXXL === 0
         ) {
-            UpdateSizeFunc(cloth.gender, cloth.clothCategory === 'regular' ? 're' : 'pe', null)
+            UpdateSizeFunc(designItem.gender, designItem.clothCategory === 'regular' ? 're' : 'pe', null)
         } else {
-            UpdateSizeFunc(cloth.gender, cloth.clothCategory === 'regular' ? 're' : 'pe', newQty)
+            UpdateSizeFunc(designItem.gender, designItem.clothCategory === 'regular' ? 're' : 'pe', newQty)
         }
 
     }
@@ -301,7 +301,7 @@ function RenderSize({name, size, minH, maxH, minW, maxW, qty, SetQtyFunc, Update
                 </Typography>
             </div>
 
-            <div className={'cloth-size d-flex align-items-center'}>
+            <div className={'designItem-size d-flex align-items-center'}>
                 <Typography variant={'subtitle1'} fontSize={12} sx={{marginBottom: '0.2vh'}} fontWeight={'bold'}>
                     Quantity:
                 </Typography>
@@ -317,7 +317,7 @@ function RenderSize({name, size, minH, maxH, minW, maxW, qty, SetQtyFunc, Update
                 />
 
                 <Typography variant={'subtitle1'} fontSize={12}>
-                    {cloth.clothType.toLowerCase()}
+                    {designItem.clothType.toLowerCase()}
                 </Typography>
                 <RenderTooltip title={"Reset quantity"}>
                     <IconButton
@@ -417,7 +417,7 @@ function RenderFirstStep({selectedDesign, hasRegular, hasPE}) {
     )
 }
 
-function RenderSecondStep({cloths, hasRegular, hasPE, SetLockFunc}) {
+function RenderSecondStep({designItems, hasRegular, hasPE, SetLockFunc}) {
 
     const designId = localStorage.getItem("sRequest") ? localStorage.getItem("sRequest") : null
 
@@ -439,16 +439,16 @@ function RenderSecondStep({cloths, hasRegular, hasPE, SetLockFunc}) {
 
     //Get list for size
     //Regular
-    const boyUpperRE = cloths.find(cloth => cloth.clothCategory === 'regular' && cloth.gender === 'boy' && cloth.clothType === 'shirt')
-    const boyLowerRE = cloths.find(cloth => cloth.clothCategory === 'regular' && cloth.gender === 'boy' && cloth.clothType === 'pants')
-    const girlUpperRE = cloths.find(cloth => cloth.clothCategory === 'regular' && cloth.gender === 'girl' && cloth.clothType === 'shirt')
-    const girlLowerRE = cloths.find(cloth => cloth.clothCategory === 'regular' && cloth.gender === 'girl' && (cloth.clothType === 'pants' || cloth.clothType === 'skirt'))
+    const boyUpperRE = designItems.find(designItem => designItem.clothCategory === 'regular' && designItem.gender === 'boy' && designItem.clothType === 'shirt')
+    const boyLowerRE = designItems.find(designItem => designItem.clothCategory === 'regular' && designItem.gender === 'boy' && designItem.clothType === 'pants')
+    const girlUpperRE = designItems.find(designItem => designItem.clothCategory === 'regular' && designItem.gender === 'girl' && designItem.clothType === 'shirt')
+    const girlLowerRE = designItems.find(designItem => designItem.clothCategory === 'regular' && designItem.gender === 'girl' && (designItem.clothType === 'pants' || designItem.clothType === 'skirt'))
 
     //Physical Education
-    const boyUpperPE = cloths.find(cloth => cloth.clothCategory === 'pe' && cloth.gender === 'boy' && cloth.clothType === 'shirt')
-    const boyLowerPE = cloths.find(cloth => cloth.clothCategory === 'pe' && cloth.gender === 'boy' && cloth.clothType === 'pants')
-    const girlUpperPE = cloths.find(cloth => cloth.clothCategory === 'pe' && cloth.gender === 'girl' && cloth.clothType === 'shirt')
-    const girlLowerPE = cloths.find(cloth => cloth.clothCategory === 'pe' && cloth.gender === 'girl' && cloth.clothType === 'pants')
+    const boyUpperPE = designItems.find(designItem => designItem.clothCategory === 'pe' && designItem.gender === 'boy' && designItem.clothType === 'shirt')
+    const boyLowerPE = designItems.find(designItem => designItem.clothCategory === 'pe' && designItem.gender === 'boy' && designItem.clothType === 'pants')
+    const girlUpperPE = designItems.find(designItem => designItem.clothCategory === 'pe' && designItem.gender === 'girl' && designItem.clothType === 'shirt')
+    const girlLowerPE = designItems.find(designItem => designItem.clothCategory === 'pe' && designItem.gender === 'girl' && designItem.clothType === 'pants')
 
     //Condition for displaying
     const isREBoySizeFilled = size.reBoy !== null // Both upper and lower existed
@@ -622,8 +622,8 @@ function RenderSecondStep({cloths, hasRegular, hasPE, SetLockFunc}) {
                                 qty={size.reBoy ? SumSizeQty(size.reBoy) : 0}
                             />
                             <RenderFillSizeArea
-                                upperCloth={boyUpperRE}
-                                lowerCloth={boyLowerRE}
+                                upperDesignItem={boyUpperRE}
+                                lowerDesignItem={boyLowerRE}
                                 UpdateSizeFunc={UpdateSizes}
                                 initQty={size.reBoy}/>
                         </>
@@ -635,8 +635,8 @@ function RenderSecondStep({cloths, hasRegular, hasPE, SetLockFunc}) {
                                 qty={size.reGirl ? SumSizeQty(size.reGirl) : 0}
                             />
                             <RenderFillSizeArea
-                                upperCloth={girlUpperRE}
-                                lowerCloth={girlLowerRE}
+                                upperDesignItem={girlUpperRE}
+                                lowerDesignItem={girlLowerRE}
                                 UpdateSizeFunc={UpdateSizes}
                                 initQty={size.reGirl}/>
                         </>
@@ -648,8 +648,8 @@ function RenderSecondStep({cloths, hasRegular, hasPE, SetLockFunc}) {
                                 qty={size.peBoy ? SumSizeQty(size.peBoy) : 0}
                             />
                             <RenderFillSizeArea
-                                upperCloth={boyUpperPE}
-                                lowerCloth={boyLowerPE}
+                                upperDesignItem={boyUpperPE}
+                                lowerDesignItem={boyLowerPE}
                                 UpdateSizeFunc={UpdateSizes}
                                 initQty={size.peBoy}/>
                         </>
@@ -661,8 +661,8 @@ function RenderSecondStep({cloths, hasRegular, hasPE, SetLockFunc}) {
                                 qty={size.peGirl ? SumSizeQty(size.peGirl) : 0}
                             />
                             <RenderFillSizeArea
-                                upperCloth={girlUpperPE}
-                                lowerCloth={girlLowerPE}
+                                upperDesignItem={girlUpperPE}
+                                lowerDesignItem={girlLowerPE}
                                 UpdateSizeFunc={UpdateSizes}
                                 initQty={size.peGirl}/>
                         </>
@@ -740,7 +740,7 @@ function RenderFinalStep({hasRegular, hasPE}) {
                                     </Typography>
                                     <Typography>
                                         <span
-                                            className={'fw-bold'}>Qty: </span> {reBoy.S + reBoy.M + reBoy.L + reBoy.XL + reBoy.XXL + reBoy.XXXL + reBoy.XXXXL} uniforms
+                                            className={'fw-bold'}>Qty: </span> {reBoy.S + reBoy.M + reBoy.L + reBoy.XL + reBoy.XXL + reBoy.XXXL + reBoy.XXXXL} uniform(s)
                                     </Typography>
                                     <Typography>
                                         <span className={'fw-bold'}>Including: </span>
@@ -763,7 +763,7 @@ function RenderFinalStep({hasRegular, hasPE}) {
                                     </Typography>
                                     <Typography sx={{paddingLeft: '1vw'}}>
                                         <span
-                                            className={'fw-bold'}>Qty: </span> {reGirl.S + reGirl.M + reGirl.L + reGirl.XL + reGirl.XXL + reGirl.XXXL + reGirl.XXXXL} uniform
+                                            className={'fw-bold'}>Qty: </span> {reGirl.S + reGirl.M + reGirl.L + reGirl.XL + reGirl.XXL + reGirl.XXXL + reGirl.XXXXL} uniform(s)
                                     </Typography>
                                     <Typography sx={{paddingLeft: '1vw'}}>
                                         <span className={'fw-bold'}>Including: </span>
@@ -790,7 +790,7 @@ function RenderFinalStep({hasRegular, hasPE}) {
                                     </Typography>
                                     <Typography>
                                         <span
-                                            className={'fw-bold'}>Qty: </span> {peBoy.S + peBoy.M + peBoy.L + peBoy.XL + peBoy.XXL + peBoy.XXXL + peBoy.XXXXL} uniforms
+                                            className={'fw-bold'}>Qty: </span> {peBoy.S + peBoy.M + peBoy.L + peBoy.XL + peBoy.XXL + peBoy.XXXL + peBoy.XXXXL} uniform(s)
                                     </Typography>
                                     <Typography>
                                         <span className={'fw-bold'}>Including: </span>
@@ -813,7 +813,7 @@ function RenderFinalStep({hasRegular, hasPE}) {
                                     </Typography>
                                     <Typography sx={{paddingLeft: '1vw'}}>
                                         <span
-                                            className={'fw-bold'}>Qty: </span> {peGirl.S + peGirl.M + peGirl.L + peGirl.XL + peGirl.XXL + peGirl.XXXL + peGirl.XXXXL} uniform
+                                            className={'fw-bold'}>Qty: </span> {peGirl.S + peGirl.M + peGirl.L + peGirl.XL + peGirl.XXL + peGirl.XXXL + peGirl.XXXXL} uniform(s)
                                     </Typography>
                                     <Typography sx={{paddingLeft: '1vw'}}>
                                         <span className={'fw-bold'}>Including: </span>
@@ -901,8 +901,8 @@ function GetFilledSize() {
         null
 }
 
-function BuildOrderCloth(hasRegular, hasPE, requestCloth, size) {
-    const cloths = []
+function BuildOrderDesignItem(hasRegular, hasPE, requestDesignItem, size) {
+    const designItems = []
 
     const mapSize = (selectedSize) => {
         return Object.entries(selectedSize)
@@ -911,10 +911,10 @@ function BuildOrderCloth(hasRegular, hasPE, requestCloth, size) {
     }
 
     if (hasRegular) {
-        const reBoyUpper = requestCloth.find(cloth => cloth.clothCategory === 'regular' && cloth.gender === 'boy' && cloth.clothType === 'shirt')
-        const reBoyLower = requestCloth.find(cloth => cloth.clothCategory === 'regular' && cloth.gender === 'boy' && cloth.clothType === 'pants')
-        const reGirlUpper = requestCloth.find(cloth => cloth.clothCategory === 'regular' && cloth.gender === 'girl' && cloth.clothType === 'shirt')
-        const reGirlLower = requestCloth.find(cloth => cloth.clothCategory === 'regular' && cloth.gender === 'girl' && (cloth.clothType === 'pants' || cloth.clothType === 'skirt'))
+        const reBoyUpper = requestDesignItem.find(designItem => designItem.clothCategory === 'regular' && designItem.gender === 'boy' && designItem.clothType === 'shirt')
+        const reBoyLower = requestDesignItem.find(designItem => designItem.clothCategory === 'regular' && designItem.gender === 'boy' && designItem.clothType === 'pants')
+        const reGirlUpper = requestDesignItem.find(designItem => designItem.clothCategory === 'regular' && designItem.gender === 'girl' && designItem.clothType === 'shirt')
+        const reGirlLower = requestDesignItem.find(designItem => designItem.clothCategory === 'regular' && designItem.gender === 'girl' && (designItem.clothType === 'pants' || designItem.clothType === 'skirt'))
 
         const boySize = mapSize(size.reBoy)
         const girlSize = mapSize(size.reGirl)
@@ -947,17 +947,17 @@ function BuildOrderCloth(hasRegular, hasPE, requestCloth, size) {
             sizeList: girlSize
         }
 
-        cloths.push(boyUpper)
-        cloths.push(boyLower)
-        cloths.push(girlUpper)
-        cloths.push(girlLower)
+        designItems.push(boyUpper)
+        designItems.push(boyLower)
+        designItems.push(girlUpper)
+        designItems.push(girlLower)
     }
 
     if (hasPE) {
-        const peBoyUpper = requestCloth.find(cloth => cloth.clothCategory === 'pe' && cloth.gender === 'boy' && cloth.clothType === 'shirt')
-        const peBoyLower = requestCloth.find(cloth => cloth.clothCategory === 'pe' && cloth.gender === 'boy' && cloth.clothType === 'pants')
-        const peGirUpper = requestCloth.find(cloth => cloth.clothCategory === 'pe' && cloth.gender === 'girl' && cloth.clothType === 'shirt')
-        const peGirLower = requestCloth.find(cloth => cloth.clothCategory === 'pe' && cloth.gender === 'girl' && cloth.clothType === 'pants')
+        const peBoyUpper = requestDesignItem.find(designItem => designItem.clothCategory === 'pe' && designItem.gender === 'boy' && designItem.clothType === 'shirt')
+        const peBoyLower = requestDesignItem.find(designItem => designItem.clothCategory === 'pe' && designItem.gender === 'boy' && designItem.clothType === 'pants')
+        const peGirUpper = requestDesignItem.find(designItem => designItem.clothCategory === 'pe' && designItem.gender === 'girl' && designItem.clothType === 'shirt')
+        const peGirLower = requestDesignItem.find(designItem => designItem.clothCategory === 'pe' && designItem.gender === 'girl' && designItem.clothType === 'pants')
 
         const boySize = mapSize(size.peBoy)
         const girlSize = mapSize(size.peGirl)
@@ -990,17 +990,19 @@ function BuildOrderCloth(hasRegular, hasPE, requestCloth, size) {
             sizeList: girlSize
         }
 
-        cloths.push(boyUpper)
-        cloths.push(boyLower)
-        cloths.push(girlUpper)
-        cloths.push(girlLower)
+        designItems.push(boyUpper)
+        designItems.push(boyLower)
+        designItems.push(girlUpper)
+        designItems.push(girlLower)
     }
 
-    return cloths
+    return designItems
 }
 
 function RenderPage({selectedDesign}) {
     const navigate = useNavigate()
+
+    console.log("selectedDesign: ", selectedDesign)
 
     const [currentStep, setCurrentStep] = useState(parseInt(localStorage.getItem("formStep")))
 
@@ -1024,11 +1026,11 @@ function RenderPage({selectedDesign}) {
             const schoolId = localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')).id : null
             const deadline = localStorage.getItem('orderData_' + localStorage.getItem('sRequest')) ? JSON.parse(localStorage.getItem('orderData_' + localStorage.getItem('sRequest'))).deadline : null
             const note = localStorage.getItem('orderData_' + localStorage.getItem('sRequest')) ? JSON.parse(localStorage.getItem('orderData_' + localStorage.getItem('sRequest'))).note : null
-            const requestCloth = selectedDesign.cloth
+            const requestDesignItem = selectedDesign.cloth
             const size = JSON.parse(localStorage.getItem('size_' + selectedDesign.id))
-            const cloths = BuildOrderCloth(hasRegular, hasPE, requestCloth, size)
+            const items = BuildOrderDesignItem(hasRegular, hasPE, requestDesignItem, size)
 
-            await createOrder(schoolId, cloths, deadline, note).then(res => {
+            await createOrder(schoolId, items, deadline, note).then(res => {
                 if (res && res.status === 201) {
                     enqueueSnackbar(res.data.message, {variant: 'success'})
                     localStorage.removeItem('orderData_' + selectedDesign.id)
@@ -1037,7 +1039,7 @@ function RenderPage({selectedDesign}) {
                     localStorage.removeItem('formStep')
                     if (findGarment) {
                         localStorage.setItem("sOrder", res.data.data.orderId)
-                        window.location.href = "/garment/list"
+                        window.location.href = "/list/garment"
                     } else {
                         window.location.href = "/school/d/order"
                     }
@@ -1120,7 +1122,7 @@ function RenderPage({selectedDesign}) {
                                     {
                                         currentStep === 1 &&
                                         <RenderSecondStep
-                                            cloths={selectedDesign.cloth}
+                                            designItems={selectedDesign.cloth}
                                             hasPE={hasPE}
                                             hasRegular={hasRegular}
                                             SetLockFunc={HandleSetLock}

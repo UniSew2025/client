@@ -111,7 +111,7 @@ function RenderPage({orders}) {
                                         <TableCell align={'center'}>
                                             <IconButton onClick={() => {
                                                 localStorage.setItem("sOrder", order.id)
-                                                window.location.href = "/garment/list"
+                                                window.location.href = "/list/garment"
                                             }}>
                                                 <RenderTooltip title={'Find your garment factory'}>
                                                     <Search color={'secondary'}/>
