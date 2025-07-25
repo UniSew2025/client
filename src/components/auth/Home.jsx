@@ -18,8 +18,7 @@ function HeroSection() {
                         </form>
                         <div className="text-white small">
                             Popular:&nbsp;
-                            <span className="hero-popular-link">Uniform Design</span>,&nbsp;
-                            <span className="hero-popular-link">Logo Design</span>
+                            <span className="hero-popular-link">Uniform Design</span>
                         </div>
                     </Col>
                 </Row>
@@ -34,8 +33,8 @@ function TrustedBySection() {
             <Container>
                 <div className="d-flex align-items-center justify-content-center gap-4">
                     <span className="trusted-label">Trusted by:</span>
-                    <img src="/google.png" alt="Paypal" height={25} />
-                    <img src="/payos.png" alt="Google" height={35} />
+                    <img src="/google.png" alt="Google" height={25} />
+                    <img src="/vnpay.webp" alt="VNPay" height={35} />
                 </div>
             </Container>
         </section>
