@@ -98,10 +98,15 @@ function AdminAccount() {
     };
 
     const handleSubmit = async () => {
-        const res = await createAccount(formData);
-        await FetchAccounts();
-        handleCloseDialog();
-        enqueueSnackbar(res?.message || "Create account fail!", {variant: "error"});
+        try{
+            const res = await createAccount(formData);
+            await FetchAccounts();
+            handleCloseDialog();
+            enqueueSnackbar(res?.message || "Create account fail!", {variant: "success"});
+        } catch (error) {
+            enqueueSnackbar(error?.message, {variant: "error"});
+        }
+
     }
 
     const getRoleColor = (role) => {
