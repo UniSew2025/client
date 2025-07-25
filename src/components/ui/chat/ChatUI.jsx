@@ -30,8 +30,9 @@ import {
 } from '@mui/material';
 import {useLocation} from "react-router-dom";
 import {
+    addFinalImages,
     getAllComments,
-    getAllDelivery,
+    getAllDelivery, getAllFinalImageByRequestId,
     getClothByRequestId, getRequestById, getRevisionUnUseList, makeDeliveryFinalAndRequestComplete,
     sendComment,
     submitDelivery,
@@ -95,7 +96,9 @@ const ActivityTab = ({requestId, userRole, onSend}) => {
             onSend?.(newComment);
             setCommentInput('');
         } catch (error) {
-            console.error('Failed to send comment:', error);
+            const errorMsg = error?.response?.data?.message || "Error sendding message";
+            enqueueSnackbar(errorMsg, {variant: "error"});
+            console.log("error", error);
         } finally {
             setIsSending(false);
         }
@@ -600,41 +603,122 @@ const DeliveryTab = ({requestId, userRole, request, refreshKey}) => {
     );
 };
 
-const SpecificationPopUp = ({open, onClose, request}) => {
-    const [specs, setSpecs] = useState(
-        (request?.clothes || []).map(c => ({
-            ...c,
-            specification: "",
-            file: null,
-            filePreview: null,
-        }))
-    );
+const SpecificationPopUp = ({ open, onClose, request }) => {
+    useEffect(() => {
+        console.log("request in popup", request);
+        console.log("clothes in popup", request?.clothes);
+    }, [open, request]);
+    const [loading, setLoading] = useState(false);
+    const [specs, setSpecs] = useState([]);
+    useEffect(() => {
+        if (!open || !request?.id) return;
+        setLoading(true);
+        getAllFinalImageByRequestId(request.id)
+            .then(res => {
+                const images = res.data || [];
+                const mappedSpecs = (request?.clothes || []).map(c => {
+                    const frontImg = images.find(img => img.designItemId === c.id && img.imageName === "front");
+                    const backImg  = images.find(img => img.designItemId === c.id && img.imageName === "back");
+                    return {
+                        ...c,
+                        front: { file: null, preview: frontImg ? frontImg.imageUrl : null, uploaded: !!frontImg },
+                        back:  { file: null, preview: backImg  ? backImg.imageUrl  : null, uploaded: !!backImg  }
+                    }
+                });
+                setSpecs(mappedSpecs);
+            })
+            .catch(error => {
+                if (error.response && error.response.status === 404) {
+                    setSpecs((request?.clothes || []).map(c => ({
+                        ...c,
+                        front: { file: null, preview: null, uploaded: false },
+                        back:  { file: null, preview: null, uploaded: false }
+                    })));
+                } else {
+                    enqueueSnackbar("Error loading images!", { variant: "error" });
+                }
+            })
+            .finally(() => setLoading(false));
+    }, [open, request]);
 
-    const handleChange = (index, key, value) => {
-        setSpecs(prev => {
-            const updated = [...prev];
-            updated[index][key] = value;
-            return updated;
-        });
-    };
 
-    const handleFileChange = (index, e) => {
+    console.log("specs", specs);
+    const handleFileChange = (index, side, e) => {
         const file = e.target.files[0];
         if (file) {
-            const filePreview = URL.createObjectURL(file);
-            handleChange(index, "file", file);
-            handleChange(index, "filePreview", filePreview);
+            const preview = URL.createObjectURL(file);
+            setSpecs(prev => {
+                const updated = [...prev];
+                updated[index][side] = { file, preview, uploaded: false };
+                return updated;
+            });
         }
     };
 
-    const handleSubmit = () => {
-        console.log("Specs to submit:", specs);
-        onClose();
+    const uploadToCloudinary = async (file) => {
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("upload_preset", "SmartSew");
+        formData.append("cloud_name", "di1aqthok");
+        const res = await fetch("https://api.cloudinary.com/v1_1/di1aqthok/image/upload", {
+            method: "POST",
+            body: formData,
+        });
+        const data = await res.json();
+        return data.secure_url;
     };
+
+    const handleSubmit = async () => {
+        setLoading(true);
+        try {
+            const imagesPayload = [];
+            for (let i = 0; i < specs.length; i++) {
+                const item = specs[i];
+                if (item.front.file && !item.front.uploaded) {
+                    const url = await uploadToCloudinary(item.front.file);
+                    imagesPayload.push({
+                        designItemId: item.id,
+                        imageName: "front",
+                        imageUrl: url,
+                    });
+                }
+                if (item.back.file && !item.back.uploaded) {
+                    const url = await uploadToCloudinary(item.back.file);
+                    imagesPayload.push({
+                        designItemId: item.id,
+                        imageName: "back",
+                        imageUrl: url,
+                    });
+                }
+            }
+            if (imagesPayload.length === 0) {
+                enqueueSnackbar("No new images to upload.", { variant: "info" });
+                setLoading(false);
+                return;
+            }
+            const data = {
+                requestId: request.id,
+                images: imagesPayload,
+            };
+
+            await addFinalImages(data);
+            enqueueSnackbar("Upload successful!", { variant: "success" });
+            setLoading(false);
+            onClose();
+        } catch (err) {
+            setLoading(false);
+            enqueueSnackbar("Upload failed!", { variant: "error" });
+            console.error("Upload error:", err);
+        }
+    };
+
+    const allUploaded = specs.length > 0 && specs.every(item =>
+        item.front.uploaded && item.back.uploaded
+    );
 
     return (
         <Dialog open={open} onClose={onClose} maxWidth={"md"} fullWidth>
-            <DialogTitle>Upload image for each item</DialogTitle>
+            <DialogTitle>Upload front and back images for each item</DialogTitle>
             <DialogContent dividers>
                 <Box display="flex" flexDirection="column" gap={3}>
                     {specs.map((item, i) => (
@@ -645,43 +729,103 @@ const SpecificationPopUp = ({open, onClose, request}) => {
                             borderRadius={2}
                             bgcolor="#fafafa"
                         >
-                            <Typography variant="h6">{item.type} - {item.category}</Typography>
-                            <TextField
-                                label="Specification / Notes"
-                                value={item.specification}
-                                onChange={e => handleChange(i, "specification", e.target.value)}
-                                fullWidth
-                                sx={{my: 2}}
-                            />
-                            <Box display="flex" alignItems="center" gap={2}>
-                                <Button
-                                    variant="outlined"
-                                    component="label"
-                                    startIcon={<FileUploadIcon/>}
+                            <Typography variant="h6" mb={2}>
+                                {item.type} - {item.category}
+                            </Typography>
+                            <Box display="flex" justifyContent="space-between" gap={6}>
+                                <Box
+                                    flex={1}
+                                    display="flex"
+                                    flexDirection="column"
+                                    alignItems="center"
+                                    borderRight="1px solid #eee"
+                                    pr={4}
                                 >
-                                    Upload Image
-                                    <input
-                                        type="file"
-                                        accept="image/*"
-                                        hidden
-                                        onChange={e => handleFileChange(i, e)}
-                                    />
-                                </Button>
-                                {item.filePreview && (
-                                    <img
-                                        src={item.filePreview}
-                                        alt="Preview"
-                                        style={{height: 60, borderRadius: 8, border: '1px solid #ccc'}}
-                                    />
-                                )}
+                                    <Typography fontWeight="bold" mb={1}>Front</Typography>
+                                    {item.front.preview && (
+                                        <img
+                                            src={item.front.preview}
+                                            alt="Front"
+                                            style={{
+                                                height: 80,
+                                                borderRadius: 8,
+                                                border: item.front.uploaded ? "2px solid #39C661" : "1px solid #ccc",
+                                                marginBottom: 8
+                                            }}
+                                        />
+                                    )}
+                                    {!item.front.uploaded && (
+                                        <Button
+                                            variant="outlined"
+                                            component="label"
+                                            startIcon={<FileUploadIcon />}
+                                            sx={{ mb: 1 }}
+                                            disabled={loading}
+                                        >
+                                            Upload
+                                            <input
+                                                type="file"
+                                                accept="image/*"
+                                                hidden
+                                                onChange={e => handleFileChange(i, "front", e)}
+                                                disabled={loading}
+                                            />
+                                        </Button>
+                                    )}
+                                </Box>
+                                <Box
+                                    flex={1}
+                                    display="flex"
+                                    flexDirection="column"
+                                    alignItems="center"
+                                    pl={4}
+                                >
+                                    <Typography fontWeight="bold" mb={1}>Back</Typography>
+                                    {item.back.preview && (
+                                        <img
+                                            src={item.back.preview}
+                                            alt="Back"
+                                            style={{
+                                                height: 80,
+                                                borderRadius: 8,
+                                                border: item.back.uploaded ? "2px solid #39C661" : "1px solid #ccc",
+                                                marginBottom: 8
+                                            }}
+                                        />
+                                    )}
+                                    {!item.back.uploaded && (
+                                        <Button
+                                            variant="outlined"
+                                            component="label"
+                                            startIcon={<FileUploadIcon />}
+                                            sx={{ mb: 1 }}
+                                            disabled={loading}
+                                        >
+                                            Upload
+                                            <input
+                                                type="file"
+                                                accept="image/*"
+                                                hidden
+                                                onChange={e => handleFileChange(i, "back", e)}
+                                                disabled={loading}
+                                            />
+                                        </Button>
+                                    )}
+                                </Box>
                             </Box>
                         </Box>
                     ))}
                 </Box>
             </DialogContent>
             <DialogActions>
-                <Button onClick={onClose}>Cancel</Button>
-                <Button variant="contained" onClick={handleSubmit}>Submit</Button>
+                <Button onClick={onClose} disabled={loading}>Cancel</Button>
+                <Button
+                    variant="contained"
+                    onClick={handleSubmit}
+                    disabled={loading || allUploaded}
+                >
+                    {allUploaded ? "All Uploaded" : loading ? "Uploading..." : "Submit"}
+                </Button>
             </DialogActions>
         </Dialog>
     );

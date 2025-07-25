@@ -97,6 +97,15 @@ export const makeDeliveryFinalAndRequestComplete = async (deliveryId, requestId)
     const response = await axiosClient.post(`design/makeFinal/${deliveryId}/${requestId}`)
     return response?.data || null;
 }
+export const addFinalImages = async (data) => {
+    const response = await axiosClient.post("/design/final-image", data);
+    return response.data || null;
+}
+
+export const getAllFinalImageByRequestId = async (id) => {
+    const response = await axiosClient.get(`/design/list/final-image/${id}`);
+    return response?.data || null;
+}
 
 
 
