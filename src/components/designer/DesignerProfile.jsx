@@ -34,35 +34,36 @@ function formatPhoneDash(phone) {
 }
 
 //api
-async function handleUpdateDesignerProfile(updatedUser, setUserData, setShowEdit) {
+async function HandleUpdateDesignerProfile(updatedUser, setUserData, setShowEdit) {
+    try {
         const req = {
             accountId: updatedUser.accountId || updatedUser.id || updatedUser.profile.accountId,
             name: updatedUser.profile.name,
             phone: updatedUser.profile.phone,
-            bio: updatedUser.profile.designer.bio,
-            shortProfile: updatedUser.profile.designer.shortPreview,
-            startDate: updatedUser.profile.designer.startTime?.slice(0, 5),
-            endDate: updatedUser.profile.designer.endTime?.slice(0, 5),
+            outsidePreview: updatedUser.profile.partner.outsidePreview,
+            insidePreview: updatedUser.profile.partner.insidePreview,
+            startDate: updatedUser.profile.partner.startTime,
+            endDate: updatedUser.profile.partner.endTime,
         };
 
+        console.log("alo:", req);
         const res = await updateDesignerProfile(req);
-        if (res && res.status === 200) {
-            enqueueSnackbar("Profile updated!", { variant: "success" });
-            setUserData(updatedUser);
-            setShowEdit(false);
-            localStorage.setItem('user', JSON.stringify(updatedUser));
-        } else {
-            enqueueSnackbar(res?.message || "Update failed!", { variant: "error" });
-        }
+        enqueueSnackbar(res?.message || "", {variant: "success"});
+        setUserData(updatedUser);
+        setShowEdit(false);
+        localStorage.setItem('user', JSON.stringify(updatedUser));
+    } catch (error) {
+            enqueueSnackbar(error?.message || "Update failed!", { variant: "error" });
+    }
 }
 
 function EditProfileForm({user, onClose, onSave}) {
     const [name, setName] = useState(user.profile.name || "");
     const [phone, setPhone] = useState(user.profile.phone || "");
-    const [bio, setBio] = useState(user.profile.designer.bio || "");
-    const [shortPreview, setShortPreview] = useState(user.profile.designer.shortPreview || "");
-    const [startTime, setStartTime] = useState(user.profile.designer.startTime || "08:00:00");
-    const [endTime, setEndTime] = useState(user.profile.designer.endTime || "17:00:00");
+    const [outsidePreview, setOutsidePreview] = useState(user.profile.partner.outsidePreview || "");
+    const [insidePreview, setInsidePreview] = useState(user.profile.partner.insidePreview || "");
+    const [startTime, setStartTime] = useState(user.profile.partner.startTime || "08:00:00");
+    const [endTime, setEndTime] = useState(user.profile.partner.endTime || "17:00:00");
 
 
     const handleSave = () => {
@@ -72,10 +73,10 @@ function EditProfileForm({user, onClose, onSave}) {
                 ...user.profile,
                 name,
                 phone,
-                designer: {
-                    ...user.profile.designer,
-                    bio,
-                    shortPreview,
+                partner: {
+                    ...user.profile.partner,
+                    outsidePreview,
+                    insidePreview,
                     startTime,
                     endTime,
                 },
@@ -162,20 +163,20 @@ function EditProfileForm({user, onClose, onSave}) {
                                 />
                             </Stack>
                             <TextField
-                                label="About (Bio)"
+                                label="About (OutsidePreview)"
                                 fullWidth
                                 multiline
                                 minRows={3}
-                                value={bio}
-                                onChange={e => setBio(e.target.value)}
+                                value={outsidePreview}
+                                onChange={e => setOutsidePreview(e.target.value)}
                             />
                             <TextField
-                                label="Short Review"
+                                label="Inside Preview"
                                 fullWidth
                                 multiline
                                 minRows={2}
-                                value={shortPreview}
-                                onChange={e => setShortPreview(e.target.value)}
+                                value={insidePreview}
+                                onChange={e => setInsidePreview(e.target.value)}
                             />
                         </Stack>
                         <Stack direction="row" spacing={2} justifyContent="flex-end" mt={3}>
@@ -213,7 +214,7 @@ function RenderLeftArea({onEditProfile, user}) {
                             <Stack direction="row" spacing={1} alignItems="center">
                                 <AccessTimeIcon fontSize="small" color="action"/>
                                 <Typography variant="body2">Working
-                                    time: {formatTimeToAMPM(user.profile.designer.startTime)} - {formatTimeToAMPM(user.profile.designer.endTime)}</Typography>
+                                    time: {formatTimeToAMPM(user.profile.partner.startTime)} - {formatTimeToAMPM(user.profile.partner.endTime)}</Typography>
                             </Stack>
                         </Stack>
                         <Button
@@ -272,7 +273,7 @@ function RenderRightArea({user}) {
                                 About
                             </Typography>
                             <Typography variant="body2" color="text.secondary">
-                                {user.profile.designer.bio}
+                                {user.profile.partner.outsidePreview || "You haven't added an outside preview yet."}
                             </Typography>
                         </CardContent>
                         <CardContent>
@@ -280,7 +281,7 @@ function RenderRightArea({user}) {
                                 Short review
                             </Typography>
                             <Typography variant="body2" color="text.secondary">
-                                {user.profile.designer.shortPreview || "You haven't added a short review yet."}
+                                {user.profile.partner.insidePreview || "You haven't added a short review yet."}
                             </Typography>
                         </CardContent>
                     </Card>
@@ -315,7 +316,7 @@ export default function DesignerProfile() {
     const [userData, setUserData] = useState(user);
 
     const handleSave = (updatedUser) => {
-        handleUpdateDesignerProfile(updatedUser, setUserData, setShowEdit);
+        HandleUpdateDesignerProfile(updatedUser, setUserData, setShowEdit);
     };
     return (
         <Box sx={{minHeight: "100vh", py: 5}}>

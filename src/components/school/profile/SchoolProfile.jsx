@@ -33,38 +33,39 @@ import {motion, AnimatePresence} from "framer-motion";
 import {useState} from "react";
 import {enqueueSnackbar} from "notistack";
 import {updateSchoolProfile} from "../../../services/ProfileService.jsx";
+import * as res from "antd";
 
 
 const user = JSON.parse(localStorage.getItem('user'))
 
 const checklist = [
     {
-        icon: <InfoOutlinedIcon color="primary" />,
+        icon: <InfoOutlinedIcon color="primary"/>,
         title: "...",
         desc: "...",
         action: "Add"
     },
     {
-        icon: <AddCircleOutlineIcon color="primary" />,
+        icon: <AddCircleOutlineIcon color="primary"/>,
         title: "Add contact for your profile",
         desc: "Upload a photo and info for more experience...",
         action: "Add"
     },
     {
-        icon: <WorkOutlineIcon color="primary" />,
+        icon: <WorkOutlineIcon color="primary"/>,
         title: "...",
         desc: "...",
         action: "Add"
     },
     {
-        icon: <AccessTimeIcon color="primary" />,
+        icon: <AccessTimeIcon color="primary"/>,
         title: "...",
         desc: "...",
         action: "Add"
     }
 ];
 
-function RenderLeftArea({onEditProfile, user}){
+function RenderLeftArea({onEditProfile, user}) {
     const navigate = useNavigate()
     return (
         <>
@@ -73,27 +74,28 @@ function RenderLeftArea({onEditProfile, user}){
                     <CardContent>
                         <img src={user.profile.avatar} referrerPolicy={"no-referrer"} alt={user.profile.name}/>
                         <Typography variant="h6" fontWeight="bold">{user.profile.name}</Typography>
-                        <Typography variant="body2" color="text.secondary" mb={2}>@{user.profile.name.normalize("NFD").replace(/[\u0300-\u036f]/g, "").split(" ").join("")}</Typography>
-                        <Divider sx={{ my: 1.5 }} />
-                        <Stack spacing={1} sx={{ textAlign: "left", pl: 2, mb: 2 }}>
+                        <Typography variant="body2" color="text.secondary"
+                                    mb={2}>@{user.profile.name.normalize("NFD").replace(/[\u0300-\u036f]/g, "").split(" ").join("")}</Typography>
+                        <Divider sx={{my: 1.5}}/>
+                        <Stack spacing={1} sx={{textAlign: "left", pl: 2, mb: 2}}>
                             <Stack direction="row" spacing={1} alignItems="center">
-                                <PublicIcon fontSize="small" color="action" />
+                                <PublicIcon fontSize="small" color="action"/>
                                 <Typography variant="body2">Located in Viet Nam</Typography>
                             </Stack>
                             <Stack direction="row" spacing={1} alignItems="center">
-                                <CalendarMonthIcon fontSize="small" color="action" />
+                                <CalendarMonthIcon fontSize="small" color="action"/>
                                 <Typography variant="body2">Joined in {dateFormatter(user.registerDate)}</Typography>
                             </Stack>
                             <Stack direction="row" spacing={1} alignItems="center">
-                                <AccessTimeIcon fontSize="small" color="action" />
+                                <AccessTimeIcon fontSize="small" color="action"/>
                                 <Typography variant="body2">Preferred working hours</Typography>
                             </Stack>
                         </Stack>
                         <Button
                             variant="outlined"
                             fullWidth
-                            startIcon={<RemoveRedEyeIcon />}
-                            sx={{ mb: 1, borderRadius: 2, textTransform: "none", fontWeight: "bold" }}
+                            startIcon={<RemoveRedEyeIcon/>}
+                            sx={{mb: 1, borderRadius: 2, textTransform: "none", fontWeight: "bold"}}
                             onClick={() => navigate("/school/order")}
                         >
                             View my orders
@@ -101,8 +103,8 @@ function RenderLeftArea({onEditProfile, user}){
                         <Button
                             variant="outlined"
                             fullWidth
-                            endIcon={<ArrowForwardIcon />}
-                            sx={{ mb:1, borderRadius: 2, textTransform: "none", fontWeight: "bold" }}
+                            endIcon={<ArrowForwardIcon/>}
+                            sx={{mb: 1, borderRadius: 2, textTransform: "none", fontWeight: "bold"}}
                             onClick={() => navigate("/home")}
                         >
                             Explore UniSew
@@ -110,8 +112,8 @@ function RenderLeftArea({onEditProfile, user}){
                         <Button
                             variant="outlined"
                             fullWidth
-                            startIcon={<EditIcon />}
-                            sx={{ borderRadius: 2, textTransform: "none", fontWeight: "bold" }}
+                            startIcon={<EditIcon/>}
+                            sx={{borderRadius: 2, textTransform: "none", fontWeight: "bold"}}
                             onClick={onEditProfile}
                         >
                             Edit profile
@@ -125,6 +127,7 @@ function RenderLeftArea({onEditProfile, user}){
 
 //api
 async function handleUpdateSchoolProfile(updatedUser, setUserData, setShowEdit) {
+    try {
         const req = {
             accountId: updatedUser.accountId || updatedUser.id || updatedUser.profile.accountId,
             name: updatedUser.profile.name,
@@ -132,14 +135,13 @@ async function handleUpdateSchoolProfile(updatedUser, setUserData, setShowEdit) 
         };
 
         const res = await updateSchoolProfile(req);
-        if (res && res.status === 200) {
-            enqueueSnackbar(res?.message || "Profile updated!", { variant: "success" });
-            setUserData(updatedUser);
-            setShowEdit(false);
-            localStorage.setItem('user', JSON.stringify(updatedUser));
-        } else {
-            enqueueSnackbar(res?.message || "Update failed!", { variant: "error" });
-        }
+        setUserData(updatedUser);
+        setShowEdit(false);
+        localStorage.setItem('user', JSON.stringify(updatedUser));
+        enqueueSnackbar(res?.message || "Profile updated!", {variant: "success"});
+    } catch (error) {
+        enqueueSnackbar(error?.message || "Update failed!", {variant: "error"});
+    }
 }
 
 function EditProfileForm({user, onClose, onSave}) {
@@ -227,29 +229,31 @@ function EditProfileForm({user, onClose, onSave}) {
     );
 }
 
-function RenderRightArea(){
-    return(
+function RenderRightArea() {
+    return (
         <>
             <Grid item xs={12} md={8}>
-                <Box sx={{ mb: 2 }}>
+                <Box sx={{mb: 2}}>
                     <Typography variant="h5" fontWeight="bold" mb={1}>
-                        Hi {user.profile.name} <span role="img" aria-label="wave">👋</span> Let’s help UniSew get to know you
+                        Hi {user.profile.name} <span role="img" aria-label="wave">👋</span> Let’s help UniSew get to know
+                        you
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
-                        Get the most out of UniSew by sharing a bit more about yourself and how you prefer to work with us.
+                        Get the most out of UniSew by sharing a bit more about yourself and how you prefer to work with
+                        us.
                     </Typography>
                 </Box>
 
                 <Paper elevation={6}>
-                    <Card sx={{ mb: 3}}>
+                    <Card sx={{mb: 3}}>
                         <CardContent>
                             <Typography variant="subtitle1" fontWeight="bold" mb={1.5}>
                                 Profile checklist
                             </Typography>
                             <List disablePadding>
                                 {checklist.map((item, i) => (
-                                    <ListItem key={i} disablePadding sx={{ alignItems: "flex-start", mb: 1.5 }}>
-                                        <ListItemIcon sx={{ mt: 0.5 }}>{item.icon}</ListItemIcon>
+                                    <ListItem key={i} disablePadding sx={{alignItems: "flex-start", mb: 1.5}}>
+                                        <ListItemIcon sx={{mt: 0.5}}>{item.icon}</ListItemIcon>
                                         <ListItemText
                                             primary={
                                                 <Stack direction="row" spacing={1} alignItems="center">
@@ -261,22 +265,23 @@ function RenderRightArea(){
                                                             label={`${item.percent}%`}
                                                             color={item.percent === 100 ? "success" : "primary"}
                                                             size="small"
-                                                            sx={{ fontWeight: 600 }}
+                                                            sx={{fontWeight: 600}}
                                                         />
                                                     )}
                                                 </Stack>
                                             }
                                             secondary={item.desc}
-                                            secondaryTypographyProps={{ color: "text.secondary" }}
+                                            secondaryTypographyProps={{color: "text.secondary"}}
                                         />
                                         <Box>
                                             {item.percent === 75 ? (
-                                                <Typography variant="body2" color="primary" fontWeight="bold">75%</Typography>
+                                                <Typography variant="body2" color="primary"
+                                                            fontWeight="bold">75%</Typography>
                                             ) : (
                                                 <Button
                                                     size="small"
-                                                    sx={{ textTransform: "none", fontWeight: 600, color: "#3488e2" }}
-                                                    endIcon={<ChevronRightIcon fontSize="small" />}
+                                                    sx={{textTransform: "none", fontWeight: 600, color: "#3488e2"}}
+                                                    endIcon={<ChevronRightIcon fontSize="small"/>}
                                                 >
                                                     {item.action}
                                                 </Button>
@@ -290,12 +295,12 @@ function RenderRightArea(){
                 </Paper>
 
                 <Paper elevation={6}>
-                    <Card sx={{textAlign: "center" }}>
+                    <Card sx={{textAlign: "center"}}>
                         <CardContent>
                             <Typography variant="subtitle1" fontWeight="bold" mb={2}>
                                 My feedback history
                             </Typography>
-                            <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+                            <Box sx={{display: "flex", flexDirection: "column", alignItems: "center"}}>
                                 <Typography variant="body2" color="text.secondary">
                                     You haven't left any feedback yet.
                                 </Typography>
@@ -317,10 +322,10 @@ export default function SchoolProfile() {
         handleUpdateSchoolProfile(updatedUser, setUserData, setShowEdit);
     };
     return (
-        <Box sx={{minHeight: "100vh", py: 5 }}>
+        <Box sx={{minHeight: "100vh", py: 5}}>
 
-            <Box sx={{ maxWidth: 1400, mx: "auto" }}>
-                <Grid container spacing={3} >
+            <Box sx={{maxWidth: 1400, mx: "auto"}}>
+                <Grid container spacing={3}>
                     <RenderLeftArea onEditProfile={() => setShowEdit(true)} user={userData}/>
                     <RenderRightArea user={userData}/>
                 </Grid>
